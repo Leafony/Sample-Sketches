@@ -14,7 +14,7 @@
 //		Released under the MIT license
 //		https://opensource.org/licenses/MIT
 //
-//      Rev.00 2019/08/01 First release
+//      Rev.00 2019/08/20 First release
 //=====================================================================
 //use libraries
 //Adafruit LIS3DH
@@ -252,6 +252,23 @@ float dataTemp, avrTemp;
 float dataHumid, avrHumid;
 float calcTemp = 0;
 float calcHumid = 0;
+
+//---------------------------
+// 2点補正用データ
+//---------------------------
+// 温度補正用データ0
+float TL0 = 25.0;     // 4-Sensors温度測定値
+float TM0 = 25.0;     // 温度計等測定値
+// 温度補正用データ1
+float TL1 = 40.0;     // 4-Sensors温度測定値
+float TM1 = 40.0;     // 温度計等測定値
+
+// 湿度補正用データ0
+float HL0 = 60.0;     // 4-Sensors湿度測定値
+float HM0 = 60.0;     // 湿度計等測定値
+// 湿度補正用データ1
+float HL1 = 80.0;     // 4-Sensors湿度測定値
+float HM1 = 80.0;     // 湿度計等測定値
 
 //---------------------------
 // OPT3001 : Light
@@ -770,10 +787,11 @@ void loopSensor(){
     dataTemp = (float)smeHumidity.readTemperature();  //温度
     dataHumid = (float)smeHumidity.readHumidity();    //湿度
 
-   if (dataHumid >= 100)
-     {
-      dataHumid=100;
-     }
+    //-------------------------
+    // 温度と湿度の2点補正
+    //-------------------------
+    dataTemp=TM0+(TM1-TM0)*(dataTemp-TL0)/(TL1-TL0);      // 温度補正
+    dataHumid=HM0+(HM1-HM0)*(dataHumid-HL0)/(HL1-HL0);    // 湿度補正
 
     //-------------------------
     // OPT3001
