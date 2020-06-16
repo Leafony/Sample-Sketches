@@ -344,12 +344,9 @@ void setupSensor() {
   //-------------------
   // register
   //-------------------
-  accel.writeRegister8(LIS3DH_REG_CTRL1, 0x07);    //X,Y,Z axis = enable
-  accel.setDataRate(LIS3DH_DATARATE_1_HZ);         //Data rate = 1Hz
-
-  accel.writeRegister8(LIS3DH_REG_CTRL2, 0x00);
-  accel.writeRegister8(LIS3DH_REG_CTRL3, 0x00);    // INT Disable
-  accel.writeRegister8(LIS3DH_REG_CTRL4, 0x80);    //BUD = enable, Scale = +/-2g
+  accel.setClick(0, 0);                      // Disable interrupt to save power
+  accel.setRange(LIS3DH_RANGE_2_G);          // Full scale +/- 2G
+  accel.setDataRate(LIS3DH_DATARATE_1_HZ);   // Data rate = 1Hz
 
   /*
     //-------------------
