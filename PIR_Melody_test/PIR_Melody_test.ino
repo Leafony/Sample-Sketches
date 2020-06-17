@@ -9,7 +9,7 @@
 //       (2) AP01 AVR MCU
 //       (3) AZ01 USB
 //
-//		(c) 2019  Trillion-Node Study Group
+//		(c) 2020  Trillion-Node Study Group
 //		Released under the MIT license
 //		https://opensource.org/licenses/MIT
 //
@@ -41,7 +41,7 @@ double irData;
 double tempData;
 char buf[120];
 
-volatile int state = 0; 
+volatile int state = 0;
 
 //=====================================================================
 // setup
@@ -49,13 +49,13 @@ volatile int state = 0;
 void setup() {
   //pinMode(2, INPUT);
   attachInterrupt(0,catchHuman , FALLING );           //人接近検知割り込み
-  
+
   Wire.begin();
   Serial.begin( 115200 );
   delay(100);
 
   //人感センサ設定
-  i2c_write_byte(I2C_PIR_ADDR, 0x20, 0xFF); //CNTL1  Resrt 
+  i2c_write_byte(I2C_PIR_ADDR, 0x20, 0xFF); //CNTL1  Resrt
   i2c_write_byte(I2C_PIR_ADDR, 0x2A, 0xF2); //CNTL11 人感アルゴリズム有効/割り込み出力有効
   i2c_write_byte(I2C_PIR_ADDR, 0x25, 0x0F); //CNTL6  センサゲイン205%(最大)
   i2c_write_byte(I2C_PIR_ADDR, 0x2B, 0xFF); //CNTL12 Mode=1 start Meas(連続測定モード)
@@ -124,8 +124,7 @@ void loop() {
     }
     state = 0;
   }
-  delay(1000);  
-  
+  delay(1000);
 }
 
 //=====================================================================
@@ -139,7 +138,7 @@ double clacTemp(){
   double ret;
   unsigned short val = (unsigned short)((i2c_receiveBuf[4] << 8) |  i2c_receiveBuf[3]);
   if ( (val & 0x8000) == 0x8000)  {
-     val = ~val + 1;     
+     val = ~val + 1;
      ret = (double)((val) *   0.0019837 ) * -1;
   }
   else  {
@@ -158,7 +157,7 @@ double clacIR(){
   }
   else  {
     ret = (double)(val *  0.4578 );
-  } 
+  }
   return ret;
 }
 /**********************************************

@@ -9,7 +9,7 @@
 //       (2) AI01 4-Sensors
 //       (3) AP01 AVR MCU
 //
-//		(c) 2019  Trillion-Node Study Group
+//		(c) 2020  Trillion-Node Study Group
 //		Released under the MIT license
 //		https://opensource.org/licenses/MIT
 //
@@ -136,13 +136,13 @@ void setupPort(){
 
   pinMode(LED,OUTPUT);          // PD4 : digital 4 = LED
   digitalWrite(LED,LOW);
-  
+
   pinMode(CN3_D5,OUTPUT);       // PD5 : digital 5 = not used
   digitalWrite(CN3_D5,LOW);
 
   pinMode(DISCN,OUTPUT);        // PD6 : digital 6 = BLE disconnect
   digitalWrite(DISCN,HIGH);
-  
+
   pinMode(BLSLP, OUTPUT);       // PD7 : digital 7 = BLE sleep
   digitalWrite(BLSLP, HIGH);
 
@@ -268,7 +268,7 @@ void setup() {
   interrupts();
 
   setupLoRa();
-  
+
   MsTimer2::start();      // Timer2 inverval start
 
   rxData = "";
@@ -288,7 +288,7 @@ void loopLoRa()
       if (c == '{') {
         inputString += c;
         analysisStage = 1;
-      }      
+      }
     }
     else if (analysisStage == 1) {
       inputString += c;

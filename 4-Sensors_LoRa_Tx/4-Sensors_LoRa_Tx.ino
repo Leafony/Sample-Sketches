@@ -9,7 +9,7 @@
 //       (2) AI01 4-Sensors
 //       (3) AP01 AVR MCU
 //
-//		(c) 2019  Trillion-Node Study Group
+//		(c) 2020  Trillion-Node Study Group
 //		Released under the MIT license
 //		https://opensource.org/licenses/MIT
 //
@@ -551,7 +551,7 @@ void sensor_read() {
 
   // LoRaデータ送信
   lora.println(json);
-  
+
   sleepLoRa();
 }
 
@@ -648,7 +648,7 @@ void loopSleep(){
   if(eventSleepCheck == 1){
 
     eventSleepCheck = 0;
-    
+
     wdt_reset();
     bSleep = 1;
     countWDT = 0;
@@ -667,17 +667,17 @@ void loopSleep(){
     // ATMega328 sleep
     //-----------------------
     set_sleep_mode(SLEEP_MODE_PWR_DOWN);        // ATMega328 power down mode
- 
+
     while(bSleep == 1){
 
       ADCSRA &= ~(1 << ADEN);                  // ADC = OFF in sleep
       noInterrupts();
       sleep_enable();
       MCUCR = bit (BODS) | bit (BODSE);        // BOD = OFF in sleep
-      MCUCR = bit (BODS); 
+      MCUCR = bit (BODS);
       interrupts();
       sleep_cpu();                             // Enter sleep
-        
+
       sleep_disable();                         // Exit sleep
     }
 
@@ -757,7 +757,7 @@ void loop() {
     // loop counter /event
     //--------------------------------------------
     loopCounter();
-    
+
     //--------------------------------------------
     // sleep/resume
     //--------------------------------------------

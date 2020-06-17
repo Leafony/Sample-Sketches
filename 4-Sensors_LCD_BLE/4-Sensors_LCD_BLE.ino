@@ -11,7 +11,7 @@
 //       (4) AP01 AVR MCU
 //       (5) AZ01 USB
 //
-//    (c) 2019 Trillion-Node Study Group
+//    (c) 2020 Trillion-Node Study Group
 //    Released under the MIT license
 //    https://opensource.org/licenses/MIT
 //
@@ -983,7 +983,7 @@ void bt_sendData(){
     value = 0;
   }
   dtostrf(value,4,0,pips);
-  
+
   //-------------------------
   // Battery Voltage (4Byte)
   //-------------------------

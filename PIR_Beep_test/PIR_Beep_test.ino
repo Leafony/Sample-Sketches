@@ -9,7 +9,7 @@
 //       (2) AP01 AVR MCU
 //       (3) AZ01 USB
 //
-//		(c) 2019  Trillion-Node Study Group
+//		(c) 2020  Trillion-Node Study Group
 //		Released under the MIT license
 //		https://opensource.org/licenses/MIT
 //
@@ -35,7 +35,7 @@ double irData;
 double tempData;
 char buf[120];
 
-volatile int state = 0; 
+volatile int state = 0;
 
 //=====================================================================
 // setup
@@ -43,7 +43,7 @@ volatile int state = 0;
 void setup() {
   //pinMode(2, INPUT);
   attachInterrupt(0,catchHuman , FALLING );           //人接近検知割り込み
-  
+
   Wire.begin();
   Serial.begin( 115200 );
   delay(100);
@@ -82,8 +82,7 @@ void loop() {
     tone(5, 262, 300);
     state = 0;
   }
-  delay(1000);  
-  
+  delay(1000);
 }
 
 //=====================================================================
@@ -95,12 +94,12 @@ void catchHuman()
 
 //=====================================================================
 double clacTemp()
-{  
+{
   double ret;
   unsigned short val = (unsigned short)((i2c_receiveBuf[4] << 8) |  i2c_receiveBuf[3]);
   if ( (val & 0x8000) == 0x8000)
   {
-     val = ~val + 1;     
+     val = ~val + 1;
      ret = (double)((val) *   0.0019837 ) * -1;
   }
   else
@@ -112,7 +111,7 @@ double clacTemp()
 
 //=====================================================================
 double clacIR()
-{  
+{
   double ret;
   unsigned short val = (unsigned short)((i2c_receiveBuf[2] << 8) |  i2c_receiveBuf[1]);
   if ( (val & 0x8000) == 0x8000)
@@ -123,7 +122,7 @@ double clacIR()
   else
   {
     ret = (double)(val *  0.4578 );
-  } 
+  }
   return ret;
 }
 /**********************************************

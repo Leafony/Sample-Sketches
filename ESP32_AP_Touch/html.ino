@@ -152,7 +152,7 @@ void html(WiFiClient &client,  int update, uint32_t ip){
 //====================================================================
 void htmlMesg(WiFiClient &client, char *txt, uint32_t ip){
     char s_ip[16];
-    
+
     sprintf(s_ip,"%d.%d.%d.%d",
         ip & 255,
         ip>>8 & 255,

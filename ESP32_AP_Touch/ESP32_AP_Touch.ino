@@ -8,7 +8,7 @@
 //       (1) AP02A ESP MCU
 //       (2) AX08A 29pin header
 //
-//    (c) 2019 Trillion-Node Study Group
+//    (c) 2020 Trillion-Node Study Group
 //    Released under the MIT license
 //    https://opensource.org/licenses/MIT
 //
@@ -69,7 +69,7 @@ int threshold = 20;                                           // Touch 検出閾
 // }
 
 //====================================================================
-void setup(){ 
+void setup(){
     Serial.begin(115200);                                     // デバッグシリアル出力開始
     Serial.println("Wi-Fi & Touch Sensor Test");              // シリアル出力表示
 
@@ -103,7 +103,7 @@ void loop(){
     int len=0;                                                // 文字列等の長さカウント用
     int t_wait=0;                                             // 更新時間カウント用
     int i,f_size;
-    
+
     delay(500);                                               // Wait：これが短いと”このページは動作していません"が頻発する
     client = server.available();                              // 接続されたクライアントを生成
 

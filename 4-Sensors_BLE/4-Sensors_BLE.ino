@@ -10,7 +10,7 @@
 //       (3) AP01 AVR MCU
 //       (4) AZ01 USB
 //
-//    (c) 2019 Trillion-Node Study Group
+//    (c) 2020 Trillion-Node Study Group
 //    Released under the MIT license
 //    https://opensource.org/licenses/MIT
 //

@@ -11,7 +11,7 @@
 //       (4) AV02 CR2450 or AV01 CR2032
 //       (5) AZ01 USB		(for debug)
 //
-//		(c) 2019  Trillion-Node Study Group
+//		(c) 2020  Trillion-Node Study Group
 //		Released under the MIT license
 //		https://opensource.org/licenses/MIT
 //
@@ -43,7 +43,7 @@
 #include <avr/power.h>
 
 #include <Wire.h>
-#include <Adafruit_LIS3DH.h>    
+#include <Adafruit_LIS3DH.h>
 #include <Adafruit_Sensor.h>
 #include <HTS221.h>
 #include <ClosedCube_OPT3001.h>
@@ -78,7 +78,7 @@
 #define PCRX  1
 #define INT0  2
 #define INT1  3
-#define RSV_D4  4       
+#define RSV_D4  4
 #define RSV_D5  5
 #define RSV_D6  6
 #define RSV_D7  7
@@ -120,12 +120,12 @@
 
 //=====================================================================
 // プログラム内で使用する定数定義
-// 
+//
 //=====================================================================
 //-----------------------------------------------
 //３軸センサ、輝度センサ I2Cアドレス
 //-----------------------------------------------
-#define LIS2DH_ADDRESS 0x19       // SD0/SA0 pin = VCC 
+#define LIS2DH_ADDRESS 0x19       // SD0/SA0 pin = VCC
 #define OPT3001_ADDRESS 0x45      // ADDR pin = VCC
 #define I2C_EXPANDER_ADDR_LCD   0x1A
 
@@ -155,16 +155,16 @@
 // Sensor
 //-----------------------------------------------
 Adafruit_LIS3DH accel = Adafruit_LIS3DH();
-ClosedCube_OPT3001 light;      
+ClosedCube_OPT3001 light;
 
 //-----------------------------------------------
 // LCD
 //-----------------------------------------------
   ST7032 lcd;
- 
+
 //=====================================================================
 // プログラムで使用する変数定義
-// 
+//
 //=====================================================================
 //=====================================================================
 // RAM data
@@ -233,12 +233,11 @@ float calcLight = 0;
 // LCD
 //---------------------------
 volatile bool  bLCDchange = false;
-volatile int lcd_view_sts = 0; 
+volatile int lcd_view_sts = 0;
 
 //---------------------------
 // Sleep, Watchdog Timer
 //---------------------------
-
 volatile int countWDT = 0;
 volatile int wakeupWDT = 2;
 
@@ -278,11 +277,11 @@ void setupPort(){
   // PC port
   //---------------------
   // PC4 : digital 18 = I2C SDA
-  // PC5 : digital 19 = I2C SCL 
+  // PC5 : digital 19 = I2C SCL
 }
 //=====================================================================
 // 割り込み処理初期設定
-// 
+//
 //=====================================================================
 //-----------------------------------------------
 // external interrupt
@@ -304,7 +303,7 @@ void setupTC2Int(){
 }
 //=====================================================================
 // I2C　制御関数
-// 
+//
 //=====================================================================
 //-----------------------------------------------
 //I2C スレーブデバイスに1バイト書き込む
@@ -334,7 +333,7 @@ unsigned char i2c_read_byte(int device_address, int reg_address){
 
 //=====================================================================
 // 各デバイスの初期設定
-// 
+//
 //=====================================================================
 //-----------------------------------------------
 // sensor
@@ -359,7 +358,7 @@ void setupSensor(){
   //-------------------------------------
   // HTS221 (temperature /humidity)
   //-------------------------------------
-  smeHumidity.begin(); 
+  smeHumidity.begin();
 
   //-------------------------------------
   // OPT3001 (light)
@@ -379,9 +378,9 @@ void setupSensor(){
   newConfig.ConvertionTime = B1;               // convertion time = 800ms
   newConfig.ModeOfConversionOperation = B11;   // continous conversion
   newConfig.Latch = B0;                        // hysteresis-style
-  
+
   errorConfig = light.writeConfig(newConfig);
-  
+
   if(errorConfig != NO_ERROR){
     errorConfig = light.writeConfig(newConfig);   //retry
   }
@@ -389,7 +388,7 @@ void setupSensor(){
 
 //=====================================================================
 // 割り込み処理
-// 
+//
 //=====================================================================
 //=====================================================================
 // interrupt
@@ -506,7 +505,7 @@ void loopSensor(){
     }
 
     dataTilt = acos(dataZ_g)/PI*180;
-    
+
     //-------------------------
     // HTS221
     // 温湿度センサーデータ取得
@@ -544,7 +543,7 @@ void loopSensor(){
   adcVal1 = Wire.read();
   adcVal2 = Wire.read();
 
-  if (adcVal1 == 0xff && adcVal2 == 0xff) { 
+  if (adcVal1 == 0xff && adcVal2 == 0xff) {
     //測定値がFFならバッテリリーフはつながっていない
     adcVal1 = adcVal2 = 0;
   }
@@ -559,8 +558,8 @@ void loopSensor(){
     //-------------------------
 #ifdef DEBUG
     Serial.println("");
-#if 0    
-    Serial.println("--- sensor data ---");    
+#if 0
+    Serial.println("--- sensor data ---");
     Serial.println("  Tmp[degC]     = " + String(dataTemp));
     Serial.println("  Hum[%]        = " + String(dataHumid));
     Serial.println("  Lum[lx]       = " + String(dataLight));
@@ -570,7 +569,7 @@ void loopSensor(){
     //Serial.println(" Accel X,Y,Z" + String(dataX_g) + " " + String(dataY_g) + " " + String(dataZ_g));
 #else
     Serial.println("T =" + String(dataTemp) + " H =" + String(dataHumid) + " L=" + String(dataLight) + " A=" + String(dataTilt) + " V=" + String(dataBatt));
-#endif    
+#endif
 #endif
 
 
@@ -591,7 +590,7 @@ void getBattVal()
   adcVal1 = Wire.read();
   adcVal2 = Wire.read();
 
-  if (adcVal1 == 0xff && adcVal2 == 0xff) { 
+  if (adcVal1 == 0xff && adcVal2 == 0xff) {
     //測定値がFFならバッテリリーフはつながっていない
     adcVal1 = adcVal2 = 0;
   }
@@ -600,7 +599,7 @@ void getBattVal()
   //dataBatt = (((adcVal1 << 4) | (adcVal2 >> 4)) * (3.3 / 256)) * 2 ;
   double temp_mv = ((double)((adcVal1 << 4) | (adcVal2 >> 4)) * 3300 * 2) / 256;
   float batval = (float)(temp_mv / 1000);
-  Serial.println(" V=" + String(batval));  
+  Serial.println(" V=" + String(batval));
 }
 void loopLCD( void ){
     /*  */
@@ -615,7 +614,7 @@ void loopLCD( void ){
 // センサーデータを文字列に変換してLCDに表示する
 //---------------------------------------
 void veiwSencerData(){
- 
+
   float value;
   char temp[7], humid[7], light[7], tilt[7],battVolt[7];
   char code[4];
@@ -635,27 +634,27 @@ void veiwSencerData(){
   if(value >= 100){
     value = 99.9;
   }
-  else if(value <= -10){    
+  else if(value <= -10){
     value = -9.9;
-  } 
+  }
   dtostrf(value,4,1,temp);
 
   //-------------------------
   // Humidity (4Byte)
   //-------------------------
-  value = dataHumid;   
+  value = dataHumid;
   dtostrf(value,4,1,humid);
 
   //-------------------------
   // Ambient Light (5Byte)
   //-------------------------
   value = dataLight;
-    
+
   if(value >= 100000){
     value = 99999;
-  }      
+  }
   dtostrf(value,5,0,light);
- 
+
   //-------------------------
   // Tilt (4Byte)
   //-------------------------
@@ -676,10 +675,10 @@ void veiwSencerData(){
   }
   dtostrf(value, 4, 2, battVolt);
 
- 
+
   trim(temp);
   trim(humid);
-  trim(light); 
+  trim(light);
   trim(tilt);
   trim(battVolt);
 
@@ -687,22 +686,22 @@ void veiwSencerData(){
   switch (lcd_view_sts)
   {
     case 0:
-      //                 Tmp XX.X [degC]       
+      //                 Tmp XX.X [degC]
       lcd.print("Temp");
       lcd.setCursor(0, 1);
-      lcd.print( String(temp) +" C");        
+      lcd.print( String(temp) +" C");
       break;
     case 1:
       //                 Hum xx.x [%]
       lcd.print("Humidity");
       lcd.setCursor(0, 1);
-      lcd.print( String(humid) +" %");     
+      lcd.print( String(humid) +" %");
       break;
     case 2:
       //                 Lum XXXXX [lx]
       lcd.print("Luminous");
       lcd.setCursor(0, 1);
-      lcd.print( String(light) +" lx"); 
+      lcd.print( String(light) +" lx");
       break;
     case 3:
       //                 Ang XXXX [arc deg]
@@ -727,13 +726,13 @@ void veiwSencerData(){
   }
 
 //debug//
-#ifdef DEBUG 
+#ifdef DEBUG
  //getBattVal();
 #endif
 //debug//
 }
 //---------------------------------------
-// trim 
+// trim
 // 文字列配列からSPを削除する
 //---------------------------------------
 void trim(char * data)
@@ -782,13 +781,13 @@ void loopSleep(){
 
 #ifdef DEBUG
         Serial.println("  <<< Wake up <<<");
-#endif        
+#endif
     }
 }
 //-----------------------------------------
 // SLEEP
 //-----------------------------------------
-void sleep(){  
+void sleep(){
   ADCSRA &= ~(1 << ADEN);                 //ADC停止
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);    //SET SLEEP MODE
   sleep_enable();                         // SLEEP ENABLE
@@ -796,7 +795,7 @@ void sleep(){
   // BOD停止
   MCUCR |= (1 << BODSE) | (1 << BODS);             // MCUCRのBODSとBODSEに1をセット
   MCUCR = (MCUCR & ~(1 << BODSE)) | (1 << BODS);  // すぐに（4クロック以内）BODSSEを0, BODSを1に設定
-  asm("sleep");                                   // 3クロック以内にスリープ 
+  asm("sleep");                                   // 3クロック以内にスリープ
   sleep_disable();                         // SLEEP DISABLE
 }
 //-----------------------------------------
@@ -805,7 +804,7 @@ void sleep(){
 void wdt_start(){
   // watchdog timer reset
   wdt_reset();
-  
+
   //disable interruput
   cli();
   //clear WatchDog system Reset Flag(WDRF)
@@ -838,7 +837,7 @@ void sleepSensor(){
 
     errorConfig = light.writeConfig(newConfig);
   }
-    
+
   //-----------------------
   // LIS2DH sleep
   //-----------------------
@@ -860,7 +859,7 @@ void wakeupSensor(){
   //-----------------------
   OPT3001_Config newConfig;
   OPT3001_ErrorCode errorConfig;
-      
+
   newConfig.RangeNumber = B1100;               //automatic full scale
   newConfig.ConvertionTime = B1;               //convertion time = 800ms
   newConfig.ModeOfConversionOperation = B11;   //continous conversion
@@ -871,16 +870,16 @@ void wakeupSensor(){
 
     errorConfig = light.writeConfig(newConfig);   //retry
   }
-      
+
   //-----------------------
   // LIS2DH wakeup
   //-----------------------
   accel.setDataRate(LIS3DH_DATARATE_1_HZ);
-    
+
   //-----------------------
   // HTS221 wakeup
   //-----------------------
-  smeHumidity.activate(); 
+  smeHumidity.activate();
 }
 //-----------------------------------------
 // sleep LCD
@@ -904,7 +903,7 @@ void wakeupLCD(){
 void powerOffLCD(){
 
   // LCD 電源 OFF
-  i2c_write_byte(I2C_EXPANDER_ADDR_LCD, 0x01, 0x00); 
+  i2c_write_byte(I2C_EXPANDER_ADDR_LCD, 0x01, 0x00);
 }
 //-----------------------------------------
 // wakeup LCD
@@ -916,7 +915,7 @@ void powerOnLCD(){
   // LCDの電源が一度落ちたので、ＬＣＤを再設定
   lcd.begin(8, 2);
   lcd.setContrast(30);
-  lcd.clear();   
+  lcd.clear();
 }
 
 //====================================================================
@@ -970,8 +969,8 @@ void loop() {
   // Timer2 interval　125ms で1回ループ
   //-----------------------------------------------------
   if (bInterval == true){
-     bInterval = false; 
-    //--------------------------------------------    
+     bInterval = false;
+    //--------------------------------------------
     //--------------------------------------------
     // loop counter
     //--------------------------------------------
@@ -988,5 +987,5 @@ void loop() {
     // sleep/resume
     //--------------------------------------------
     loopSleep();
-  } 
+  }
 }

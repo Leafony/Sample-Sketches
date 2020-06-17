@@ -10,7 +10,7 @@
 //       (3) AZ01 USB
 //       (4) AZ02 RTC＆MicroSD
 //
-//		(c) 2019  Trillion-Node Study Group
+//		(c) 2020  Trillion-Node Study Group
 //		Released under the MIT license
 //		https://opensource.org/licenses/MIT
 //
@@ -31,13 +31,13 @@
 #include <avr/power.h>
 //=====================================================================
 
-#define DEBUG 
+#define DEBUG
 
 //=====================================================================
 // SPI CLOCK 
 // SDカードのSPI I/Fのクロック速度4Mでは動作しないので4M以下に設定すること
 //=====================================================================
-#define SD_CLCK 2500000 
+#define SD_CLCK 2500000
 
 //=====================================================================
 // 撮影間隔（秒）
@@ -64,7 +64,7 @@
 #define PCRX    1
 #define INT0    2
 #define INT1    3
-#define RSV_D4  4       
+#define RSV_D4  4
 #define RSV_D5  5
 #define SD_EN   6
 #define RSV_D7  7
@@ -98,8 +98,8 @@
 //     RESET              : PC6 = RESET#
 //-----------------------------------------------
 #define RSV_D14   14
-#define UART3_TX  15      
-#define UART3_RX  16     
+#define UART3_TX  15
+#define UART3_RX  16
 #define RSV_D17   17
 #define SDA       18
 #define SCL       19
@@ -108,17 +108,17 @@
 //=====================================================================
 // camera
 //=====================================================================
-//Color Setting 
-#define COLOR_2BIT_GRAY   0x01 
-#define COLOR_4BIT_GRAY   0x02 
-#define COLOR_8BIT_GRAY   0x03 
-#define COLOR_2BIT_COLOR  0x05 
-#define COLOR_4BIT_COLOR  0x06 
+//Color Setting
+#define COLOR_2BIT_GRAY   0x01
+#define COLOR_4BIT_GRAY   0x02
+#define COLOR_8BIT_GRAY   0x03
+#define COLOR_2BIT_COLOR  0x05
+#define COLOR_4BIT_COLOR  0x06
 #define COLOR_JPEG        0x07
-//Preview Resolution 
+//Preview Resolution
 #define PRE_RES_80_60     0x01
 #define PRE_RES_160_120   0x03
-//JPEG Resolution 
+//JPEG Resolution
 #define JPEG_RES_80_60    0x01
 #define JPEG_RES_QQVGA    0x03
 #define JPEG_RES_QVGA     0x05
@@ -127,7 +127,7 @@
 #define GET_SNAPCHOT      0x01
 #define GET_PRE_PIC       0x02
 #define GET_PRE_JPEG      0x03
-//Snapshot Setting 
+//Snapshot Setting
 #define COMPRESSED        0x00
 #define UNCOMPRESSED      0x01
 //data length
@@ -137,7 +137,7 @@
 // SD
 //=====================================================================
 File myFile;
-SoftwareSerial CameraSerial(UART3_RX, UART3_TX);  
+SoftwareSerial CameraSerial(UART3_RX, UART3_TX);
 
 //=====================================================================
 // 変数定義
@@ -182,7 +182,7 @@ void setupPort(){
   pinMode(SD_EN, OUTPUT);      // PD6 : digital 6 = BLE reset active-low
   digitalWrite(SD_EN, HIGH);
 
-  pinMode(RSV_D7, OUTPUT);       // PD7 : digital 7 = BLE sleep 
+  pinMode(RSV_D7, OUTPUT);       // PD7 : digital 7 = BLE sleep
   digitalWrite(RSV_D7, HIGH);
 
   //---------------------
@@ -207,7 +207,7 @@ void setupPort(){
   digitalWrite(RSV_D17, LOW);
 
   // PC4 : digital 18 = I2C SDA
-  // PC5 : digital 19 = I2C SCL 
+  // PC5 : digital 19 = I2C SCL
 }
 //=====================================================================
 // 割り込み処理
@@ -242,9 +242,9 @@ void intTimer2(){
 //----------------------------------------------
 void clearReadBuf()
 {
-  while (CameraSerial.available()) 
+  while (CameraSerial.available())
   {
-    CameraSerial.read(); 
+    CameraSerial.read();
   }
 }
 //----------------------------------------------
@@ -253,7 +253,7 @@ void clearReadBuf()
 //----------------------------------------------
 void sendCmd(char cmd[], int cmd_len)
 {
-  for (char i = 0; i < cmd_len; i++) CameraSerial.write(cmd[i]); 
+  for (char i = 0; i < cmd_len; i++) CameraSerial.write(cmd[i]);
 }
 //----------------------------------------------
 //  readRespons
@@ -263,7 +263,7 @@ int readRespons(char *dest, int len, unsigned int timeout)
 {
   int read_len = 0;
   unsigned long t = millis();
-  
+
   while (read_len < len)
   {
     while (CameraSerial.available()<1)
@@ -275,9 +275,9 @@ int readRespons(char *dest, int len, unsigned int timeout)
       }
     }
     *(dest+read_len) = CameraSerial.read();
-#ifdef DEBUG    
-    //Serial.write(*(dest+read_len),);     //debug 
-#endif    
+#ifdef DEBUG
+    //Serial.write(*(dest+read_len),);     //debug
+#endif
     read_len++;
   }
   return read_len;
@@ -287,13 +287,13 @@ int readRespons(char *dest, int len, unsigned int timeout)
 //  カメラとの通信確立
 //----------------------------------------------
 void initialize()
-{   
-  char cmd[] = {0xaa,0x0d,0x00,0x00,0x00,0x00} ;  
+{
+  char cmd[] = {0xaa,0x0d,0x00,0x00,0x00,0x00} ;
   unsigned char resp[6];
 
   Serial.print("initializing camera...");
-  
-  while (1) 
+
+  while (1)
   {
     sendCmd(cmd,6);
     if (readRespons((char *)resp, 6,1000) != 6)
@@ -301,15 +301,15 @@ void initialize()
       Serial.print(".");
       continue;
     }
-    if (resp[0] == 0xaa && resp[1] == 0x0e && resp[2] == 0x0d && resp[4] == 0 && resp[5] == 0) 
+    if (resp[0] == 0xaa && resp[1] == 0x0e && resp[2] == 0x0d && resp[4] == 0 && resp[5] == 0)
     {
-      if (readRespons((char *)resp, 6, 500) != 6) continue; 
-      if (resp[0] == 0xaa && resp[1] == 0x0d  && resp[2] == 0 && resp[3] == 0 && resp[4] == 0 && resp[5] == 0) break; 
+      if (readRespons((char *)resp, 6, 500) != 6) continue;
+      if (resp[0] == 0xaa && resp[1] == 0x0d  && resp[2] == 0 && resp[3] == 0 && resp[4] == 0 && resp[5] == 0) break;
     }
-  }  
+  }
   cmd[1] = 0x0e;
   cmd[2] = 0x0d;
-  sendCmd(cmd, 6); 
+  sendCmd(cmd, 6);
   Serial.println(" done.\r\n");
 }
 //----------------------------------------------
@@ -318,15 +318,15 @@ void initialize()
 //----------------------------------------------
 void preCapture()
 {
-  char cmd[] = { 0xaa, 0x01, 0x00, COLOR_JPEG, PRE_RES_80_60, JPEG_RES_VGA };  
-  unsigned char resp[6]; 
-  
+  char cmd[] = { 0xaa, 0x01, 0x00, COLOR_JPEG, PRE_RES_80_60, JPEG_RES_VGA };
+  unsigned char resp[6];
+
   while (1)
   {
     clearReadBuf();
     sendCmd(cmd, 6);
-    if (readRespons((char *)resp, 6, 100) != 6) continue; 
-    if (resp[0] == 0xaa && resp[1] == 0x0e && resp[2] == 0x01 && resp[4] == 0 && resp[5] == 0) break; 
+    if (readRespons((char *)resp, 6, 100) != 6) continue;
+    if (resp[0] == 0xaa && resp[1] == 0x0e && resp[2] == 0x01 && resp[4] == 0 && resp[5] == 0) break;
   }
 }
 
@@ -337,7 +337,7 @@ void preCapture()
 //----------------------------------------------
 void Capture()
 {
-  char cmd[] = { 0xaa, 0x06 , 0x08, PIC_PKT_LEN & 0xff, (PIC_PKT_LEN>>8) & 0xff ,0}; 
+  char cmd[] = { 0xaa, 0x06 , 0x08, PIC_PKT_LEN & 0xff, (PIC_PKT_LEN>>8) & 0xff ,0};
   unsigned char resp[6];
 
   while (1)
@@ -345,13 +345,13 @@ void Capture()
     clearReadBuf();
     sendCmd(cmd, 6);
     if (readRespons((char *)resp, 6, 100) != 6) continue;
-    if (resp[0] == 0xaa && resp[1] == 0x0e && resp[2] == 0x06 && resp[4] == 0 && resp[5] == 0) break; 
+    if (resp[0] == 0xaa && resp[1] == 0x0e && resp[2] == 0x06 && resp[4] == 0 && resp[5] == 0) break;
   }
   cmd[1] = 0x05;
   cmd[2] = 0;
   cmd[3] = 0;
   cmd[4] = 0;
-  cmd[5] = 0; 
+  cmd[5] = 0;
   while (1)
   {
     clearReadBuf();
@@ -361,7 +361,7 @@ void Capture()
   }
   cmd[1] = 0x04;
   cmd[2] = GET_SNAPCHOT;
-  while (1) 
+  while (1)
   {
     clearReadBuf();
     sendCmd(cmd, 6);
@@ -374,14 +374,14 @@ void Capture()
       }
       if (resp[0] == 0xaa && resp[1] == 0x0a && resp[2] == 0x01)
       {
-        picTotalLen = (resp[3]) | (resp[4] << 8) | (resp[5] << 16);         
+        picTotalLen = (resp[3]) | (resp[4] << 8) | (resp[5] << 16);
         //Serial.print("picTotalLen:");
         //Serial.println(picTotalLen);
         break;
       }
     }
   }
-  
+
 }
 
 //----------------------------------------------
@@ -390,18 +390,18 @@ void Capture()
 //----------------------------------------------
 void GetData()
 {
-  char cmd[] = { 0xaa, 0x0e , 0x00, 0x00, 0x00, 0x00 };  
+  char cmd[] = { 0xaa, 0x0e , 0x00, 0x00, 0x00, 0x00 };
   unsigned char pkt[PIC_PKT_LEN];
-  unsigned int pktCnt = (picTotalLen) / (PIC_PKT_LEN - 6); 
-  
+  unsigned int pktCnt = (picTotalLen) / (PIC_PKT_LEN - 6);
+
   if ((picTotalLen % (PIC_PKT_LEN-6)) != 0) pktCnt += 1;
-  
+
   set_filename();
   if (SD.exists(fname))
   {
     SD.remove(fname);
   }
-  myFile = SD.open(fname, FILE_WRITE); 
+  myFile = SD.open(fname, FILE_WRITE);
   if(!myFile){
    Serial.println("myFile open fail...");
   }
@@ -411,15 +411,15 @@ void GetData()
     {
       cmd[4] = i & 0xff;
       cmd[5] = (i >> 8) & 0xff;
-      
+
       int retry_cnt = 0;
     retry:
       delay(10);
-      clearReadBuf(); 
-      sendCmd(cmd, 6); 
+      clearReadBuf();
+      sendCmd(cmd, 6);
       uint16_t cnt = readRespons((char *)pkt, PIC_PKT_LEN, 200);
-      
-      unsigned char sum = 0; 
+
+      unsigned char sum = 0;
       for (int y = 0; y < cnt - 2; y++)
       {
         sum += pkt[y];
@@ -429,13 +429,13 @@ void GetData()
         if (++retry_cnt < 100) goto retry;
         else break;
       }
-      
-      myFile.write((const uint8_t *)&pkt[4], cnt-6); 
+
+      myFile.write((const uint8_t *)&pkt[4], cnt-6);
       //if (cnt != PIC_PKT_LEN) break;
     }
     cmd[4] = 0xf0;
-    cmd[5] = 0xf0; 
-    sendCmd(cmd, 6); 
+    cmd[5] = 0xf0;
+    sendCmd(cmd, 6);
   }
   myFile.close();
   Serial.println("end!!");
@@ -493,9 +493,6 @@ void setup() {
   Capture();
   GetData();
   MsTimer2::start();
-
-
-   
 }
 //====================================================================
 // loop

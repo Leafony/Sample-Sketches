@@ -9,7 +9,7 @@
 //       (2) AP01 AVR MCU
 //       (3) AZ01 USB
 //
-//		(c) 2019  Trillion-Node Study Group
+//		(c) 2020  Trillion-Node Study Group
 //		Released under the MIT license
 //		https://opensource.org/licenses/MIT
 //
@@ -43,9 +43,9 @@ void setup() {
   Wire.begin();
 
   // IO　Expander Initialize
- i2c_write_byte(I2C_EXPANDER_ADDR, 0x03, 0xFE);
- i2c_write_byte(I2C_EXPANDER_ADDR, 0x01, 0x01);
-  
+  i2c_write_byte(I2C_EXPANDER_ADDR, 0x03, 0xFE);
+  i2c_write_byte(I2C_EXPANDER_ADDR, 0x01, 0x01);
+
   //LCD Initialize
   lcd.begin(8, 2);
   lcd.setContrast(30);
@@ -56,7 +56,7 @@ void setup() {
   delay(3000);
 
   // LCD Power off
-  i2c_write_byte(I2C_EXPANDER_ADDR, 0x01, 0x00); 
+  i2c_write_byte(I2C_EXPANDER_ADDR, 0x01, 0x00);
   delay(3000);
 
   // LCD Power on
@@ -103,11 +103,11 @@ void loop() {
   }else{
      lcd.print("SW1 is L");
   }
-	
+
   // SW 2
-  val = i2c_read_byte(I2C_EXPANDER_ADDR, 0x00); 
+  val = i2c_read_byte(I2C_EXPANDER_ADDR, 0x00);
   lcd.setCursor(0, 1);
-  if ((val & 0x02) == 0x02)  {     
+  if ((val & 0x02) == 0x02)  {
      lcd.print("SW2 is H");
   }
   else {

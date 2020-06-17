@@ -9,7 +9,7 @@
 //       (2) AP01 AVR MCU
 //       (3) AZ01 USB
 //
-//		(c) 2019  Trillion-Node Study Group
+//		(c) 2020  Trillion-Node Study Group
 //		Released under the MIT license
 //		https://opensource.org/licenses/MIT
 //
@@ -34,7 +34,7 @@
 // difinition
 //=====================================================================
 #include <Wire.h>
-#include <Adafruit_LIS3DH.h>    
+#include <Adafruit_LIS3DH.h>
 #include <Adafruit_Sensor.h>
 #include <HTS221.h>
 #include <ClosedCube_OPT3001.h>
@@ -55,7 +55,7 @@
 //-----------------------------------------------
 //３軸センサ、輝度センサ I2Cアドレス
 //-----------------------------------------------
-#define LIS2DH_ADDRESS 0x19       // SD0/SA0 pin = VCC 
+#define LIS2DH_ADDRESS 0x19       // SD0/SA0 pin = VCC
 #define OPT3001_ADDRESS 0x45      // ADDR pin = VCC
 
 //-----------------------------------------------
@@ -73,7 +73,7 @@
 // Sensor
 //-----------------------------------------------
 Adafruit_LIS3DH accel = Adafruit_LIS3DH();
-ClosedCube_OPT3001 light;      
+ClosedCube_OPT3001 light;
 
 //=====================================================================
 // プログラムで使用する変数定義
@@ -152,7 +152,7 @@ void loop() {
     }
 
     dataTilt = acos(dataZ_g)/PI*180;
-    
+
     //-------------------------
     // HTS221
     // 温湿度センサーデータ取得
@@ -178,7 +178,7 @@ void loop() {
     //-------------------------
     // シリアルモニタ表示
     //-------------------------
-    Serial.println("--- sensor data ---");    
+    Serial.println("--- sensor data ---");
     Serial.println("  Tmp[degC]     = " + String(dataTemp));
     Serial.println("  Hum[%]        = " + String(dataHumid));
     Serial.println("  Lum[lx]       = " + String(dataLight));
@@ -215,7 +215,7 @@ void setupSensor(){
   //-------------------------------------
   // HTS221 (temperature /humidity)
   //-------------------------------------
-  smeHumidity.begin(); 
+  smeHumidity.begin();
 
   //-------------------------------------
   // OPT3001 (light)
@@ -235,9 +235,9 @@ void setupSensor(){
   newConfig.ConvertionTime = B1;               // convertion time = 800ms
   newConfig.ModeOfConversionOperation = B11;   // continous conversion
   newConfig.Latch = B0;                        // hysteresis-style
-  
+
   errorConfig = light.writeConfig(newConfig);
-  
+
   if(errorConfig != NO_ERROR){
     errorConfig = light.writeConfig(newConfig);   //retry
   }

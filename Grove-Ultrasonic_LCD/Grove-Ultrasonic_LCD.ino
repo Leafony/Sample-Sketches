@@ -11,7 +11,7 @@
 //           ※  Ultrasonic RangerはGrove&5VのUARTに接続する
 //       (4) AZ01 USB
 //
-//		(c) 2019  Trillion-Node Study Group
+//		(c) 2020  Trillion-Node Study Group
 //		Released under the MIT license
 //		https://opensource.org/licenses/MIT
 //
@@ -77,13 +77,13 @@ void setup() {
 
 void loop() {
   long RangeInCentimeters;
-    
-      lcd.clear();
-      lcd.print("Distance");
-      RangeInCentimeters = ultrasonic.MeasureInCentimeters();
-      sprintf(strMessage,"%5d cm",RangeInCentimeters);    
-      lcd.setCursor(0, 1);
-      lcd.print(strMessage);
+
+  lcd.clear();
+  lcd.print("Distance");
+  RangeInCentimeters = ultrasonic.MeasureInCentimeters();
+  sprintf(strMessage,"%5d cm",RangeInCentimeters);
+  lcd.setCursor(0, 1);
+  lcd.print(strMessage);
 
   delay(250);
 }
