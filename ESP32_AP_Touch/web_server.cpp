@@ -78,7 +78,6 @@ static int printHtmlBody(WiFiClient client, int update, String ipAddress) {
     client.println("<input type=\"submit\" name=\"INT\" value=\"1 秒\">");
     client.println("</form>");
     client.println("</body>");
-
     return 0;
 }
 
@@ -109,24 +108,5 @@ void htmlTouchSensorMain(WiFiClient client, int update, uint32_t ip) {
 
     printHtmlBody(client, update, ipAddress);
 
-    client.println("</html>");
-}
-
-void htmlMsgMain(WiFiClient client, char *txt, uint32_t ip) {
-    String ipAddress = ipUintToString(ip);
-    
-    connectHtml(client);
-
-    client.println("<html>");
-
-    client.println("<head><title>Test Page</title>");
-    client.println("<meta http-equiv=\"Content-type\" content=\"text/html; charset=UTF-8\">");
-    client.print("<meta http-equiv=\"refresh\" content=\"3;URL=http://");
-    client.print(ipAddress);
-    client.println("/\">");
-    client.print("<p>");
-    client.print(txt);
-    client.println("</p>");
-    client.println("</body>");
     client.println("</html>");
 }
