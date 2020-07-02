@@ -18,18 +18,7 @@
 #include <WiFiClient.h>
 #include <WiFiAP.h>
 #include "web_server.h"
-
-#define DEBUG_BUILD // comment out when non-debugging mode
-
-#ifdef DEBUG_BUILD
-#define SERIAL_BEGIN(num) Serial.begin(num)
-#define SERIAL_PRINTLN(str) Serial.println(str)
-#define SERIAL_PRINT(str) Serial.print(str)
-#else
-#define SERIAL_BEGIN(num)
-#define SERIAL_PRINTLN(str)
-#define SERIAL_PRINT(str)
-#endif
+#include "esp32_ap_touch.h"
 
 const char WIFI_SSID[] = "Leafony_ESP32-AP";
 const char WIFI_PASSWORD[] = "password";
