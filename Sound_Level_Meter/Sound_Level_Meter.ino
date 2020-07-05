@@ -30,7 +30,7 @@ unsigned int dataMic;
 //-----------------------------------------------
 // VRとMICデータを取得する
 //-----------------------------------------------
-void getSencerData()
+void getSensorData()
 {
     dataVR = analogRead(A3);
     dataMic = analogRead(A2);
@@ -45,7 +45,7 @@ void getSencerData()
 //-----------------------------------------------
 // VRとMICの値にあわせてLEDを点灯、消灯させる
 //-----------------------------------------------
-void viewSencerData()
+void dispSensorData()
 {
     if (dataVR < 400)
     {
@@ -146,7 +146,7 @@ void setup() {
 
 
 void loop() {
-  getSencerData();
-  viewSencerData();
+  getSensorData();
+  dispSensorData();
   delay(100);
 }
