@@ -1,105 +1,108 @@
 //=====================================================================
 //  Leafony Platform sample sketch
-//     Platform     : 4-Sensors
-//     Processor    : ATmega328P (3.3V /8MHz)
 //     Application  : 4-Sensors with Serial monitor
+//     Processor    : ATmega328P (3.3V /8MHz)
 //
 //     Leaf configuration
 //       (1) AI01 4-Sensors
 //       (2) AP01 AVR MCU
 //       (3) AZ01 USB
 //
-//		(c) 2020  Trillion-Node Study Group
+//		(c)2019 Trillion-Node Study Group
 //		Released under the MIT license
 //		https://opensource.org/licenses/MIT
 //
 //      Rev.00 2019/08/20 First release
+//      Rev.01 2020/07/29 不要部分削除等体裁修正
 //=====================================================================
-//use libraries
-//Adafruit LIS3DH
-//https://github.com/adafruit/Adafruit_LIS3DH
-//※  Adafruit_LIS3DH.h
-//    uint8_t readRegister8(uint8_t reg);
-//    void writeRegister8(uint8_t reg, uint8_t value);
-//    をpublic:に移動する
-//Adafruit Unified Sensor Driver
-//https://github.com/adafruit/Adafruit_Sensor
-//SmartEverything ST HTS221 Humidity Sensor
-//https://github.com/ameltech/sme-hts221-library
-//ClosedCube Arduino Library for ClosedCube OPT3001
-//https://github.com/closedcube/ClosedCube_OPT3001_Arduino
+// use libraries
+//  Adafruit Unified Sensor Driver
+//    https://github.com/adafruit/Adafruit_Sensor
+//  Adafruit Bus IO Library
+//    https://github.com/adafruit/Adafruit_BusIO
+//  Adafruit LIS3DH
+//    https://github.com/adafruit/Adafruit_LIS3DH
+//  SmartEverything ST HTS221 Humidity Sensor
+//    https://github.com/ameltech/sme-hts221-library
+//  ClosedCube Arduino Library for ClosedCube OPT3001
+//    https://github.com/closedcube/ClosedCube_OPT3001_Arduino
 //=====================================================================
 
-//=====================================================================
+//---------------------------------------------------------------------
 // difinition
-//=====================================================================
-#include <Wire.h>
-#include <Adafruit_LIS3DH.h>
-#include <Adafruit_Sensor.h>
-#include <HTS221.h>
-#include <ClosedCube_OPT3001.h>
-#include <SoftwareSerial.h>
-//=====================================================================
+//---------------------------------------------------------------------
+#include <Wire.h>                           // I2C
 
-//=====================================================================
-// IOピンの名前定義
-// 接続するリーフに合わせて定義する
-//=====================================================================
-#define SDA       18
-#define SCL       19
+#include <Adafruit_LIS3DH.h>                // 3-axis accelerometer
+#include <HTS221.h>                         // humidity and temperature sensor
+#include <ClosedCube_OPT3001.h>             // Ambient Light Sensor
 
-//=====================================================================
+//===============================================
+// シリアルモニタへの出力
+//      #define SERIAL_MONITOR = 出力あり
+//    //#define SERIAL_MONITOR = 出力なし（コメントアウトする）
+//===============================================
+#define SERIAL_MONITOR
+
+//-----------------------------------------------
+// IOピン一覧
+//-----------------------------------------------
+//  D0              0                   // PD0  (RXD)
+//  D1              1                   // PD1  (TXD)
+//  D2              2                   // PD2  (INT0)
+//  D3              3                   // PD3  (INT1)
+//  D4              4                   // PD4
+//  D5              5                   // PD5
+//  D6              6                   // PD6
+//  D7              7                   // PD7
+//  D8              8                   // PB0  (S-UART2_RX)
+//  D9              9                   // PB1  (S-UART2_TX)
+//  D10             10                  // PB2  (SS)
+//  D11             11                  // PB3  (MOSI)
+//  D12             12                  // PB4  (MISO)
+//  D13             13                  // PB5  (SCK/LED)
+
+//  D14             14                  // [A0] PC0
+//  D15             15                  // [A1] PC1
+//  D16             16                  // [A2] PC2
+//  D17             17                  // [A3] PC3
+
+//-----------------------------------------------
 // プログラム内で使用する定数定義
-// 
-//=====================================================================
 //-----------------------------------------------
-//３軸センサ、輝度センサ I2Cアドレス
-//-----------------------------------------------
-#define LIS2DH_ADDRESS 0x19       // SD0/SA0 pin = VCC
-#define OPT3001_ADDRESS 0x45      // ADDR pin = VCC
+//------------------------------
+// I2Cアドレス
+//------------------------------
+#define LIS2DH_ADDRESS          0x19        // Accelerometer (SD0/SA0 pin = VCC)
+#define OPT3001_ADDRESS         0x45        // Ambient Light Sensor (ADDR pin = VCC)
 
-//-----------------------------------------------
-// LIS2DH
-//-----------------------------------------------
-#define DIVIDER_2G 16383          // full scale 2G  (=0xFFFF/4)
-#define DIVIDER_4G 8191           // full scale 4G  (=0xFFFF/4/2)
-#define DIVIDER_8G 4096           // full scale 8G  (=0xFFFF/4/4)
-#define DIVIDER_16G 1365          // full scale 16G (=0xFFFF/4/12)
-
-//=====================================================================
+//---------------------------------------------------------------------
 // object
-//=====================================================================
+//---------------------------------------------------------------------
 //-----------------------------------------------
 // Sensor
 //-----------------------------------------------
 Adafruit_LIS3DH accel = Adafruit_LIS3DH();
 ClosedCube_OPT3001 light;
 
-//=====================================================================
+//---------------------------------------------------------------------
 // プログラムで使用する変数定義
-// 
-//=====================================================================
-//=====================================================================
-// RAM data
-//=====================================================================
-//---------------------------
+//---------------------------------------------------------------------
+//------------------------------
 // LIS2DH : accelerometer
-//---------------------------
-int16_t dataX, dataY, dataZ;
+//------------------------------
 float dataX_g, dataY_g, dataZ_g;
-float dataTilt, avrTilt;
+float dataTilt;
 
-//---------------------------
+//------------------------------
 // HTS221 : Temperature/Humidity
-//---------------------------
-float dataTemp, avrTemp;
-float dataHumid, avrHumid;
-float calcTemp = 0;
-float calcHumid = 0;
+//------------------------------
+float dataTemp;
+float dataHumid;
 
-//---------------------------
+//--------------------
 // 2点補正用データ
-//---------------------------
+//--------------------
 // 温度補正用データ0
 float TL0 = 25.0;     // 4-Sensors温度測定値
 float TM0 = 25.0;     // 温度計等測定値
@@ -114,31 +117,85 @@ float HM0 = 60.0;     // 湿度計等測定値
 float HL1 = 80.0;     // 4-Sensors湿度測定値
 float HM1 = 80.0;     // 湿度計等測定値
 
-//---------------------------
-// OPT3001 : Light
-//---------------------------
-float dataLight, avrLight;
-float calcLight = 0;
+//------------------------------
+// OPT3001 : Ambient Light Sensor
+//------------------------------
+float dataLight;
 
 //====================================================================
 // setup
 //====================================================================
 void setup() {
-  Serial.begin(115200);       // UART 115200bps
-  Wire.begin();               // I2C 100KHz
-
+  Wire.begin();               	// I2C 100kHz
+#ifdef SERIAL_MONITOR
+  	Serial.begin(115200);       // UART 115200bps
+    Serial.println(F("========================================="));
+    Serial.println(F("setup start"));
+#endif
+  setupPort();
   delay(10);
 
   setupSensor();
+#ifdef SERIAL_MONITOR
+    Serial.println(F("setup end"));
+#endif
+}
+
+//-----------------------------------------------
+// IOピンの入出力設定
+// 接続するリーフに合わせて設定する
+//-----------------------------------------------
+void setupPort(){
+}
+
+//---------------------------------------------------------------------
+// 各デバイスの初期設定
+//---------------------------------------------------------------------
+//------------------------------
+// sensor
+//------------------------------
+void setupSensor(){
+  //-------------------------------------
+  // LIS2DH (accelerometer)
+  //-------------------------------------
+  accel.begin(LIS2DH_ADDRESS);                      // I2C address
+
+  accel.setClick(0, 0);                             // Disable Interrupt
+  accel.setRange(LIS3DH_RANGE_2_G);                 // Full scale +/- 2G
+  accel.setDataRate(LIS3DH_DATARATE_10_HZ);         // Data rate = 10Hz
+  
+  //-------------------------------------
+  // HTS221 (humidity and temperature sensor)
+  //-------------------------------------
+  smeHumidity.begin(); 
+
+  //-------------------------------------
+  // OPT3001 (Ambient Light Sensor)
+  //-------------------------------------
+  OPT3001_Config newConfig;
+  OPT3001_ErrorCode errorConfig;
+
+  light.begin(OPT3001_ADDRESS);                   // I2C address
+
+  newConfig.RangeNumber = B1100;                  // automatic full scale
+  newConfig.ConvertionTime = B1;                  // convertion time = 800ms
+  newConfig.ModeOfConversionOperation = B11;      // continous conversion
+  newConfig.Latch = B0;                           // hysteresis-style
+  
+  errorConfig = light.writeConfig(newConfig);
+  
+  if(errorConfig != NO_ERROR){
+    errorConfig = light.writeConfig(newConfig);   // retry
+  }
 }
 
 //====================================================================
 // Main loop
 //====================================================================
-void loop() {
+void loop(){
     //-------------------------
     // LIS2DH
-    // 3軸センサーのデータ取得
+    // 3軸センサのデータ取得
     //-------------------------
     accel.read();
     dataX_g = accel.x_g;    //X軸
@@ -152,13 +209,13 @@ void loop() {
     }
 
     dataTilt = acos(dataZ_g)/PI*180;
-
+    
     //-------------------------
     // HTS221
     // 温湿度センサーデータ取得
     //-------------------------
-    dataTemp = (float)smeHumidity.readTemperature();  //温度
-    dataHumid = (float)smeHumidity.readHumidity();    //湿度
+    dataTemp = (float)smeHumidity.readTemperature();        //温度
+    dataHumid = (float)smeHumidity.readHumidity();          //湿度
 
     //-------------------------
     // 温度と湿度の2点補正
@@ -178,69 +235,15 @@ void loop() {
     //-------------------------
     // シリアルモニタ表示
     //-------------------------
-    Serial.println("--- sensor data ---");
+#ifdef SERIAL_MONITOR
+    Serial.println("--- sensor data ---");    
     Serial.println("  Tmp[degC]     = " + String(dataTemp));
     Serial.println("  Hum[%]        = " + String(dataHumid));
     Serial.println("  Lum[lx]       = " + String(dataLight));
     Serial.println("  Ang[arc deg]  = " + String(dataTilt));
+#endif
 
     delay(3000);
-
-}
-
-//=====================================================================
-// 各デバイスの初期設定
-// 
-//=====================================================================
-//-----------------------------------------------
-// sensor
-//-----------------------------------------------
-void setupSensor(){
-
-  //-------------------------------------
-  // LIS2DH (accelerometer)
-  //-------------------------------------
-  //-------------------
-  // I2C address
-  //------------------
-  accel.begin(LIS2DH_ADDRESS);
-
-  //-------------------
-  // register
-  //-------------------
-  accel.setClick(0, 0);                      // Disable interrupt to save power
-  accel.setRange(LIS3DH_RANGE_2_G);          // Full scale +/- 2G
-  accel.setDataRate(LIS3DH_DATARATE_1_HZ);   // Data rate = 1Hz
-
-  //-------------------------------------
-  // HTS221 (temperature /humidity)
-  //-------------------------------------
-  smeHumidity.begin();
-
-  //-------------------------------------
-  // OPT3001 (light)
-  //-------------------------------------
-  OPT3001_Config newConfig;
-  OPT3001_ErrorCode errorConfig;
-
-  //-------------------
-  // I2C address
-  //-------------------
-  light.begin(OPT3001_ADDRESS);
-
-  //-------------------
-  // config register
-  //-------------------
-  newConfig.RangeNumber = B1100;               // automatic full scale
-  newConfig.ConvertionTime = B1;               // convertion time = 800ms
-  newConfig.ModeOfConversionOperation = B11;   // continous conversion
-  newConfig.Latch = B0;                        // hysteresis-style
-
-  errorConfig = light.writeConfig(newConfig);
-
-  if(errorConfig != NO_ERROR){
-    errorConfig = light.writeConfig(newConfig);   //retry
-  }
 }
 
 
@@ -248,8 +251,7 @@ void setupSensor(){
 // trim
 // 文字列配列からSPを削除する
 //---------------------------------------
-void trim(char * data)
-{
+void trim(char * data){
   int i = 0, j = 0;
 
   while (*(data + i) != '\0'){
@@ -264,7 +266,6 @@ void trim(char * data)
 
 //=====================================================================
 // I2C　制御関数
-// 
 //=====================================================================
 //-----------------------------------------------
 //I2C スレーブデバイスに1バイト書き込む
@@ -279,7 +280,6 @@ void i2c_write_byte(int device_address, int reg_address, int write_data){
 //I2C スレーブデバイスから1バイト読み込む
 //-----------------------------------------------
 unsigned char i2c_read_byte(int device_address, int reg_address){
-
   int read_data = 0;
 
   Wire.beginTransmission(device_address);
