@@ -27,9 +27,9 @@
 const char* SSID = "wifi_ssid";    // WiFi SSID
 const char* PASSWORD = "wifi_password";  // WiFi Password
 
-// Accessed Google Sheets ID
+// Accessed Google Script Settings
 const char* APP_SERVER = "script.google.com";
-const char* KEY = "google_sheets_key";
+const char* KEY = "google_scripts_key";
 
 // Device sleep time (sec) to reduce Joule heat
 uint64_t DEEP_SLEEP_TIME_SEC = 60;
@@ -41,18 +41,18 @@ ClosedCube_OPT3001 illum;
 #define OPT3001_ADDRESS 0x45  // ADDR pin = VCC
 
 
-void accessToGoogleSheets(float temperature, float humidity, float blightness) {
+void accessToGoogleSheets(float temperature, float humidity, float brightness) {
     WiFiClientSecure client;
     String URL = "https://script.google.com/macros/s/";
 
     URL += KEY;
     URL += "/exec?";
-    URL += "&1_cell=";
+    URL += "temperature=";
     URL += temperature;
-    URL += "&2_cell=";
+    URL += "&humidity=";
     URL += humidity;
-    URL += "&3_cell=";
-    URL += blightness;
+    URL += "&brightness=";
+    URL += brightness;
 
     Serial.println(URL);
     // access to your Google Sheets
