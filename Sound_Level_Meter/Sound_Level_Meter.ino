@@ -7,10 +7,6 @@
 //
 //      Rev.00 2020/05/17  First release
 //=====================================================================
-#include <MsTimer2.h>
-#include <avr/wdt.h>
-#include <avr/sleep.h>
-#include <avr/power.h>
 #include <Wire.h>
 
 #define AVR_LED         13
@@ -72,19 +68,19 @@ void dispSensorData()
        digitalWrite(LED6,HIGH);
     }
 
-    if (dataMic < 450)
+    if (dataMic < 700)
     {
       digitalWrite(LED1,LOW);
       digitalWrite(LED2,LOW);
       digitalWrite(LED3,LOW);
     }
-    else if (dataMic >= 450 && dataMic < 550)
+    else if (dataMic >= 700 && dataMic < 800)
     {
       digitalWrite(LED1,LOW);
       digitalWrite(LED2,LOW);
       digitalWrite(LED3,HIGH);
     }
-    else if (dataMic >= 550 && dataMic < 650)
+    else if (dataMic >= 800 && dataMic < 850)
     {
       digitalWrite(LED1,LOW);
       digitalWrite(LED2,HIGH);
