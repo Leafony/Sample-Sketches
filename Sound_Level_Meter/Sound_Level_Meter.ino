@@ -7,8 +7,6 @@
 //
 //      Rev.00 2020/05/17  First release
 //=====================================================================
-#include <Wire.h>
-
 #define AVR_LED         13
 #define LED1             6
 #define LED2             7
