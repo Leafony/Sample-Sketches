@@ -17,10 +17,9 @@
 
 
 #include <Arduino.h>
-#include <WiFiClientSecure.h>
-#include <Adafruit_LIS3DH.h>
-#include <HTS221.h>
 #include <Wire.h>
+#include <HTTPClient.h>
+#include <HTS221.h>
 #include <ClosedCube_OPT3001.h>
 
 // Connecting WiFi Settings
@@ -42,7 +41,7 @@ ClosedCube_OPT3001 illum;
 
 
 void accessToGoogleSheets(float temperature, float humidity, float brightness) {
-    WiFiClientSecure client;
+    HTTPClient http;
     String URL = "https://script.google.com/macros/s/";
 
     URL += KEY;
@@ -54,36 +53,31 @@ void accessToGoogleSheets(float temperature, float humidity, float brightness) {
     URL += "&brightness=";
     URL += brightness;
 
+    Serial.println("[HTTP] begin...");
     Serial.println(URL);
     // access to your Google Sheets
     Serial.println();
-    Serial.println("Starting connection to server...");
-    if (!client.connect(APP_SERVER, 443)) {
-        Serial.println("Connection failed!");
+    // configure target server and url
+    http.begin(URL);
+
+    Serial.println("[HTTP] GET...");
+    // start connection and send HTTP header
+    int httpCode = http.GET();
+
+    // httpCode will be negative on error
+    if(httpCode > 0) {
+        // HTTP header has been send and Server response header has been handled
+        Serial.print("[HTTP] GET... code: ");
+        Serial.println(httpCode);
+
+        // file found at server
+        if(httpCode == HTTP_CODE_OK) {
+            String payload = http.getString();
+            Serial.println(payload);
+        }
     } else {
-        Serial.println("Conncected to server!");
-        // Make a HTTP request:
-        Serial.println();
-        client.println("GET " + URL);
-        client.println("HOST: script.google.com");
-        client.println("Connection: close");
-        client.println();
-
-        while (client.connected()) {
-            String line = client.readStringUntil('\n');
-            if (line == "\r") {
-                Serial.println("Headers received");
-                break;
-            }
-        }
-
-        // if there are incoming bytes available
-        // from the server, read them and print them:
-        while (client.available()) {
-            char c = client.read();
-            Serial.write(c);
-        }
-        client.stop();
+        Serial.print("[HTTP] GET... failed, error: ");
+        Serial.println(http.errorToString(httpCode).c_str());
     }
 }
 
