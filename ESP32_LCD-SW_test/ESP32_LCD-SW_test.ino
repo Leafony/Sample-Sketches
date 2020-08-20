@@ -1,7 +1,6 @@
 //=====================================================================
 //  Leafony Platform sample sketch
 //     Application  : LCD SW test
-//     Platform     : LCD
 //     Processor    : ESP32-WROOM-32 (ESP32 Dev Module)
 //     Arduino IDE  : 1.8.13
 //     Arduino ESP32: 1.0.4
@@ -82,7 +81,7 @@ void setup(){
 
   // IO　Expander Initialize
   i2c_write_byte(I2C_EXPANDER_ADDR, 0x03, 0xFE);
-  i2c_write_byte(I2C_EXPANDER_ADDR, 0x01, 0x01);
+  i2c_write_byte(I2C_EXPANDER_ADDR, 0x01, 0x01);      // LCD Power on
   
   //LCD Initialize
   lcd.begin(8, 2);                      // 8文字, 2行
@@ -93,12 +92,10 @@ void setup(){
   lcd.setCursor(0, 1);
   delay(3000);
 
-  // LCD Power off
-  i2c_write_byte(I2C_EXPANDER_ADDR, 0x01, 0x00); 
+  i2c_write_byte(I2C_EXPANDER_ADDR, 0x01, 0x00);      // LCD Power off
   delay(3000);
 
-  // LCD Power on
-  i2c_write_byte(I2C_EXPANDER_ADDR, 0x01, 0x01);
+  i2c_write_byte(I2C_EXPANDER_ADDR, 0x01, 0x01);      // LCD Power on
 
   // LCD Initialize
   lcd.begin(8, 2);                      // 8文字, 2行
