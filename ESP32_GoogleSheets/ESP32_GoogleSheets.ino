@@ -121,10 +121,18 @@ float getBrightness() {
     return brightness;
 }
 
+void espDeepSleep() {
+    esp_sleep_enable_timer_wakeup(DEEP_SLEEP_TIME_SEC * 1000 * 1000);  // set deep sleep time
+    esp_deep_sleep_start();   // enter deep sleep
+}
+
 void setup() {
 
     OPT3001_Config illumConfig;
     OPT3001_ErrorCode illumErrorConfig;
+    // WiFi connection controlling parameters
+    int statusCheckCounter = 0;
+    const int CHECK_NUM_MAX = 100;
 
     Serial.begin(115200);
 
@@ -150,10 +158,22 @@ void setup() {
     }
 
     WiFi.begin(SSID, PASSWORD);
+    Serial.print("WiFi connecting");
+    // Wait until succeed connecting.
+    // If the number of checks is more than CHECK_NUM_MAX, give up connecting and
+    // start deepsleep to prevent Joule heat from affecting next measurements.
     while (WiFi.status() != WL_CONNECTED) {
-        // wait until succeed connecting
+        if(statusCheckCounter > CHECK_NUM_MAX) {
+            WiFi.disconnect();
+            Serial.println("failed");
+            Serial.println("Deepsleep Start");
+            espDeepSleep();
+        }
+        Serial.print(".");
         delay(500);
+        statusCheckCounter++;
     }
+    Serial.println("\nconnected");
 
 }
 
@@ -182,7 +202,6 @@ void loop() {
     // After calling "esp_deep_sleep_start" function, any following codes will not be executed
     // When restarting ESP32, all variables are restored and the program will start from the beginning
     Serial.println("Deepsleep Start");
-    esp_sleep_enable_timer_wakeup(DEEP_SLEEP_TIME_SEC * 1000 * 1000);  // set deep sleep time
-    esp_deep_sleep_start();   // enter deep sleep
+    espDeepSleep();
 
 }
