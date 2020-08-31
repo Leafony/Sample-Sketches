@@ -36,9 +36,9 @@ function Leafony() {
 
         try {
             device = await navigator.bluetooth.requestDevice({
-                filters: [
-                    {name: 'Leaf_Z'}
-                ]
+	        filters: [{name: 'Leaf_Z'}],
+	        // acceptAllDevices: true,
+	        optionalServices: [ 'generic_access', SERVICE_UUID ],
             });
 
             console.log( '> Unique Name: ' + device.name );
