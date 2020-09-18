@@ -14,18 +14,18 @@
 //
 //      Rev.00 2020/8/17  First release
 //=====================================================================
-
-
 #include <Arduino.h>
 #include <Wire.h>
 #include <HTTPClient.h>
 #include <HTS221.h>
 #include <ClosedCube_OPT3001.h>
 
-// Connecting WiFi Settings
-const char* SSID = "wifi_ssid";    // WiFi SSID
-const char* PASSWORD = "wifi_password";  // WiFi Password
+// Unique ID
+String UniqueID = "Leafony_AP02";
 
+// Connecting WiFi Settings
+const char* SSID = "wifi_ssid";           // WiFi SSID
+const char* PASSWORD = "wifi_password";   // WiFi Password
 // Accessed Google Script Settings
 const char* APP_SERVER = "script.google.com";
 const char* KEY = "google_scripts_key";
@@ -40,18 +40,20 @@ ClosedCube_OPT3001 illum;
 #define OPT3001_ADDRESS 0x45  // ADDR pin = VCC
 
 
-void accessToGoogleSheets(float temperature, float humidity, float brightness) {
+void accessToGoogleSheets(float temperature, float humidity, float illumination) {
     HTTPClient http;
     String URL = "https://script.google.com/macros/s/";
 
     URL += KEY;
     URL += "/exec?";
-    URL += "temperature=";
+    URL += "UniqueID=";
+    URL += UniqueID;
+    URL += "&temperature=";
     URL += temperature;
     URL += "&humidity=";
     URL += humidity;
-    URL += "&brightness=";
-    URL += brightness;
+    URL += "&illumination=";
+    URL += illumination;
 
     Serial.println("[HTTP] begin...");
     Serial.println(URL);
@@ -109,16 +111,16 @@ float getHumidity() {
     return humidity;
 }
 
-float getBrightness() {
+float getillumination() {
     OPT3001 result = illum.readResult();
-    float brightness;
+    float illumination;
 
     if(result.error == NO_ERROR){
-        brightness = result.lux;
+        illumination = result.lux;
     } else {
-        brightness = -99.9;
+        illumination = -99.9;
     }
-    return brightness;
+    return illumination;
 }
 
 void espDeepSleep() {
@@ -130,6 +132,7 @@ void setup() {
 
     OPT3001_Config illumConfig;
     OPT3001_ErrorCode illumErrorConfig;
+
     // WiFi connection controlling parameters
     int statusCheckCounter = 0;
     const int CHECK_NUM_MAX = 100;
@@ -169,7 +172,7 @@ void setup() {
             Serial.println("Deepsleep Start");
             espDeepSleep();
         }
-        Serial.print(".");
+        Serial.print(WiFi.status());
         delay(500);
         statusCheckCounter++;
     }
@@ -182,17 +185,17 @@ void loop() {
     // get sensor values
     float temperature = getTemperature();
     float humidity = getHumidity();
-    float brightness = getBrightness();
+    float illumination = getillumination();
 
     Serial.print("\ntemperature : ");
     Serial.println(temperature);
     Serial.print("humidity    : ");
     Serial.println(humidity);
-    Serial.print("brightness  : ");
-    Serial.println(brightness);
+    Serial.print("illumination  : ");
+    Serial.println(illumination);
 
     // send sensor values to google sheets
-    accessToGoogleSheets(temperature, humidity, brightness);
+    accessToGoogleSheets(temperature, humidity, illumination);
 
     // WiFi Connection killed
     Serial.println("\nWiFi is disconnected");
