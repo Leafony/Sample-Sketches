@@ -133,6 +133,11 @@ float dataBatt = 0;
 volatile bool bSystemBootBle = false;
 volatile uint8_t ble_state = BLE_STATE_STANDBY;
 
+//---------------------------
+// EEPROM Ring Buffer
+//---------------------------
+uint16_t rb_addr = 0;  // EEPROMリングバッファのTAILアドレス
+
 //=====================================================================
 // setup
 //=====================================================================
@@ -477,6 +482,48 @@ void wakeupBLE()
   while (ble112.checkActivity(1000)); /* [BGLIB] 受信チェック */
 }
 
+//---------------------------------------
+// EEPROM
+//---------------------------------------
+void setupRingBuffer(){
+  rb_addr = (uint16_t)(EEPROM.read(1) << 8) + (uint16_t)(EEPROM.read(0));
+  if(rb_addr >= (uint16_t)EEPROM.length() || (rb_addr - 2) % 8 != 0) {
+    rb_addr = 2;
+  }
+#ifdef DEBUG
+  Serial.print(F("rb_addr = "));
+  Serial.println(rb_addr);
+#endif
+}
+
+void writeEEPROM(){
+  uint8_t temp, humid, light, battVolt;
+  
+  if(rb_addr + 8 >= EEPROM.length()){
+    rb_addr = 2;
+  }
+
+#ifdef DEBUG
+  Serial.print(F("writeEEPROM(): ADDR="));
+  Serial.println(rb_addr);
+#endif
+
+  temp = (uint8_t)(dataTemp * 256);
+  humid = (uint8_t)(dataHumid * 256);
+  light = (uint8_t)dataLight;
+  battVolt = (uint8_t)(dataBatt * 256);
+
+  EEPROM.write(rb_addr + 0, (temp >> 8) & 0xFF);
+  EEPROM.write(rb_addr + 1, temp & 0xFF);
+  EEPROM.write(rb_addr + 2, (humid >> 8) & 0xFF);
+  EEPROM.write(rb_addr + 3, humid & 0xFF);
+  EEPROM.write(rb_addr + 4, (light >> 8) & 0xFF);
+  EEPROM.write(rb_addr + 5, light & 0xFF);
+  EEPROM.write(rb_addr + 6, (battVolt >> 8) & 0xFF);
+  EEPROM.write(rb_addr + 7, battVolt & 0xFF);
+  rb_addr += 8;
+}
+
 void setup()
 {
   Serial.begin(115200);
@@ -490,6 +537,8 @@ void setup()
 
   setupPort();
   delay(10);
+
+  setupRingBuffer();
 
   setupSensor();
   setupBLE();
@@ -508,6 +557,8 @@ void loop()
 {
   getSensor();
   sleepSensor();
+
+  writeEEPROM();
 
   StartAdvData();
 #ifdef DEBUG
