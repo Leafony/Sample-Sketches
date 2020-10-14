@@ -28,6 +28,7 @@
 //=====================================================================
 #include <SoftwareSerial.h>
 #include <Wire.h>
+#include <EEPROM.h>
 
 #include "STM32LowPower.h"
 
