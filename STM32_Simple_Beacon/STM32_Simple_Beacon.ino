@@ -6,34 +6,23 @@
 //     STM32 Core   : Ver1.9.0
 //
 //     Leaf configuration
-//       (1) AC02 BLE Sugar     :Bus-A
-//       (2) AI01 4-Sensors     :Bus-A
-//       (3) AP03 STM32 MCU
-//       (4) AZ01 USB           :Bus-A
+//       (1) AC02 BLE Sugar     :Bus-A or Bus-B
+//       (2) AP03 STM32 MCU
+//       (3) AZ01 USB           :Bus-A
 //
 //    (c) 2020 Trillion-Node Study Group
 //    Released under the MIT license
 //    https://opensource.org/licenses/MIT
 //
-//      Rev.00 2020/10/08 First release
+//      Rev.00 2020/10/15 First release
 //=====================================================================
 //  Required Libraries
-//    https://github.com/adafruit/Adafruit_LIS3DH
-//    https://github.com/ameltech/sme-hts221-library
-//    https://github.com/closedcube/ClosedCube_OPT3001_Arduino
 //    https://github.com/Leafony/TBGLib
-//    https://github.com/tomozh/arduino_ST7032
 //    https://github.com/stm32duino/STM32LowPower
 //    https://github.com/stm32duino/STM32RTC
 //=====================================================================
 #include "STM32LowPower.h"
 #include "TBGLib.h"
-
-//=====================================================================
-// BLE Local device name
-// 長さは必ず6文字
-//=====================================================================
-String strDeviceName = "Leaf_A";
 
 //=====================================================================
 // シリアルコンソールへのデバック出力
@@ -117,7 +106,6 @@ void setupBLE()
     ble112.checkActivity(100);
   }
 
-  // BLEの
   ble112.ble_cmd_system_get_bt_address();
   while (ble112.checkActivity(1000));
 
@@ -132,11 +120,6 @@ void setupBLE()
 //-----------------------------------------------
 void StartAdvData()
 {
-  uint8_t stLen;
-  float value;
-  char code[4];
-  char sendData[15];
-
   // Advertising data; 25byte MAX
   uint8_t adv_data[] = {
     // AD Structure 1: Flag
@@ -170,7 +153,7 @@ void StartAdvData()
   };
 
   // Register advertising packet
-  stLen = sizeof(adv_data);
+  uint8_t stLen = sizeof(adv_data);
   ble112.ble_cmd_le_gap_set_adv_data(SCAN_RSP_ADVERTISING_PACKETS, stLen, adv_data);
   while (ble112.checkActivity(1000));
 
@@ -201,15 +184,14 @@ void sleepBLE()
 //---------------------------------------
 void wakeupBLE()
 {
-  uint8_t *last;
   digitalWrite(BLE_WAKEUP, HIGH);
   delay(500);
 
   ble112.ble_cmd_system_halt(0);
   while (ble112.checkActivity());
 
-  ble112.ble_cmd_le_gap_set_adv_parameters(400, 800, 7); /* [BGLIB] <interval_min> <interval_max> <channel_map> */
-  while (ble112.checkActivity(1000)); /* [BGLIB] 受信チェック */
+  ble112.ble_cmd_le_gap_set_adv_parameters(400, 800, 7);
+  while (ble112.checkActivity(1000));
 }
 
 void setup()
@@ -228,12 +210,7 @@ void setup()
   setupBLE();
 #ifdef DEBUG
   Serial.println(F("setup end"));
-#endif
-
-#ifdef DEBUG
-  Serial.println(F(""));
-  Serial.println(F("loop start"));
-  Serial.println(F(""));
+  Serial.println(F("========================================="));
 #endif
 }
 
@@ -255,6 +232,7 @@ void loop()
 
 #ifdef DEBUG
   Serial.println(F("Sleep STM32"));
+  Serial.println(F(">>> Sleep >>>"));
   Serial.flush();
 #endif
   LowPower.deepSleep(SLEEP_INTERVAL * 1000);
@@ -341,6 +319,7 @@ void my_evt_system_boot(const ble_msg_system_boot_evt_t *msg)
   bSystemBootBle = true;
 }
 
+// called when the system awake
 void my_evt_system_awake(void)
 {
 #ifdef DEBUG
