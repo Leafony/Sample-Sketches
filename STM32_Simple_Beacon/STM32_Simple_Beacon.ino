@@ -194,26 +194,25 @@ void wakeupBLE()
   while (ble112.checkActivity(1000));
 }
 
+//---------------------------------------
+// setup
+//
+//---------------------------------------
 void setup()
 {
   Serial.begin(115200);
   LowPower.begin(); // Configure low power
 
-#ifdef DEBUG
-  Serial.println(F("========================================="));
-  Serial.println(F("setup start"));
-#endif
-
   setupPort();
   delay(10);
 
   setupBLE();
-#ifdef DEBUG
-  Serial.println(F("setup end"));
-  Serial.println(F("========================================="));
-#endif
 }
 
+//---------------------------------------
+// loop
+//
+//---------------------------------------
 void loop()
 {
   StartAdvData();
