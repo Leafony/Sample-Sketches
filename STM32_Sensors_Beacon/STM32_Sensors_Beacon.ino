@@ -558,64 +558,16 @@ void onTXCommandComplete()
 // called when the attribute value changed
 void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribute_value_evt_t *msg)
 {
-  uint16 attribute = (uint16)msg->attribute;
-  uint16 offset = 0;
-  uint8 value_len = msg->value.len;
-
-  uint8 value_data[20];
-  String rcv_data;
-  rcv_data = "";
-
-#ifdef DEBUG
-  Serial.print(F("###\tgatt_server_attribute_value: { "));
-  Serial.print(F("connection: "));
-  Serial.print(msg->connection, HEX);
-  Serial.print(F(", attribute: "));
-  Serial.print((uint16_t)msg->attribute, HEX);
-  Serial.print(F(", att_opcode: "));
-  Serial.print(msg->att_opcode, HEX);
-  Serial.println(F(" }"));
-#endif
-
-  for (uint8_t i = 0; i < value_len; i++)
-  {
-    rcv_data += (char)(msg->value.data[i]);
-  }
 }
 
 // called when the connection is opened
 void my_evt_le_connection_opend(const ble_msg_le_connection_opend_evt_t *msg)
 {
-#ifdef DEBUG
-  Serial.print(F("###\tconnection_opend: { "));
-  Serial.print(F("address: "));
-  // this is a "bd_addr" data type, which is a 6-byte uint8_t array
-  for (uint8_t i = 0; i < 6; i++)
-  {
-    if (msg->address.addr[i] < 16)
-      Serial.write('0');
-    Serial.print(msg->address.addr[i], HEX);
-  }
-  Serial.println(" }");
-#endif
-
-  ble_state = BLE_STATE_CONNECTED_SLAVE;
 }
 
 // called when connection is closed
 void my_evt_le_connection_closed(const struct ble_msg_le_connection_closed_evt_t *msg)
 {
-#ifdef DEBUG
-  Serial.print(F("###\tconnection_closed: { "));
-  Serial.print(F("reason: "));
-  Serial.print((uint16_t)msg->reason, HEX);
-  Serial.print(F(", connection: "));
-  Serial.print(msg->connection, HEX);
-  Serial.println(F(" }"));
-#endif
-
-  // set state to ADVERTISING
-  ble_state = BLE_STATE_STANDBY;
 }
 
 // called when the system booted

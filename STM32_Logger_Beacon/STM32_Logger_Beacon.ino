@@ -51,16 +51,22 @@ String strDeviceName = "Leaf_A";
 #define DEBUG
 
 //=====================================================================
-// スリープ時間、起動時間、送信間隔の設定
-//  SLEEP_INTERVAL :スリープ時間 (秒)
+// スリープ時間、送信時間の設定
+//  SLEEP_INTERVAL : スリープ時間 (秒)
 //  WAKE_INTERVAL　：パケット送信時間 (秒)
 //=====================================================================
 #define SLEEP_INTERVAL (8)
-#define WAKE_INTERVAL  (1)
+#define WAKE_INTERVAL  (10)
 
 //=====================================================================
 // IOピンの名前定義
 //=====================================================================
+// Bus-Aに接続する場合
+// #define BLE_WAKEUP PA8
+// #define BLE_TX PA1
+// #define BLE_RX PA0
+
+// Bus-Bに接続する場合
 #define BLE_WAKEUP PB11
 #define BLE_TX PC5
 #define BLE_RX PC4
@@ -69,17 +75,13 @@ String strDeviceName = "Leaf_A";
 // プログラム内で使用する定数定義
 //
 //=====================================================================
-//------------------------------
-// I2Cアドレス
-//------------------------------
+// I2C addresses
 #define LIS2DH_ADDRESS 0x19        // Accelerometer (SD0/SA0 pin = VCC)
 #define OPT3001_ADDRESS 0x45       // Ambient Light Sensor (ADDR pin = VCC)
 #define LCD_I2C_EXPANDER_ADDR 0x1A // LCD I2C Expander
 #define BATT_ADC_ADDR 0x50         // Battery ADC
 
-//------------------------------
-// BLE
-//------------------------------
+// BLE states
 #define BLE_STATE_STANDBY          (0)
 #define BLE_STATE_SCANNING         (1)
 #define BLE_STATE_ADVERTISING      (2)
@@ -90,60 +92,40 @@ String strDeviceName = "Leaf_A";
 //=====================================================================
 // objects
 //=====================================================================
-//-----------------------------------------------
-// Sensor
-//-----------------------------------------------
+// Sensors
 Adafruit_LIS3DH accel = Adafruit_LIS3DH();
 ClosedCube_OPT3001 light;
 
-//-----------------------------------------------
 // BLE
-//-----------------------------------------------
 HardwareSerial Serialble(BLE_TX, BLE_RX);
 BGLib ble112((HardwareSerial *)&Serialble, 0, 0);
 
 //=====================================================================
 // Variables
 //=====================================================================
-//---------------------------
 // LIS2DH : accelerometer
-//---------------------------
 float dataX_g, dataY_g, dataZ_g;
 float dataTilt = 0;
 
-//---------------------------
 // HTS221 : Temperature/Humidity
-//---------------------------
 float dataTemp = 0;
 float dataHumid = 0;
 
-//---------------------------
 // OPT3001 : Light
-//---------------------------
 float dataLight = 0;
 
-//---------------------------
-// Batt
-//---------------------------
+// Battery voltage
 float dataBatt = 0;
 
-//---------------------------
 // BLE
-//---------------------------
 volatile bool bSystemBootBle = false;
 volatile uint8_t ble_state = BLE_STATE_STANDBY;
+bool bBleConnected = false;
+bool bBleSendData = false;
 
-//---------------------------
 // EEPROM Ring Buffer
-//---------------------------
 uint16_t rb_addr = 0;  // EEPROMリングバッファのTAILアドレス
 
-//=====================================================================
-// setup
-//=====================================================================
-//-----------------------------------------------
-// port
-//-----------------------------------------------
 //=====================================================================
 // IOピンの入出力設定
 // 接続するリーフに合わせて設定する
@@ -154,10 +136,6 @@ void setupPort()
   digitalWrite(BLE_WAKEUP, HIGH); // BLE Wakeup
 }
 
-//=====================================================================
-// 各デバイスの初期設定
-//
-//=====================================================================
 //-----------------------------------------------
 // sensor
 //-----------------------------------------------
@@ -195,9 +173,7 @@ void setupSensor()
 //-----------------------------------------------
 void setupBLE()
 {
-  String stWork;
-
-  // set up internal status handlers (these are technically optional)
+  // set up internal status handlers
   ble112.onBusy = onBusy;
   ble112.onIdle = onIdle;
   ble112.onTimeout = onTimeout;
@@ -223,13 +199,14 @@ void setupBLE()
     ble112.checkActivity(100);
   }
 
+  // BLEの
   ble112.ble_cmd_system_get_bt_address();
-  while (ble112.checkActivity(1000)); /* [BGLIB] 受信チェック */
+  while (ble112.checkActivity(1000));
 
   /* interval_min : 250ms( = 400 x 0.625ms ) */
   /* interval_max : 500ms( = 800 x 0.625ms ) */
   ble112.ble_cmd_le_gap_set_adv_parameters(400, 800, 7); /* [BGLIB] <interval_min> <interval_max> <channel_map> */
-  while (ble112.checkActivity(1000)); /* [BGLIB] 受信チェック */
+  while (ble112.checkActivity(1000));
 }
 
 //-----------------------------------------------
@@ -273,9 +250,7 @@ void StartAdvData()
       (0),                                  //24: reserved
   };
 
-  //-------------------------
   // Sensors data
-  //-------------------------
   temp = (short int)(dataTemp * 256);
   humid = (short int)(dataHumid * 256);
   battVolt = (short int)(dataBatt * 256);
@@ -285,7 +260,7 @@ void StartAdvData()
   // BGLIB_GAP_AD_TYPE_LOCALNAME_COMPLETEのfield lengthを設定
   adv_data[3] = (lenStr2 + 1); // field length
   //アドバタイズデータにローカルデバイス名を入れる
-  uint8 u8Index;
+  uint8_t u8Index;
   for (u8Index = 0; u8Index < lenStr2; u8Index++)
   {
     adv_data[5 + u8Index] = strDeviceName.charAt(u8Index);
@@ -307,11 +282,11 @@ void StartAdvData()
   //アドバタイズデータを登録
   stLen = (5 + lenStr2 + 13);
   ble112.ble_cmd_le_gap_set_adv_data(SCAN_RSP_ADVERTISING_PACKETS, stLen, adv_data); //SCAN_RSP_ADVERTISING_PACKETS
-  while (ble112.checkActivity(1000)); /* 受信チェック */
+  while (ble112.checkActivity(1000));
 
   // index = 0  LE_GAP_SCANNABLE_NON_CONNECTABLE / LE_GAP_UNDIRECTED_CONNECTABLE
-  ble112.ble_cmd_le_gap_start_advertising(0, LE_GAP_USER_DATA, LE_GAP_SCANNABLE_NON_CONNECTABLE);
-  while (ble112.checkActivity(1000)); /* 受信チェック */
+  ble112.ble_cmd_le_gap_start_advertising(0, LE_GAP_USER_DATA, LE_GAP_UNDIRECTED_CONNECTABLE);
+  while (ble112.checkActivity(1000));
 }
 
 //--------------------------------------------------------------------
@@ -320,10 +295,8 @@ void StartAdvData()
 void getSensor()
 {
   double temp_mv;
-  //-------------------------
-  // LIS2DH
-  // 3軸センサーのデータ取得
-  //-------------------------
+
+  // LIS2DH 3軸センサーのデータ取得
   accel.read();
   dataX_g = accel.x_g;
   dataY_g = accel.y_g;
@@ -340,17 +313,11 @@ void getSensor()
 
   dataTilt = acos(dataZ_g) / PI * 180;
 
-  //-------------------------
-  // HTS221
-  // 温湿度センサーデータ取得
-  //-------------------------
+  // HTS221 温湿度センサーデータ取得
   dataTemp = (float)smeHumidity.readTemperature();
   dataHumid = (float)smeHumidity.readHumidity();
 
-  //-------------------------
-  // OPT3001
-  // 照度センサーデータ取得
-  //-------------------------
+  // OPT3001 照度センサーデータ取得
   OPT3001 result = light.readResult();
 
   if (result.error == NO_ERROR)
@@ -358,10 +325,7 @@ void getSensor()
     dataLight = result.lux;
   }
 
-  //-------------------------
-  // ADC081C027（ADC)
-  // 電池リーフ電池電圧取得
-  //-------------------------
+  // ADC081C027（ADC) 電池リーフ電池電圧取得
   uint8_t adcVal1 = 0;
   uint8_t adcVal2 = 0;
 
@@ -406,7 +370,7 @@ void sleepSensor()
 
   // HTS221 sleep
   smeHumidity.deactivate();
-  
+
   // OPT3001 sleep
   OPT3001_Config newConfig;
   OPT3001_ErrorCode errorConfig;
@@ -415,7 +379,6 @@ void sleepSensor()
   errorConfig = light.writeConfig(newConfig);
   if (errorConfig != NO_ERROR)
   {
-
     errorConfig = light.writeConfig(newConfig);
   }
 }
@@ -426,12 +389,16 @@ void sleepSensor()
 //-----------------------------------------
 void wakeupSensor()
 {
+  #ifdef DEBUG
+  Serial.println(F("Wakeup Senser"));
+  #endif
+  
   // LIS2DH wakeup
   accel.setDataRate(LIS3DH_DATARATE_1_HZ);
 
   // HTS221 wakeup
   smeHumidity.activate();
-  
+
   // OPT3001 wakeup
   OPT3001_Config newConfig;
   OPT3001_ErrorCode errorConfig;
@@ -455,12 +422,16 @@ void wakeupSensor()
 //---------------------------------------
 void sleepBLE()
 {
+  #ifdef DEBUG
+  Serial.println(F("Sleep BLE"));
+  #endif
+  
   ble112.ble_cmd_le_gap_stop_advertising(0);
   while (ble112.checkActivity());
-  
+
   ble112.ble_cmd_system_halt(1);
   while (ble112.checkActivity());
-  
+
   digitalWrite(BLE_WAKEUP, LOW);
   delay(500);
 }
@@ -471,6 +442,10 @@ void sleepBLE()
 //---------------------------------------
 void wakeupBLE()
 {
+  #ifdef DEBUG
+  Serial.println(F("Wakeup BLE"));
+  #endif
+  
   uint8_t *last;
   digitalWrite(BLE_WAKEUP, HIGH);
   delay(500);
@@ -524,13 +499,32 @@ void writeEEPROM(){
   rb_addr += 8;
 }
 
+void shutdownAllDevices(){
+  sleepBLE();
+
+#ifdef DEBUG
+  Serial.print(F("Shutdown STM32"));
+  Serial.print(F(" (restart after "));
+  Serial.print(SLEEP_INTERVAL);
+  Serial.println(F(" seconds)"));
+  Serial.flush();
+#endif
+  LowPower.shutdown(SLEEP_INTERVAL * 1000);
+
+#ifdef DEBUG
+  Serial.println(F("This will never been called!"));
+#endif
+}
+
 void setup()
 {
   Serial.begin(115200);
   LowPower.begin(); // Configure low power
 
   Wire.begin(); // I2C 100KHz
+
 #ifdef DEBUG
+  Serial.println(F("<<< Wake up <<<"));
   Serial.println(F("========================================="));
   Serial.println(F("setup start"));
 #endif
@@ -538,65 +532,73 @@ void setup()
   setupPort();
   delay(10);
 
-  setupRingBuffer();
+  // setupRingBuffer();
 
   setupSensor();
   setupBLE();
-#ifdef DEBUG
-  Serial.println(F("setup end"));
-#endif
 
 #ifdef DEBUG
-  Serial.println(F(""));
-  Serial.println(F("loop start"));
-  Serial.println(F(""));
+  Serial.println(F("setup end"));
+  Serial.println(F("========================================="));
 #endif
+
+  wakeupBLE();
+  
+  wakeupSensor();
+  getSensor();
+  sleepSensor();
+
+  // writeEEPROM();
+
+  StartAdvData();
+#ifdef DEBUG
+  Serial.print(F("Start advertising"));
+  Serial.print(F(" ("));
+  Serial.print(WAKE_INTERVAL);
+  Serial.println(F("s)"));
+  Serial.flush();
+#endif
+
+  // Continue Advertising
+  // TODO: この間にConnection Openedされない
+  //       BLEハンドラがこの間に割り込みできるようにする
+  for(int i=0; i<WAKE_INTERVAL; i++){
+    delay(1000);
+    ble112.checkActivity(1);
+  }
+  // bBleConnectedがtrueになるのはこのタイミング
+
+  // BLE ConnectedでなければSleep & Shutdown
+  if(!bBleConnected){
+    shutdownAllDevices();
+  }
 }
 
 void loop()
 {
-  getSensor();
-  sleepSensor();
+  if(bBleConnected){
+    // when ble is connected, this scope will run continuously.
+    if(bBleSendData){
+      #ifdef DEBUG
+      Serial.println("Start to send data.");
+      #endif
 
-  writeEEPROM();
-
-  StartAdvData();
-#ifdef DEBUG
-  Serial.println(F("Start advertise"));
-  Serial.flush();
-#endif
-
-  // Continue Advertising (during that STM32 sleeps.)
-  LowPower.deepSleep(WAKE_INTERVAL * 1000);
-
-#ifdef DEBUG
-  Serial.println(F("Sleep BLE"));
-#endif
-  sleepBLE();
-
-#ifdef DEBUG
-  Serial.println(F("Sleep STM32"));
-  Serial.flush();
-#endif
-  LowPower.deepSleep(SLEEP_INTERVAL * 1000);
-
-#ifdef DEBUG
-  Serial.println(F("Wakeup STM32"));
-#endif
-
-  wakeupBLE();
-#ifdef DEBUG
-  Serial.println(F("Wakeup BLE"));
-#endif
-
-  wakeupSensor();
-#ifdef DEBUG
-  Serial.println(F("Wakeup Senser"));
-#endif
-
-#ifdef DEBUG
-  Serial.println(F("<<< Wake up <<<"));
-#endif
+      /*
+      char sendData[40];
+      uint8_t sendLen = sprintf(sendData, "Hello Leafony\n");
+      ble112.ble_cmd_gatt_server_send_characteristic_notification( 1, 0x000C, sendLen, (const uint8 *)sendData );
+      while (ble112.checkActivity(1000));
+      */
+      
+      // after all the data trasnported,
+      bBleSendData = false;
+    } else {
+      ble112.checkActivity(100); 
+    }
+  } else {
+    // when ble is disconnected, shutdown all devices.
+    shutdownAllDevices();
+  }
 }
 
 
@@ -641,21 +643,28 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
   uint8 value_data[20];
   String rcv_data;
   rcv_data = "";
-
-#ifdef DEBUG
-  Serial.print(F("###\tgatt_server_attribute_value: { "));
-  Serial.print(F("connection: "));
-  Serial.print(msg->connection, HEX);
-  Serial.print(F(", attribute: "));
-  Serial.print((uint16_t)msg->attribute, HEX);
-  Serial.print(F(", att_opcode: "));
-  Serial.print(msg->att_opcode, HEX);
-  Serial.println(F(" }"));
-#endif
-
+  
   for (uint8_t i = 0; i < value_len; i++)
   {
     rcv_data += (char)(msg->value.data[i]);
+  }
+
+#ifdef DEBUG
+  Serial.print(F("###\tgatt_server_attribute_value: { "));
+  Serial.print(F("connection: ")); Serial.print(msg -> connection, HEX);
+  Serial.print(F(", attribute: ")); Serial.print((uint16_t)msg -> attribute, HEX);
+  Serial.print(F(", att_opcode: ")); Serial.print(msg -> att_opcode, HEX);
+  Serial.print(", offset: "); Serial.print((uint16_t)msg -> offset, HEX);
+  Serial.print(", value_len: "); Serial.print(msg -> value.len, HEX);
+  Serial.print(", value_data: "); Serial.print(rcv_data);
+  Serial.println(F(" }"));
+#endif
+
+  // Command
+  if(rcv_data.indexOf("SND") == 0){
+    bBleSendData = true;
+  } else if(rcv_data.indexOf("STP") == 0){
+    bBleSendData = false;
   }
 }
 
@@ -675,6 +684,7 @@ void my_evt_le_connection_opend(const ble_msg_le_connection_opend_evt_t *msg)
   Serial.println(" }");
 #endif
 
+  bBleConnected = true;
   ble_state = BLE_STATE_CONNECTED_SLAVE;
 }
 
@@ -690,6 +700,7 @@ void my_evt_le_connection_closed(const struct ble_msg_le_connection_closed_evt_t
   Serial.println(F(" }"));
 #endif
 
+  bBleConnected = false;
   // set state to ADVERTISING
   ble_state = BLE_STATE_STANDBY;
 }
