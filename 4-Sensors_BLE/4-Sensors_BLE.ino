@@ -146,7 +146,7 @@ BGLib ble112((HardwareSerial *)&Serialble, 0, 0 );
 //------------------------------
 // LCD
 //------------------------------
-bool dispLCD = 1;                           // LCDに表示する場合1にする
+bool dispLCD = 0;                           // LCDに表示する場合1にする
 int8_t lcdSendCount = 0;
 
 //------------------------------
