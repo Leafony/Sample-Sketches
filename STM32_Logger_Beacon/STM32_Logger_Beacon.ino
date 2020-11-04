@@ -41,7 +41,7 @@
 // BLE Local device name
 // 長さは必ず6文字
 //=====================================================================
-String strDeviceName = "Leaf_A";
+String strDeviceName = "Leaf_Z";
 
 //=====================================================================
 // シリアルコンソールへのデバック出力
@@ -583,12 +583,10 @@ void loop()
       Serial.println("Start to send data.");
       #endif
 
-      /*
       char sendData[40];
       uint8_t sendLen = sprintf(sendData, "Hello Leafony\n");
       ble112.ble_cmd_gatt_server_send_characteristic_notification( 1, 0x000C, sendLen, (const uint8 *)sendData );
       while (ble112.checkActivity(1000));
-      */
       
       // after all the data trasnported,
       bBleSendData = false;
@@ -661,9 +659,9 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
 #endif
 
   // Command
-  if(rcv_data.indexOf("SND") == 0){
+  if(rcv_data.indexOf("get") == 0){
     bBleSendData = true;
-  } else if(rcv_data.indexOf("STP") == 0){
+  } else if(rcv_data.indexOf("set") == 0){
     bBleSendData = false;
   }
 }
