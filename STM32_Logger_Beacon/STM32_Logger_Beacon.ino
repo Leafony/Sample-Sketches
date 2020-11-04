@@ -55,7 +55,7 @@ String strDeviceName = "Leaf_Z";
 //  SLEEP_INTERVAL : スリープ時間 (秒)
 //  WAKE_INTERVAL　：パケット送信時間 (秒)
 //=====================================================================
-#define SLEEP_INTERVAL (8)
+#define SLEEP_INTERVAL (5)
 #define WAKE_INTERVAL  (10)
 
 //=====================================================================
@@ -253,8 +253,8 @@ void StartAdvData()
   // Sensors data
   temp = (short int)(dataTemp * 256);
   humid = (short int)(dataHumid * 256);
-  battVolt = (short int)(dataBatt * 256);
   light = (short int)dataLight;
+  battVolt = (short int)(dataBatt * 256);
 
   size_t lenStr2 = strDeviceName.length();
   // BGLIB_GAP_AD_TYPE_LOCALNAME_COMPLETEのfield lengthを設定
@@ -461,12 +461,16 @@ void wakeupBLE()
 // EEPROM
 //---------------------------------------
 void setupRingBuffer(){
-  rb_addr = (uint16_t)(EEPROM.read(1) << 8) + (uint16_t)(EEPROM.read(0));
-  if(rb_addr >= (uint16_t)EEPROM.length() || (rb_addr - 2) % 8 != 0) {
+  // rb_addr = (uint16_t)(EEPROM.read(1) << 8) + (uint16_t)(EEPROM.read(0));
+  rb_addr = EEPROM.read(0);
+  rb_addr += EEPROM.read(1) * 256;
+  if(rb_addr >= EEPROM.length() || (rb_addr - 2) % 8 != 0) {
     rb_addr = 2;
   }
 #ifdef DEBUG
-  Serial.print(F("rb_addr = "));
+  Serial.print("EEPROM length = ");
+  Serial.println(EEPROM.length());
+  Serial.print("rb_addr = ");
   Serial.println(rb_addr);
 #endif
 }
@@ -496,7 +500,15 @@ void writeEEPROM(){
   EEPROM.write(rb_addr + 5, light & 0xFF);
   EEPROM.write(rb_addr + 6, (battVolt >> 8) & 0xFF);
   EEPROM.write(rb_addr + 7, battVolt & 0xFF);
+
+  // write next ring buffer address
   rb_addr += 8;
+  EEPROM.write(0, rb_addr & 0xFF);
+  EEPROM.write(1, rb_addr >> 8);
+#ifdef DEBUG
+  Serial.print("next addr = ");
+  Serial.println(rb_addr);
+#endif
 }
 
 void shutdownAllDevices(){
@@ -532,7 +544,7 @@ void setup()
   setupPort();
   delay(10);
 
-  // setupRingBuffer();
+  setupRingBuffer();
 
   setupSensor();
   setupBLE();
@@ -548,7 +560,7 @@ void setup()
   getSensor();
   sleepSensor();
 
-  // writeEEPROM();
+  writeEEPROM();
 
   StartAdvData();
 #ifdef DEBUG
@@ -560,8 +572,6 @@ void setup()
 #endif
 
   // Continue Advertising
-  // TODO: この間にConnection Openedされない
-  //       BLEハンドラがこの間に割り込みできるようにする
   for(int i=0; i<WAKE_INTERVAL; i++){
     delay(1000);
     ble112.checkActivity(1);
@@ -583,10 +593,34 @@ void loop()
       Serial.println("Start to send data.");
       #endif
 
+      /*
       char sendData[40];
       uint8_t sendLen = sprintf(sendData, "Hello Leafony\n");
       ble112.ble_cmd_gatt_server_send_characteristic_notification( 1, 0x000C, sendLen, (const uint8 *)sendData );
       while (ble112.checkActivity(1000));
+      */
+
+      for (int i=2; i<rb_addr; i+=8) {
+        char sendData[40];
+        char c_temp[7], c_humid[7], c_illum[7], c_batt[0];
+        float temp =  (EEPROM.read(i + 0) << 8 + EEPROM.read(i + 1)) / 256.0;
+        // float humid = (EEPROM.read(i + 2) << 8 + EEPROM.read(i + 3)) / 256.0;
+        // float illum = (EEPROM.read(i + 4) << 8 + EEPROM.read(i + 5));
+        // float batt =  (EEPROM.read(i + 6) << 8 + EEPROM.read(i + 7)) / 256;
+        
+        dtostrf(temp,4,1,c_temp);
+        //dtostrf(humid,2,0,c_humid);
+        //dtostrf(illum,5,0,c_illum);
+        //dtostrf(batt,3,2,c_batt);
+        
+        uint8_t sendLen = sprintf(sendData, "%s,%s,%s,%s", c_temp, "12", "34567", "89.0");
+        ble112.ble_cmd_gatt_server_send_characteristic_notification( 1, 0x000C, sendLen, (const uint8 *)sendData );
+        while (ble112.checkActivity(1000));
+      }
+
+      #ifdef DEBUG
+      Serial.println("Finish to send data.");
+      #endif
       
       // after all the data trasnported,
       bBleSendData = false;
