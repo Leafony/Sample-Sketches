@@ -207,6 +207,7 @@ float HM1 = 80.0;     // 湿度計等測定値
 //------------------------------
 bool bBLEconnect = false;
 bool bBLEsendData = false;
+volatile bool bSystemBootBle = false;
 
 volatile uint8_t ble_state = BLE_STATE_STANDBY;
 volatile uint8_t ble_encrypted = 0;         // 0 = not encrypted, otherwise = encrypted
@@ -665,7 +666,19 @@ void setupBLE(){
     ble112.ble_rsp_system_get_bt_address = my_rsp_system_get_bt_address;
     /*  */
 
+    uint8_t tm=0;
     Serialble.begin(9600);
+    while (!Serialble && tm <150){                                // Serial起動待ち タイムアウト1.5s
+      tm++;
+      delay(10);
+    }
+
+    tm=0;
+    while (!bSystemBootBle && tm <150){                           // BLE起動待ち
+      ble112.checkActivity(100);
+      tm++;
+      delay(10);
+    }
 
     /* setting */
     /* [set Advertising Data] */
@@ -781,11 +794,11 @@ void my_evt_gatt_server_attribute_value( const struct ble_msg_gatt_server_attrib
         Serial.print(F("connection: ")); Serial.print(msg -> connection, HEX);
         Serial.print(F(", attribute: ")); Serial.print((uint16_t)msg -> attribute, HEX);
         Serial.print(F(", att_opcode: ")); Serial.print(msg -> att_opcode, HEX);
-#if 0
+
         Serial.print(", offset: "); Serial.print((uint16_t)msg -> offset, HEX);
         Serial.print(", value_len: "); Serial.print(msg -> value.len, HEX);
         Serial.print(", value_data: "); Serial.print(rcv_data);
-#endif
+
         Serial.println(F(" }"));
 #endif
 
@@ -868,6 +881,8 @@ void my_evt_system_boot( const ble_msg_system_boot_evt_t *msg ) {
     #endif
 #endif
 
+     bSystemBootBle = true;
+
     // set state to ADVERTISING
     ble_state = BLE_STATE_ADVERTISING;
 }
@@ -880,7 +895,7 @@ void my_evt_system_awake(const ble_msg_system_boot_evt_t *msg ) {
 
 //-----------------------------------------------
 void my_rsp_system_get_bt_address(const struct ble_msg_system_get_bt_address_rsp_t *msg ){
-#ifdef SERIAL_MONITOR
+#ifdef DEBUG
   Serial.print( "###\tsystem_get_bt_address: { " );
   Serial.print( "address: " );
   for (int i = 0; i < 6 ;i++){
@@ -888,10 +903,11 @@ void my_rsp_system_get_bt_address(const struct ble_msg_system_get_bt_address_rsp
   }
   Serial.println( " }" );
 #endif
+#ifdef SERIAL_MONITOR
   unsigned short addr = 0;
   char cAddr[30];
   addr = msg->address.addr[0] + (msg->address.addr[1] *0x100);
   sprintf(cAddr, "Device name is Leaf_A_#%05d ",addr);
   Serial.println(cAddr);
+#endif
 }
-
