@@ -809,14 +809,14 @@ void loopBleRcv( void ){
 // called when the module begins sending a command
 void onBusy() {
     // turn LED on when we're busy
-    digitalWrite( D13_LED, HIGH );
+    //digitalWrite( D13_LED, HIGH );
 }
 
 //-----------------------------------------------
 // called when the module receives a complete response or "system_boot" event
 void onIdle() {
     // turn LED off when we're no longer busy
-    digitalWrite( D13_LED, LOW );
+    //digitalWrite( D13_LED, LOW );
 }
 
 //-----------------------------------------------
