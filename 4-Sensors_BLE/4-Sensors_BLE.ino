@@ -2,7 +2,7 @@
 //  Leafony Platform sample sketch
 //     Application  : BLE 4-Sensers demo
 //     Processor    : ATmega328P (3.3V /8MHz)
-//     Arduino IDE  : 1.8.13
+//     Confirmed in Arduino IDE 1.8.13
 //
 //     Leaf configuration
 //       (1) AC02 BLE Sugar
@@ -18,23 +18,6 @@
 //      Rev.00 2019/08/29 First release
 //      Rev.01 2020/07/29 不要部分削除等体裁修正
 //=====================================================================
-// use libraries
-//  Adafruit Unified Sensor Driver
-//    https://github.com/adafruit/Adafruit_Sensor
-//  Adafruit Bus IO Library
-//    https://github.com/adafruit/Adafruit_BusIO
-//  Adafruit LIS3DH
-//    https://github.com/adafruit/Adafruit_LIS3DH
-//  SmartEverything ST HTS221 Humidity Sensor
-//    https://github.com/ameltech/sme-hts221-library
-//  ClosedCube Arduino Library for ClosedCube OPT3001
-//    https://github.com/closedcube/ClosedCube_OPT3001_Arduino
-//  Blue gecko library for Leafony AC02
-//    https://github.com/Leafony/TBGLib
-//  ST7032 - Arduino LiquidCrystal compatible library
-//    https://github.com/tomozh/arduino_ST7032
-//=====================================================================
-
 //---------------------------------------------------------------------
 // difinition
 //---------------------------------------------------------------------
@@ -62,6 +45,13 @@ String strDeviceName = "Leafony_AC02";
 //    //#define SERIAL_MONITOR = 出力なし（コメントアウトする）
 //===============================================
 #define SERIAL_MONITOR
+
+//===============================================
+// シリアルモニタへのデバック出力
+//      #define DEBUG = 出力あり
+//    //#define DEBUG = 出力なし（コメントアウトする）
+//===============================================
+//#define DEBUG
 
 //-----------------------------------------------
 // 送信間隔の設定
@@ -226,8 +216,10 @@ bool bToggle = 0;
 // setup
 //=====================================================================
 void setup() {
-  Wire.begin();             // I2C 100kHz
+  delay(500);
+
   Serial.begin(115200);     // UART 115200bps
+  Wire.begin();             // I2C 100kHz
 #ifdef SERIAL_MONITOR
     Serial.println(F("========================================="));
     Serial.println(F("setup start"));
@@ -661,13 +653,16 @@ void bt_sendData(){
     // シリアルモニタ表示
     //-------------------------
 #ifdef SERIAL_MONITOR
+/*
+    // 複数行に表示する場合
     Serial.println("--- sensor data ---");    
     Serial.println("  Tmp[degC]     = " + String(dataTemp));
     Serial.println("  Hum[%]        = " + String(dataHumid));
     Serial.println("  Lum[lx]       = " + String(dataLight));
     Serial.println("  Ang[arc deg]  = " + String(dataTilt));
     Serial.println("  Bat[V]        = " + String(dataBatt));
-//  Serial.println("###\tbt_sendDatasend: { Temp=" + String(temp) + ", Humid=" + String(humid) + ", Light=" + String(light) + ", Tilt=" + String(tilt) + ", Vbat=" + String(battVolt) + ", Dice=" + String(pips) + " }");
+*/
+  Serial.println("SensorData: Temp=" + String(temp) + ", Humid=" + String(humid) + ", Light=" + String(light) + ", Tilt=" + String(tilt) + ", Vbat=" + String(battVolt) + ", Dice=" + String(pips));
 #endif
 }
 //====================================================================
@@ -814,14 +809,14 @@ void loopBleRcv( void ){
 // called when the module begins sending a command
 void onBusy() {
     // turn LED on when we're busy
-    //digitalWrite( D13_LED, HIGH );
+    digitalWrite( D13_LED, HIGH );
 }
 
 //-----------------------------------------------
 // called when the module receives a complete response or "system_boot" event
 void onIdle() {
     // turn LED off when we're no longer busy
-    //digitalWrite( D13_LED, LOW );
+    digitalWrite( D13_LED, LOW );
 }
 
 //-----------------------------------------------
@@ -863,7 +858,7 @@ void my_evt_gatt_server_attribute_value( const struct ble_msg_gatt_server_attrib
         rcv_data += (char)(msg -> value.data[i]);
     }
 
-#ifdef SERIAL_MONITOR
+#ifdef DEBUG
         Serial.print(F("###\tgatt_server_attribute_value: { "));
         Serial.print(F("connection: ")); Serial.print(msg -> connection, HEX);
         Serial.print(F(", attribute: ")); Serial.print((uint16_t)msg -> attribute, HEX);
@@ -895,7 +890,7 @@ void my_evt_gatt_server_attribute_value( const struct ble_msg_gatt_server_attrib
 
 //-----------------------------------------------
 void my_evt_le_connection_opend( const ble_msg_le_connection_opend_evt_t *msg ) {
-    #ifdef SERIAL_MONITOR
+    #ifdef DEBUG
         Serial.print(F("###\tconnection_opend: { "));
         Serial.print(F("address: "));
         // this is a "bd_addr" data type, which is a 6-byte uint8_t array
@@ -903,13 +898,6 @@ void my_evt_le_connection_opend( const ble_msg_le_connection_opend_evt_t *msg ) 
             if (msg -> address.addr[i] < 16) Serial.write('0');
             Serial.print(msg -> address.addr[i], HEX);
         }
-    #if 0
-        Serial.print(", address_type: "); Serial.print(msg -> address_type, HEX);
-        Serial.print(", master: "); Serial.print(msg -> master, HEX);
-        Serial.print(", connection: "); Serial.print(msg -> connection, HEX);
-        Serial.print(", bonding: "); Serial.print(msg -> bonding, HEX);
-        Serial.print(", advertiser: "); Serial.print(msg -> advertiser, HEX);
-    #endif
         Serial.println(" }");
     #endif
     /*  */
@@ -918,7 +906,7 @@ void my_evt_le_connection_opend( const ble_msg_le_connection_opend_evt_t *msg ) 
 /*  */
 //-----------------------------------------------
 void my_evt_le_connection_closed( const struct ble_msg_le_connection_closed_evt_t *msg ) {
-    #ifdef SERIAL_MONITOR
+    #ifdef DEBUG
         Serial.print(F("###\tconnection_closed: { "));
         Serial.print(F("reason: ")); Serial.print((uint16_t)msg -> reason, HEX);
         Serial.print(F(", connection: ")); Serial.print(msg -> connection, HEX);
@@ -945,20 +933,16 @@ void my_evt_le_connection_closed( const struct ble_msg_le_connection_closed_evt_
 
 //-----------------------------------------------
 void my_evt_system_boot( const ble_msg_system_boot_evt_t *msg ) {
-#if 0
-    #ifdef SERIAL_MONITOR
+    #ifdef DEBUG
         Serial.print( "###\tsystem_boot: { " );
         Serial.print( "major: " ); Serial.print(msg -> major, HEX);
         Serial.print( ", minor: " ); Serial.print(msg -> minor, HEX);
         Serial.print( ", patch: " ); Serial.print(msg -> patch, HEX);
         Serial.print( ", build: " ); Serial.print(msg -> build, HEX);
-    //    SerialUSB.print(", ll_version: "); Serial.print(msg -> ll_version, HEX);
         Serial.print( ", bootloader_version: " ); Serial.print( msg -> bootloader, HEX );           /*  */
-    //    Serial.print(", protocol_version: "); Serial.print(msg -> protocol_version, HEX);
         Serial.print( ", hw: " ); Serial.print( msg -> hw, HEX );
         Serial.println( " }" );
     #endif
-#endif
 
     // set state to ADVERTISING
     ble_state = BLE_STATE_ADVERTISING;
@@ -972,7 +956,7 @@ void my_evt_system_awake(const ble_msg_system_boot_evt_t *msg ) {
 
 //-----------------------------------------------
 void my_rsp_system_get_bt_address(const struct ble_msg_system_get_bt_address_rsp_t *msg ){
-#ifdef SERIAL_MONITOR
+#ifdef DEBUG
   Serial.print( "###\tsystem_get_bt_address: { " );
   Serial.print( "address: " );
   for (int i = 0; i < 6 ;i++){
