@@ -18,7 +18,6 @@
 //      Rev.00 2020/10/08 First release
 //=====================================================================
 //  Required Libraries
-//    https://github.com/adafruit/Adafruit_LIS3DH
 //    https://github.com/ameltech/sme-hts221-library
 //    https://github.com/closedcube/ClosedCube_OPT3001_Arduino
 //    https://github.com/Leafony/TBGLib
@@ -38,6 +37,7 @@
 #include "TBGLib.h"
 
 //=====================================================================
+//    https://github.com/adafruit/Adafruit_LIS3DH
 // BLE Local device name
 // 長さは必ず6文字
 //=====================================================================
@@ -66,10 +66,15 @@ String strDeviceName = "Leaf_Z";
 // #define BLE_TX PA1
 // #define BLE_RX PA0
 
-// Bus-Bに接続する場合
-#define BLE_WAKEUP PB11
-#define BLE_TX PC5
-#define BLE_RX PC4
+//// Bus-Bに接続する場合
+//#define BLE_WAKEUP PB11
+//#define BLE_TX PC5
+//#define BLE_RX PC4
+
+// 29-pinの場合
+#define BLE_WAKEUP      PB12                // D7   PB12
+#define BLE_RX          PA0                 // [A2] PA1
+#define BLE_TX          PA1                 // [A1] PA0
 
 //=====================================================================
 // プログラム内で使用する定数定義
@@ -125,6 +130,7 @@ bool bBleSendData = false;
 
 // EEPROM Ring Buffer
 uint16_t rb_addr = 0;  // EEPROMリングバッファのTAILアドレス
+const uint8_t PACKET_LENGTH = 16;
 
 //=====================================================================
 // IOピンの入出力設定
@@ -141,6 +147,10 @@ void setupPort()
 //-----------------------------------------------
 void setupSensor()
 {
+#ifdef DEBUG
+  Serial.println("setupSensor()");
+#endif
+
   // LIS2DH (accelerometer)
   accel.begin(LIS2DH_ADDRESS);
   accel.setClick(0, 0);                    // Disable Interrupt
@@ -173,6 +183,9 @@ void setupSensor()
 //-----------------------------------------------
 void setupBLE()
 {
+#ifdef DEBUG
+  Serial.println("setupBLE()");
+#endif
   // set up internal status handlers
   ble112.onBusy = onBusy;
   ble112.onIdle = onIdle;
@@ -198,14 +211,14 @@ void setupBLE()
   { // BLE起動待ち
     ble112.checkActivity(100);
   }
-
-  // BLEの
+  
+  //
   ble112.ble_cmd_system_get_bt_address();
   while (ble112.checkActivity(1000));
 
   /* interval_min : 250ms( = 400 x 0.625ms ) */
   /* interval_max : 500ms( = 800 x 0.625ms ) */
-  ble112.ble_cmd_le_gap_set_adv_parameters(400, 800, 7); /* [BGLIB] <interval_min> <interval_max> <channel_map> */
+  ble112.ble_cmd_le_gap_set_adv_parameters( 400, 800, 7 ); /* [BGLIB] <interval_min> <interval_max> <channel_map> */
   while (ble112.checkActivity(1000));
 }
 
@@ -214,73 +227,40 @@ void setupBLE()
 //-----------------------------------------------
 void StartAdvData()
 {
+  char charTemp[7], charBatt[7];
+  char userData[15];
+  uint8 dataLen;
+
   uint8 stLen;
-  float value;
-  short int temp, humid, light, battVolt;
-  char code[4];
-  char sendData[15];
+  uint8 adv_data[25];  // advertising data (max 25bytes)
+  uint8 index = 0;
 
-  /* setting */
-  /* [set Advertising Data]  25byte MAX*/
-  uint8 adv_data[] = {
-      (2),                                  //0:  field length
-      BGLIB_GAP_AD_TYPE_FLAGS,              //1:  field type (0x01)
-      (6),                                  //2:  data
-      (1),                                  //3:  field length (1は仮の初期値) BGLIB_GAP_AD_TYPE_LOCALNAME_COMPLETE(LOCAL DEVICE NAMEのデータ長
-      BGLIB_GAP_AD_TYPE_LOCALNAME_COMPLETE, //4:  field type (0x09)
-      (0),                                  //5:  L  1
-      (0),                                  //6:  e  2
-      (0),                                  //7:  a  3
-      (0),                                  //8:  f  4
-      (0),                                  //9:  _  5
-      (0),                                  //10: A  6
-      (0),                                  //11: field length
-      (0xff),                               //12: field type (0xff)
-      (0),                                  //13: Temp (Upper Byte)
-      (0),                                  //14: Temp (Lower Byte)
-      (0),                                  //15: Humid (Upper Byte)
-      (0),                                  //16: Humid (Lower Byte)
-      (0),                                  //17: Light (Upper Byte)
-      (0),                                  //18: Light (Lower Byte)
-      (0),                                  //19: Battery (Upper Byte)
-      (0),                                  //20: Battery (Lower Byte)
-      (0),                                  //21: reserved
-      (0),                                  //22: reserved
-      (0),                                  //23: reserved
-      (0),                                  //24: reserved
-  };
+  // AD Structure 1 (Flags)
+  adv_data[index++] = 0x02;                       // field length
+  adv_data[index++] = BGLIB_GAP_AD_TYPE_FLAGS;    // AD Type (Flags)
+  adv_data[index++] = (1 << 1) | (1 << 2);        // LE General Discover Mode | BR/EDR Not Supported
 
-  // Sensors data
-  temp = (short int)(dataTemp * 256);
-  humid = (short int)(dataHumid * 256);
-  light = (short int)dataLight;
-  battVolt = (short int)(dataBatt * 256);
-
-  size_t lenStr2 = strDeviceName.length();
-  // BGLIB_GAP_AD_TYPE_LOCALNAME_COMPLETEのfield lengthを設定
-  adv_data[3] = (lenStr2 + 1); // field length
-  //アドバタイズデータにローカルデバイス名を入れる
-  uint8_t u8Index;
-  for (u8Index = 0; u8Index < lenStr2; u8Index++)
-  {
-    adv_data[5 + u8Index] = strDeviceName.charAt(u8Index);
+  // AD Structure 2 (Complete Local Name)
+  adv_data[index++] = strDeviceName.length() + 1;  // field length
+  adv_data[index++] = BGLIB_GAP_AD_TYPE_LOCALNAME_COMPLETE;  // AD Type (Complete Local Name)
+  for (uint8 i = 0; i < strDeviceName.length(); i++){
+    adv_data[index++] = strDeviceName.charAt(i);  // Local Name
   }
-  adv_data[5 + u8Index] = 12;
-  adv_data[5 + u8Index + 1] = 0xFF; // field type
-  adv_data[5 + u8Index + 2] = (temp >> 8) & 0xFF;
-  adv_data[5 + u8Index + 3] = temp & 0xFF;
-  adv_data[5 + u8Index + 4] = (humid >> 8) & 0xFF;
-  adv_data[5 + u8Index + 5] = humid & 0xFF;
-  adv_data[5 + u8Index + 6] = (light >> 8) & 0xFF;
-  adv_data[5 + u8Index + 7] = light & 0xFF;
-  adv_data[5 + u8Index + 8] = (battVolt >> 8) & 0xFF;
-  adv_data[5 + u8Index + 9] = battVolt & 0xFF;
-  adv_data[5 + u8Index + 10] = 0;
-  adv_data[5 + u8Index + 11] = 0;
-  adv_data[5 + u8Index + 12] = 0;
+
+  // AD Structure 3 (Manufacturer Specific Data)
+  dtostrf(dataTemp, 4, 1, charTemp);  // Temperature (5byte)
+  dtostrf(dataBatt, 4, 2, charBatt);  // Battery Voltage (4byte)
+  dataLen = sprintf(userData, "TTT%4sV%4s", charTemp, charBatt);
+
+  adv_data[index++] = dataLen + 1;  // field lengh
+  adv_data[index++] = 0xff;         // AD Type (Manufacturer Specific Data)
+
+  for (uint8 i = 0; i < dataLen; i++){
+    adv_data[index++] = userData[i];  // User Data
+  }
 
   //アドバタイズデータを登録
-  stLen = (5 + lenStr2 + 13);
+  stLen = index;
   ble112.ble_cmd_le_gap_set_adv_data(SCAN_RSP_ADVERTISING_PACKETS, stLen, adv_data); //SCAN_RSP_ADVERTISING_PACKETS
   while (ble112.checkActivity(1000));
 
@@ -464,7 +444,7 @@ void setupRingBuffer(){
   // rb_addr = (uint16_t)(EEPROM.read(1) << 8) + (uint16_t)(EEPROM.read(0));
   rb_addr = EEPROM.read(0);
   rb_addr += EEPROM.read(1) * 256;
-  if(rb_addr >= EEPROM.length() || (rb_addr - 2) % 8 != 0) {
+  if(rb_addr >= EEPROM.length() || (rb_addr - 2) % PACKET_LENGTH != 0) {
     rb_addr = 2;
   }
 #ifdef DEBUG
@@ -478,7 +458,7 @@ void setupRingBuffer(){
 void writeEEPROM(){
   uint8_t temp, humid, light, battVolt;
   
-  if(rb_addr + 8 >= EEPROM.length()){
+  if(rb_addr + PACKET_LENGTH >= EEPROM.length()){
     rb_addr = 2;
   }
 
@@ -502,10 +482,14 @@ void writeEEPROM(){
   EEPROM.write(rb_addr + 7, battVolt & 0xFF);
 
   // write next ring buffer address
-  rb_addr += 8;
+  rb_addr += PACKET_LENGTH;
   EEPROM.write(0, rb_addr & 0xFF);
   EEPROM.write(1, rb_addr >> 8);
 #ifdef DEBUG
+  Serial.print("temp = ");
+  Serial.println(temp);
+  Serial.print("humid = ");
+  Serial.println(humid);
   Serial.print("next addr = ");
   Serial.println(rb_addr);
 #endif
@@ -600,20 +584,27 @@ void loop()
       while (ble112.checkActivity(1000));
       */
 
-      for (int i=2; i<rb_addr; i+=8) {
+      for (int i=2; i<rb_addr; i+=PACKET_LENGTH) {
         char sendData[40];
         char c_temp[7], c_humid[7], c_illum[7], c_batt[0];
         float temp =  (EEPROM.read(i + 0) << 8 + EEPROM.read(i + 1)) / 256.0;
-        // float humid = (EEPROM.read(i + 2) << 8 + EEPROM.read(i + 3)) / 256.0;
+        float humid = (EEPROM.read(i + 2) << 8 + EEPROM.read(i + 3)) / 256.0;
         // float illum = (EEPROM.read(i + 4) << 8 + EEPROM.read(i + 5));
         // float batt =  (EEPROM.read(i + 6) << 8 + EEPROM.read(i + 7)) / 256;
+
+#ifdef DEBUG
+  Serial.print("temp (read) = ");
+  Serial.println(temp);
+  Serial.print("humid (read) = ");
+  Serial.println(humid);
+#endif
         
         dtostrf(temp,4,1,c_temp);
-        //dtostrf(humid,2,0,c_humid);
+        dtostrf(humid,2,0,c_humid);
         //dtostrf(illum,5,0,c_illum);
         //dtostrf(batt,3,2,c_batt);
         
-        uint8_t sendLen = sprintf(sendData, "%s,%s,%s,%s", c_temp, "12", "34567", "89.0");
+        uint8_t sendLen = sprintf(sendData, "%s,%s,%s,%s", c_temp, c_humid, "00000", "00.0");
         ble112.ble_cmd_gatt_server_send_characteristic_notification( 1, 0x000C, sendLen, (const uint8 *)sendData );
         while (ble112.checkActivity(1000));
       }
@@ -723,14 +714,12 @@ void my_evt_le_connection_opend(const ble_msg_le_connection_opend_evt_t *msg)
 // called when connection is closed
 void my_evt_le_connection_closed(const struct ble_msg_le_connection_closed_evt_t *msg)
 {
-#ifdef DEBUG
-  Serial.print(F("###\tconnection_closed: { "));
-  Serial.print(F("reason: "));
-  Serial.print((uint16_t)msg->reason, HEX);
-  Serial.print(F(", connection: "));
-  Serial.print(msg->connection, HEX);
-  Serial.println(F(" }"));
-#endif
+    #ifdef DEBUG
+        Serial.print(F("###\tconnection_closed: { "));
+        Serial.print(F("reason: ")); Serial.print((uint16_t)msg -> reason, HEX);
+        Serial.print(F(", connection: ")); Serial.print(msg -> connection, HEX);
+        Serial.println(F(" }"));
+    #endif
 
   bBleConnected = false;
   // set state to ADVERTISING
@@ -740,22 +729,16 @@ void my_evt_le_connection_closed(const struct ble_msg_le_connection_closed_evt_t
 // called when the system booted
 void my_evt_system_boot(const ble_msg_system_boot_evt_t *msg)
 {
-#ifdef DEBUG
-  Serial.print("###\tsystem_boot: { ");
-  Serial.print("major: ");
-  Serial.print(msg->major, HEX);
-  Serial.print(", minor: ");
-  Serial.print(msg->minor, HEX);
-  Serial.print(", patch: ");
-  Serial.print(msg->patch, HEX);
-  Serial.print(", build: ");
-  Serial.print(msg->build, HEX);
-  Serial.print(", bootloader_version: ");
-  Serial.print(msg->bootloader, HEX);
-  Serial.print(", hw: ");
-  Serial.print(msg->hw, HEX);
-  Serial.println(" }");
-#endif
+    #ifdef DEBUG
+        Serial.print( "###\tsystem_boot: { " );
+        Serial.print( "major: " ); Serial.print(msg -> major, HEX);
+        Serial.print( ", minor: " ); Serial.print(msg -> minor, HEX);
+        Serial.print( ", patch: " ); Serial.print(msg -> patch, HEX);
+        Serial.print( ", build: " ); Serial.print(msg -> build, HEX);
+        Serial.print( ", bootloader_version: " ); Serial.print( msg -> bootloader, HEX );           /*  */
+        Serial.print( ", hw: " ); Serial.print( msg -> hw, HEX );
+        Serial.println( " }" );
+    #endif
 
   bSystemBootBle = true;
   ble_state = BLE_STATE_ADVERTISING;
