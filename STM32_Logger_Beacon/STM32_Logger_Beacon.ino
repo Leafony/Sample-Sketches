@@ -467,6 +467,7 @@ void setupRingBuffer()
 void writeEEPROM()
 {
   uint16_t temp, humid, illum, battVolt;
+  uint32_t u_time = 0; // TODO: support logging time.
 
   // Reset the ring buffer address when the size is not enough;
   if (rb_addr + PACKET_LENGTH >= EEPROM.length())
@@ -493,6 +494,14 @@ void writeEEPROM()
   EEPROM.write(rb_addr + 5, illum & 0xFF);
   EEPROM.write(rb_addr + 6, (battVolt >> 8) & 0xFF);
   EEPROM.write(rb_addr + 7, battVolt & 0xFF);
+  EEPROM.write(rb_addr + 8, (u_time >> 24) & 0xFF);
+  EEPROM.write(rb_addr + 9, (u_time >> 16) & 0xFF);
+  EEPROM.write(rb_addr + 10, (u_time >> 8) & 0xFF);
+  EEPROM.write(rb_addr + 11, (u_time >> 0) & 0xFF);
+  // EEPROM.write(rb_addr + 12, 0x00);  // Reserved
+  // EEPROM.write(rb_addr + 13, 0x00);  // Reserved
+  // EEPROM.write(rb_addr + 14, 0x00);  // Reserved
+  // EEPROM.write(rb_addr + 15, 0x00);  // Reserved
 
   // write next ring buffer address
   rb_addr += PACKET_LENGTH;
@@ -601,49 +610,12 @@ void loop()
 
       for (int i = 2; i < rb_addr; i += PACKET_LENGTH)
       {
-        char sendData[40];
-        char c_temp[5], c_humid[5], c_illum[5], c_batt[5];
+        char sendData[PACKET_LENGTH];
 
-        uint8_t u_temp = EEPROM.read(i + 0);
-        uint8_t l_temp = EEPROM.read(i + 1);
-        uint8_t u_humid = EEPROM.read(i + 2);
-        uint8_t l_humid = EEPROM.read(i + 3);
-        uint8_t u_illum = EEPROM.read(i + 4);
-        uint8_t l_illum = EEPROM.read(i + 5);
-        uint8_t u_batt = EEPROM.read(i + 6);
-        uint8_t l_batt = EEPROM.read(i + 7);
-
-        float temp = ((float)u_temp * 256.0 + (float)l_temp) / 256.0;
-        float humid = ((float)u_humid * 256.0 + (float)l_humid) / 256.0;
-        float illum = ((float)u_illum * 256.0 + (float)l_illum);
-        float batt = ((float)u_batt * 256.0 + (float)l_batt) / 256.0;
-
-#ifdef DEBUG
-        Serial.print(i);
-        Serial.print(": ");
-        Serial.print(temp);
-        Serial.print(", ");
-        Serial.print(humid);
-        Serial.print(", ");
-        Serial.print(illum);
-        Serial.print(", ");
-        Serial.println(batt);
-#endif
-
-        dtostrf(temp, 4, 1, c_temp);
-        dtostrf(humid, 4, 1, c_humid);
-        dtostrf(illum, 5, 0, c_illum);
-        dtostrf(batt, 4, 2, c_batt);
-
-#ifdef DEBUG
-        Serial.println(c_temp);
-        Serial.println(c_humid);
-        Serial.println(c_illum);
-        Serial.println(c_batt);
-#endif
-
-        uint8_t sendLen = sprintf(sendData, "%s,%s,%s,%s", c_temp, c_humid, c_illum, c_batt);
-        ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, sendLen, (const uint8 *)sendData);
+        for (int j=0; j<PACKET_LENGTH; j++){
+          sendData[j] = EEPROM.read(i + j);
+        }
+        ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, PACKET_LENGTH, (const uint8_t *)sendData);
         while (ble112.checkActivity(1000))
           ;
       }

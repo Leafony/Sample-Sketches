@@ -20,14 +20,10 @@ const buttonLescan = document.getElementById('ble-lescan-button');
 const buttonLestop = document.getElementById('ble-lestop-button');
 
 let leafony;
-let chart;
+let chart_temp, chart_ilum, chart_batt;
 
 // array of received data
-let array_temp = ['Temp'];
-let array_humid = ['Humid'];
-let array_illum = ['Illum'];
-let array_batt = ['Batt'];
-
+let array_temp, array_humd, array_ilum, array_batt;
 
 window.onload = function () {
 
@@ -51,10 +47,7 @@ buttonConnect.addEventListener( 'click', function () {
 		updateTable( state );
 	} );
 	leafony.onAdvertisementReceived( function ( state ) {
-		let textDecoder = new TextDecoder('ascii');
-      	let asciiString = textDecoder.decode(state);
-		textTemp.innerHTML = asciiString;
-		console.log("onAdvertisementReceived: " + asciiString);
+		onAdvertisementReceived( state );
 	} );
 	leafony.disableSleep();
 	leafony.connect();
@@ -68,7 +61,7 @@ buttonConnect.addEventListener( 'click', function () {
 buttonDisconnect.addEventListener( 'click', function () {
 
 	leafony.disconnect();
-	leafony = null;
+	leafony = new Leafony();
 
 	buttonConnect.style.display = '';
 	buttonDisconnect.style.display = 'none';
@@ -101,19 +94,35 @@ function clearTable () {
 }
 
 function initChart () {
-	array_temp = ['Temp'];
-	array_humid = ['Humid'];
-	array_illum = ['Illum'];
-	array_batt = ['Batt'];
+	array_temp = ['Temperature'];
+	array_humd = ['Humidity'];
+	array_ilum = ['Illuminance'];
+	array_batt = ['Battery Voltage'];
 
-	chart = c3.generate({
-	    bindto: '#chart',
+	chart_temp = c3.generate({
+	    bindto: '#chart_temp',
 	    data: {
 	      columns: [
 			array_temp,
-			array_humid,
-			array_illum,
-			array_batt
+			array_humd,
+	      ]
+	    }
+	});
+
+	chart_ilum = c3.generate({
+	    bindto: '#chart_ilum',
+	    data: {
+	      columns: [
+			  array_ilum,
+	      ]
+	    }
+	});
+
+	chart_batt = c3.generate({
+	    bindto: '#chart_batt',
+	    data: {
+	      columns: [
+			  array_batt,
 	      ]
 	    }
 	});
@@ -130,25 +139,57 @@ function updateTable ( state ) {
 	let datetime = year + '/' + month + '/' + day + ' ' +
 				   hours + ':' + minutes + ':' + seconds;
 
+	let data = new Uint8Array(state.data.buffer);
+
+    let temp = (data[0] * 256.0 + data[1]) / 256.0;
+    let humd = (data[2] * 256.0 + data[3]) / 256.0;
+    let illm = data[4] * 256.0 + data[5];
+	let batt = (data[6] * 256.0 + data[7]) / 256.0;
+
+	let unixtime = new Uint32Array(state.data.buffer)[2];
+	let time = new Date(unixtime * 1000);
+	console.log(time, unixtime)
+
 	textDeviceName.innerText = state.devn;
 	textUniqueName.innerText = state.unin;
 	textDateTime.innerText = datetime;
-	textTemp.innerText = state.temp;
-	textHumid.innerText = state.humd;
-	textIllum.innerText = state.illm;
-	textBatt.innerText = state.batt;
+	textTemp.innerText = temp;
+	textHumid.innerText = humd;
+	textIllum.innerText = illm;
+	textBatt.innerText = batt;
 
-	array_temp.push( state.temp );
-	array_humid.push( state.humd );
-	array_illum.push( state.illm );
-	array_batt.push( state.batt );
+	array_temp.push( temp );
+	array_humd.push( humd );
+	array_ilum.push( illm );
+	array_batt.push( batt );
 
-	chart.load({
+	chart_temp.load({
 		columns: [
 			array_temp,
-			array_humid,
-			array_illum,
-			array_batt
+			array_humd,
 		]
 	});
+
+	chart_ilum.load({
+		columns: [
+			array_ilum,
+		]
+	});
+
+	chart_batt.load({
+		columns: [
+			array_batt,
+		]
+	});
+}
+
+
+function onAdvertisementReceived ( state ) {
+
+	let textDecoder = new TextDecoder('ascii');
+  	let asciiString = textDecoder.decode(state);
+	textTemp.innerHTML = asciiString;
+	console.log(state);
+	console.log("onAdvertisementReceived: " + asciiString);
+
 }

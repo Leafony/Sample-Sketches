@@ -90,21 +90,9 @@ function Leafony() {
      */
     function handleData ( event ) {
 
-        let data = event.target.value;
-        let decoder = new TextDecoder( 'utf-8' );
-        data = decoder.decode( data );
-        data = data.replace( /\r?\n/g, '' );
-        data = data.split( ',' );
-
-        console.log(data);
-
         state.devn = deviceName;
         state.unin = uniqueName;
-
-        state.temp = data[0];
-        state.humd = data[1];
-        state.illm = data[2];
-        state.batt = data[3];
+        state.data = event.target.value;
 
         onStateChangeCallback( state );
 
