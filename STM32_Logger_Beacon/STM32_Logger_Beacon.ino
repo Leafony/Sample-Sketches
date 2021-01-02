@@ -456,7 +456,7 @@ void setupRingBuffer(){
 }
 
 void writeEEPROM(){
-  uint8_t temp, humid, light, battVolt;
+  uint16_t temp, humid, light, battVolt;
   
   if(rb_addr + PACKET_LENGTH >= EEPROM.length()){
     rb_addr = 2;
@@ -467,10 +467,10 @@ void writeEEPROM(){
   Serial.println(rb_addr);
 #endif
 
-  temp = (uint8_t)(dataTemp * 256);
-  humid = (uint8_t)(dataHumid * 256);
-  light = (uint8_t)dataLight;
-  battVolt = (uint8_t)(dataBatt * 256);
+  temp = (uint16_t)(dataTemp * 256.0);
+  humid = (uint16_t)(dataHumid * 256.0);
+  light = (uint16_t)dataLight;
+  battVolt = (uint16_t)(dataBatt * 256.0);
 
   EEPROM.write(rb_addr + 0, (temp >> 8) & 0xFF);
   EEPROM.write(rb_addr + 1, temp & 0xFF);
@@ -486,12 +486,11 @@ void writeEEPROM(){
   EEPROM.write(0, rb_addr & 0xFF);
   EEPROM.write(1, rb_addr >> 8);
 #ifdef DEBUG
-  Serial.print("temp = ");
-  Serial.println(temp);
-  Serial.print("humid = ");
-  Serial.println(humid);
-  Serial.print("next addr = ");
-  Serial.println(rb_addr);
+  Serial.print("temp = "); Serial.print(temp);
+  Serial.print(", humid = "); Serial.print(humid);
+  Serial.print(", illum = "); Serial.print(light);
+  Serial.print(", batt = "); Serial.println(battVolt);
+  Serial.print("next addr = "); Serial.println(rb_addr);
 #endif
 }
 
@@ -499,10 +498,9 @@ void shutdownAllDevices(){
   sleepBLE();
 
 #ifdef DEBUG
-  Serial.print(F("Shutdown STM32"));
-  Serial.print(F(" (restart after "));
+  Serial.print("Shutdown STM32 (restart after ");
   Serial.print(SLEEP_INTERVAL);
-  Serial.println(F(" seconds)"));
+  Serial.println(" seconds)");
   Serial.flush();
 #endif
   LowPower.shutdown(SLEEP_INTERVAL * 1000);
@@ -586,25 +584,49 @@ void loop()
 
       for (int i=2; i<rb_addr; i+=PACKET_LENGTH) {
         char sendData[40];
-        char c_temp[7], c_humid[7], c_illum[7], c_batt[0];
-        float temp =  (EEPROM.read(i + 0) << 8 + EEPROM.read(i + 1)) / 256.0;
-        float humid = (EEPROM.read(i + 2) << 8 + EEPROM.read(i + 3)) / 256.0;
-        // float illum = (EEPROM.read(i + 4) << 8 + EEPROM.read(i + 5));
-        // float batt =  (EEPROM.read(i + 6) << 8 + EEPROM.read(i + 7)) / 256;
+        char c_temp[5], c_humid[5], c_illum[5], c_batt[5];
+        float temp, humid, illum, batt;
 
-#ifdef DEBUG
-  Serial.print("temp (read) = ");
-  Serial.println(temp);
-  Serial.print("humid (read) = ");
-  Serial.println(humid);
-#endif
+        uint8_t u_temp, l_temp;
+        uint8_t u_humid, l_humid;
+        uint8_t u_illum, l_illum;
+        uint8_t u_batt, l_batt;
+
+        u_temp = EEPROM.read(i + 0);
+        l_temp = EEPROM.read(i + 1);
+        u_humid = EEPROM.read(i + 2);
+        l_humid = EEPROM.read(i + 3);
+        u_illum = EEPROM.read(i + 4);
+        l_illum = EEPROM.read(i + 5);
+        u_batt = EEPROM.read(i + 6);
+        l_batt = EEPROM.read(i + 7);
+        
+        temp =  ((float)u_temp * 256.0 + (float)l_temp) / 256.0;
+        humid = ((float)u_humid * 256.0 + (float)l_humid) / 256.0;
+        illum = ((float)u_illum * 256.0 + (float)l_illum);
+        batt =  ((float)u_batt * 256.0 + (float)l_batt) / 256.0;
+
+        #ifdef DEBUG
+        Serial.print(i); Serial.print(": ");
+        Serial.print(temp); Serial.print(", ");
+        Serial.print(humid); Serial.print(", ");
+        Serial.print(illum); Serial.print(", ");
+        Serial.println(batt);
+        #endif
         
         dtostrf(temp,4,1,c_temp);
-        dtostrf(humid,2,0,c_humid);
-        //dtostrf(illum,5,0,c_illum);
-        //dtostrf(batt,3,2,c_batt);
+        dtostrf(humid,4,1,c_humid);
+        dtostrf(illum,5,0,c_illum);
+        dtostrf(batt,4,2,c_batt);
+
+        #ifdef DEBUG
+        Serial.println(c_temp);
+        Serial.println(c_humid);
+        Serial.println(c_illum);
+        Serial.println(c_batt);
+        #endif
         
-        uint8_t sendLen = sprintf(sendData, "%s,%s,%s,%s", c_temp, c_humid, "00000", "00.0");
+        uint8_t sendLen = sprintf(sendData, "%s,%s,%s,%s", c_temp, c_humid, c_illum, c_batt);
         ble112.ble_cmd_gatt_server_send_characteristic_notification( 1, 0x000C, sendLen, (const uint8 *)sendData );
         while (ble112.checkActivity(1000));
       }
@@ -735,7 +757,7 @@ void my_evt_system_boot(const ble_msg_system_boot_evt_t *msg)
         Serial.print( ", minor: " ); Serial.print(msg -> minor, HEX);
         Serial.print( ", patch: " ); Serial.print(msg -> patch, HEX);
         Serial.print( ", build: " ); Serial.print(msg -> build, HEX);
-        Serial.print( ", bootloader_version: " ); Serial.print( msg -> bootloader, HEX );           /*  */
+        Serial.print( ", bootloader_version: " ); Serial.print( msg -> bootloader, HEX );
         Serial.print( ", hw: " ); Serial.print( msg -> hw, HEX );
         Serial.println( " }" );
     #endif
