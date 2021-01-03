@@ -105,8 +105,30 @@ function initChart () {
 	      columns: [
 			array_temp,
 			array_humd,
-	      ]
-	    }
+		  ],
+		  axes: {
+			  Humidity: 'y2'
+		  },
+		},
+		axis: {
+			y: {
+				max: 40,
+				min: -10,
+				label: {
+					text: 'Temperature (℃)',
+					position: 'outer-middle',
+				}
+			},
+			y2: {
+				show: true,
+				max: 100,
+				min: 0,
+				label: {
+					text: 'Humidity (%)',
+					position: 'outer-middle',
+				}
+			}
+		}
 	});
 
 	chart_ilum = c3.generate({
@@ -115,7 +137,17 @@ function initChart () {
 	      columns: [
 			  array_ilum,
 	      ]
-	    }
+		},
+		axis: {
+			y: {
+				max: 10000,
+				min: 0,
+				label: {
+					text: 'Illuminance (lux)',
+					position: 'outer-middle',
+				}
+			}
+		}
 	});
 
 	chart_batt = c3.generate({
@@ -124,7 +156,17 @@ function initChart () {
 	      columns: [
 			  array_batt,
 	      ]
-	    }
+		},
+		axis: {
+			y: {
+				max: 4,
+				min: 0,
+				label: {
+					text: 'Battery Voltage (V)',
+					position: 'outer-middle',
+				}
+			}
+		}
 	});
 }
 
