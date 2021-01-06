@@ -109,7 +109,7 @@ function initChart () {
 	array_temp = ['Temperature'];
 	array_humd = ['Humidity'];
 	array_ilum = ['Illuminance'];
-	array_batt = ['Battery Voltage'];
+	array_batt = ['Battery'];
 
 	chart_temp = c3.generate({
 	    bindto: '#chart_temp',
@@ -144,11 +144,14 @@ function initChart () {
 	});
 
 	chart_ilum = c3.generate({
-	    bindto: '#chart_ilum',
-	    data: {
-	      columns: [
-			  array_ilum,
-	      ]
+		bindto: '#chart_ilum',
+		data: {
+			columns: [
+				array_ilum,
+			],
+			colors: {
+				Illuminance: '#ff9896'
+			}
 		},
 		axis: {
 			y: {
@@ -159,15 +162,19 @@ function initChart () {
 					position: 'outer-middle',
 				}
 			}
-		}
+		},
+
 	});
 
 	chart_batt = c3.generate({
-	    bindto: '#chart_batt',
-	    data: {
-	      columns: [
-			  array_batt,
-	      ]
+		bindto: '#chart_batt',
+		data: {
+			columns: [
+				array_batt,
+			],
+			colors: {
+				Battery: '#2ca02c'
+			}
 		},
 		axis: {
 			y: {
@@ -186,23 +193,23 @@ function initChart () {
  * This function is called when bluetooth reveice data.
  * @param {*} state : received buffer
  */
-function onStateChange ( state ) {
+function onStateChange(state) {
 	// Reveiced datetime
 	let date = new Date();
-	let year     = String( date.getFullYear() );
-	let month    = ( '00' + ( date.getMonth() + 1 ) ).slice( -2 );
-	let day      = ( '00' + date.getDate() ).slice( -2 );
-	let hours    = ( '00' + date.getHours() ).slice( -2 );
-	let minutes  = ( '00' + date.getMinutes() ).slice( -2 );
-	let seconds  = ( '00' + date.getSeconds() ).slice( -2 );
+	let year = String(date.getFullYear());
+	let month = ('00' + (date.getMonth() + 1)).slice(-2);
+	let day = ('00' + date.getDate()).slice(-2);
+	let hours = ('00' + date.getHours()).slice(-2);
+	let minutes = ('00' + date.getMinutes()).slice(-2);
+	let seconds = ('00' + date.getSeconds()).slice(-2);
 	let datetime = year + '/' + month + '/' + day + ' ' +
-				   hours + ':' + minutes + ':' + seconds;
+		hours + ':' + minutes + ':' + seconds;
 
-    // Decode received data
+	// Decode received data
 	let data = new Uint8Array(state.data.buffer);
-    let temp = (data[0] * 256.0 + data[1]) / 256.0;
-    let humd = (data[2] * 256.0 + data[3]) / 256.0;
-    let illm = data[4] * 256.0 + data[5];
+	let temp = (data[0] * 256.0 + data[1]) / 256.0;
+	let humd = (data[2] * 256.0 + data[3]) / 256.0;
+	let illm = data[4] * 256.0 + data[5];
 	let batt = (data[6] * 256.0 + data[7]) / 256.0;
 
 	let unixtime = new Uint32Array(state.data.buffer)[2];
@@ -218,10 +225,10 @@ function onStateChange ( state ) {
 	textBatt.innerText = batt;
 
 	// Append sensors values to array
-	array_temp.push( temp );
-	array_humd.push( humd );
-	array_ilum.push( illm );
-	array_batt.push( batt );
+	array_temp.push(temp);
+	array_humd.push(humd);
+	array_ilum.push(illm);
+	array_batt.push(batt);
 
 	// Update charts
 	chart_temp.load({
@@ -249,10 +256,10 @@ function onStateChange ( state ) {
  * This function is called when Bluetooth receive advertising packet.
  * @param {*} state 
  */
-function onAdvertisementReceived ( state ) {
+function onAdvertisementReceived(state) {
 
 	let textDecoder = new TextDecoder('ascii');
-  	let asciiString = textDecoder.decode(state);
+	let asciiString = textDecoder.decode(state);
 	textTemp.innerHTML = asciiString;
 	console.log(state);
 	console.log("onAdvertisementReceived: " + asciiString);
