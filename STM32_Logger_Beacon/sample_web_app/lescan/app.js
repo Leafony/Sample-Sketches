@@ -19,6 +19,9 @@ const buttonDisconnect = document.getElementById('ble-disconnect-button');
 const buttonLescan = document.getElementById('ble-lescan-button');
 const buttonLestop = document.getElementById('ble-lestop-button');
 
+const alertBox = document.getElementById('alertBox');
+const alertMessage = document.getElementById('alertMessage');
+
 let leafony;
 let chart_temp, chart_ilum, chart_batt;
 
@@ -31,6 +34,11 @@ window.onload = function () {
 	initChart();
 
 	leafony = new Leafony();
+	// Check BLE availability
+	if (!leafony.getBleAvailability()) {
+		alertBox.style.display = '';
+		alertMessage.textContent = 'お使いのデバイスではWebBluetoothがご利用いただけません。'
+	}
 	leafony.lescan();
 
 };
@@ -44,7 +52,7 @@ buttonConnect.addEventListener( 'click', function () {
 
 	// connect to leafony
 	leafony.onStateChange( function ( state ) {
-		updateTable( state );
+		onStateChange( state );
 	} );
 	leafony.onAdvertisementReceived( function ( state ) {
 		onAdvertisementReceived( state );
@@ -93,6 +101,10 @@ function clearTable () {
 
 }
 
+
+/**
+ * Initialize Chart
+ */
 function initChart () {
 	array_temp = ['Temperature'];
 	array_humd = ['Humidity'];
@@ -170,7 +182,12 @@ function initChart () {
 	});
 }
 
-function updateTable ( state ) {
+/**
+ * This function is called when bluetooth reveice data.
+ * @param {*} state : received buffer
+ */
+function onStateChange ( state ) {
+	// Reveiced datetime
 	let date = new Date();
 	let year     = String( date.getFullYear() );
 	let month    = ( '00' + ( date.getMonth() + 1 ) ).slice( -2 );
@@ -181,8 +198,8 @@ function updateTable ( state ) {
 	let datetime = year + '/' + month + '/' + day + ' ' +
 				   hours + ':' + minutes + ':' + seconds;
 
+    // Decode received data
 	let data = new Uint8Array(state.data.buffer);
-
     let temp = (data[0] * 256.0 + data[1]) / 256.0;
     let humd = (data[2] * 256.0 + data[3]) / 256.0;
     let illm = data[4] * 256.0 + data[5];
@@ -200,11 +217,13 @@ function updateTable ( state ) {
 	textIllum.innerText = illm;
 	textBatt.innerText = batt;
 
+	// Append sensors values to array
 	array_temp.push( temp );
 	array_humd.push( humd );
 	array_ilum.push( illm );
 	array_batt.push( batt );
 
+	// Update charts
 	chart_temp.load({
 		columns: [
 			array_temp,
@@ -226,6 +245,10 @@ function updateTable ( state ) {
 }
 
 
+/**
+ * This function is called when Bluetooth receive advertising packet.
+ * @param {*} state 
+ */
 function onAdvertisementReceived ( state ) {
 
 	let textDecoder = new TextDecoder('ascii');

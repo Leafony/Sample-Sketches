@@ -131,7 +131,7 @@ bool bBleSendData = false;
 
 // EEPROM Ring Buffer
 uint16_t rb_addr = 0; // EEPROMリングバッファのTAILアドレス
-const uint8_t PACKET_LENGTH = 16;
+const uint8_t PACKET_LENGTH = 12;
 
 //=====================================================================
 // IOピンの入出力設定
@@ -498,10 +498,6 @@ void writeEEPROM()
   EEPROM.write(rb_addr + 9, (u_time >> 16) & 0xFF);
   EEPROM.write(rb_addr + 10, (u_time >> 8) & 0xFF);
   EEPROM.write(rb_addr + 11, (u_time >> 0) & 0xFF);
-  // EEPROM.write(rb_addr + 12, 0x00);  // Reserved
-  // EEPROM.write(rb_addr + 13, 0x00);  // Reserved
-  // EEPROM.write(rb_addr + 14, 0x00);  // Reserved
-  // EEPROM.write(rb_addr + 15, 0x00);  // Reserved
 
   // write next ring buffer address
   rb_addr += PACKET_LENGTH;

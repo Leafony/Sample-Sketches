@@ -41,14 +41,33 @@
     </div>
   </div>
 
+
+
   <div class="container">
     <br>
+    <div id="alertBox" style="display:none;">
+      <div class="alert alert-warning" role="alert" id="alertMessage">
+        Alert Message Here.
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <p class="text-center display-1" id="textTempLe">00.0℃</p>
+        <p class="text-center display-1" id="textBattLe">0.00V</p>
+      </div>
+      <div class="col-md-6">
+        <div id="chart_temp"></div>
+      </div>
+      <div class="col-md-6">
+        <div id="chart_ilum"></div>
+      </div>
+      <div class="col-md-6">
+        <div id="chart_batt"></div>
+      </div>
+    </div>
     <div class="row">
       <div class="col-sm-8 mx-auto">
-        <div class="text-center" id="textTempLe">00.0℃</div>
-        <div id="chart_temp"></div>
-        <div id="chart_ilum"></div>
-        <div id="chart_batt"></div>
         <table id="table-recvdata" class="table table-hover">
           <tbody>
             <tr id="deviceNameTable">

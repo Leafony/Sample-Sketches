@@ -31,6 +31,13 @@ function Leafony() {
     var isApple = os.match(/iPhone|iPad|iPod|Mac/);
 
     /**
+     * BLEが利用可能かを調べる関数
+     */
+    function getBleAvailability () {
+        return navigator.bluetooth.getAvailability()
+    }
+
+    /**
      * Bluetoothリーフと接続する関数
      * @param none
      * @return none
@@ -80,7 +87,7 @@ function Leafony() {
         char.read.addEventListener( 'characteristicvaluechanged', handleData );
 
         // ログデータ送信命令
-        setTimeout( sendCommand, 1000, 'get' );
+        setTimeout( sendCommand, 1500, 'get' );
 
     }
 
@@ -285,6 +292,7 @@ function Leafony() {
 
 
     return {
+        getBleAvailability: getBleAvailability,
         connect: connect,
         onStateChange: function ( callback ) {
             onStateChangeCallback = callback;
