@@ -66,6 +66,14 @@
         <div id="chart_batt"></div>
       </div>
     </div>
+
+    <div class="row">
+      <div class="col-sm-10 mx-auto my-5 text-center">
+        <button type="button" class="btn btn-primary badge-pill btn-lg btn-block" id="button-download"
+         download="data.csv" href="#">Download CSV</button>
+      </div>
+    </div>
+
     <div class="row">
       <div class="col-sm-8 mx-auto">
         <table id="table-recvdata" class="table table-hover">
@@ -102,6 +110,7 @@
         </table>
       </div>
     </div>
+
   </div>
 
   <div class="py-5 bg-dark">
@@ -110,6 +119,8 @@
       <p>Version 1.1.0</p>
     </div>
   </div>
+
+  <a style="display:none;" id="downloader" href="#"></a>
 
   <!-- Load c3.css -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.css" rel="stylesheet">

@@ -22,6 +22,8 @@ const buttonLestop = document.getElementById('ble-lestop-button');
 const alertBox = document.getElementById('alertBox');
 const alertMessage = document.getElementById('alertMessage');
 
+const buttonDownload = document.getElementById("button-download");
+
 let leafony;
 let chart_temp, chart_ilum, chart_batt;
 
@@ -265,3 +267,30 @@ function onAdvertisementReceived(state) {
 	console.log("onAdvertisementReceived: " + asciiString);
 
 }
+
+
+/**
+ * Download CSV
+ */
+buttonDownload.addEventListener( 'click', function () {
+
+	let bom_utf_8 = new Uint8Array( [ 0xEF, 0xBB, 0xBF ] );
+	let csvText = "";
+
+	for (var i = 0; i < array_temp.length; i++ ) {
+		csvText += String(i) + "," + array_temp[i] + "," +
+				   array_humd[i] + "," + array_ilum[i] + "," + array_batt[i] + '\n';
+	}
+
+	let blob = new Blob( [ bom_utf_8, csvText ], { "type": "text/csv" } );
+
+	let url = window.URL.createObjectURL( blob );
+
+	let downloader = document.getElementById( "downloader" );
+	downloader.download = "data.csv";
+	downloader.href = url;
+	$( "#downloader" )[0].click();
+
+	delete csvText;
+	delete blob;
+});
