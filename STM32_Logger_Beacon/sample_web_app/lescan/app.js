@@ -41,7 +41,7 @@ window.onload = function () {
 		alertBox.style.display = '';
 		alertMessage.textContent = 'お使いのデバイスではWebBluetoothがご利用いただけません。'
 	}
-	leafony.lescan();
+	// leafony.lescan();
 
 };
 
@@ -79,16 +79,16 @@ buttonDisconnect.addEventListener( 'click', function () {
 } );
 
 
-// buttonLescan.addEventListener( 'click', function () {
-// 	console.log('buttonLescan: click');
-// 	leafony.lescan();
-// } );
+buttonLescan.addEventListener( 'click', function () {
+	console.log('buttonLescan: click');
+	leafony.lescan();
+} );
 
 
-// buttonLestop.addEventListener( 'click', function () {
-// 	console.log('buttonLestop: click');
-// 	leafony.lestop();
-// } );
+buttonLestop.addEventListener( 'click', function () {
+	console.log('buttonLestop: click');
+	leafony.lestop();
+} );
 
 
 function clearTable () {
