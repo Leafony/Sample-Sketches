@@ -264,13 +264,12 @@ function onStateChange(state) {
  * This function is called when Bluetooth receive advertising packet.
  * @param {*} state 
  */
-function onAdvertisementReceived(state) {
+function onAdvertisementReceived( state ) {
 
 	let textDecoder = new TextDecoder('ascii');
-	let asciiString = textDecoder.decode(state);
-	textTempLe.innerHTML = asciiString;
-	textBattLe.innerHTML = asciiString;
-	console.log(state);
+	let asciiString = textDecoder.decode(state).split(/A-Z/);
+	textTempLe.innerHTML = asciiString[0] + '℃';
+	textBattLe.innerHTML = asciiString[1] + 'V';
 	console.log("onAdvertisementReceived: " + asciiString);
 
 }
