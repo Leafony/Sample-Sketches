@@ -267,7 +267,7 @@ function onStateChange(state) {
 function onAdvertisementReceived( state ) {
 
 	let textDecoder = new TextDecoder('ascii');
-	let asciiString = textDecoder.decode(state).split(/A-Z/);
+	let asciiString = textDecoder.decode(state).split(',');
 	textTempLe.innerHTML = asciiString[0] + '℃';
 	textBattLe.innerHTML = asciiString[1] + 'V';
 	console.log("onAdvertisementReceived: " + asciiString);

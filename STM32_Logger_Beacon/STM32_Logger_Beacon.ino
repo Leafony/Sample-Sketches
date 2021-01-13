@@ -249,7 +249,7 @@ void StartAdvData()
   // AD Structure 3 (Manufacturer Specific Data)
   dtostrf(dataTemp, 4, 1, charTemp); // Temperature (5byte)
   dtostrf(dataBatt, 4, 2, charBatt); // Battery Voltage (4byte)
-  dataLen = sprintf(userData, "TTT%4sV%4s", charTemp, charBatt);
+  dataLen = sprintf(userData, "TT%4s,%4s", charTemp, charBatt);
 
   adv_data[index++] = dataLen + 1; // field lengh
   adv_data[index++] = 0xff;        // AD Type (Manufacturer Specific Data)
