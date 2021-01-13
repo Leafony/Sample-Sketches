@@ -85,12 +85,18 @@ buttonDisconnect.addEventListener( 'click', function () {
 buttonLescan.addEventListener( 'click', function () {
 	console.log('buttonLescan: click');
 	leafony.lescan();
+
+	buttonLescan.style.display = 'none';
+	buttonLestop.style.display = '';
 } );
 
 
 buttonLestop.addEventListener( 'click', function () {
 	console.log('buttonLestop: click');
 	leafony.lestop();
+
+	buttonLescan.style.display = '';
+	buttonLestop.style.display = 'none';
 } );
 
 
