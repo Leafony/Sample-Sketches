@@ -13,6 +13,8 @@ const textTemp = document.getElementById('textTemp');
 const textHumid = document.getElementById('textHumid');
 const textIllum = document.getElementById('textIllum');
 const textBatt = document.getElementById('textBatt');
+const textTempLe = document.getElementById('textTempLe');
+const textBattLe = document.getElementById('textBattLe');
 
 const buttonConnect = document.getElementById('ble-connect-button');
 const buttonDisconnect = document.getElementById('ble-disconnect-button');
@@ -41,8 +43,9 @@ window.onload = function () {
 		alertBox.style.display = '';
 		alertMessage.textContent = 'お使いのデバイスではWebBluetoothがご利用いただけません。'
 	}
-	// leafony.lescan();
 
+	// NOTE: Webbluetooth API requires user actions to run.
+	// leafony.lescan();
 };
 
 
@@ -262,7 +265,8 @@ function onAdvertisementReceived(state) {
 
 	let textDecoder = new TextDecoder('ascii');
 	let asciiString = textDecoder.decode(state);
-	textTemp.innerHTML = asciiString;
+	textTempLe.innerHTML = asciiString;
+	textBattLe.innerHTML = asciiString;
 	console.log(state);
 	console.log("onAdvertisementReceived: " + asciiString);
 
