@@ -230,7 +230,6 @@ function Leafony() {
      * @param none
      */
     async function lescan () {
-        console.log('LE Scanner Function');
         try {
             scan = await navigator.bluetooth.requestLEScan({
                 filters: [
@@ -272,9 +271,14 @@ function Leafony() {
      * @param none
      */
     function lestop () {
-        console.log('Stop Scanning');
-        scan.stop();
-        console.log('Stopped. scan.active = ' + scan.active);
+        try {
+            if ( scan != null ){
+                scan.stop();
+                console.log('Scanning is stopped. scan.active = ' + scan.active);
+            }
+        } catch ( error ) {
+            console.log( error );
+        }
     }
 
     function onAdvertisementReceivedCallback () {}

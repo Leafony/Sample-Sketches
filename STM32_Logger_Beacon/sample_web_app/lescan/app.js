@@ -38,14 +38,16 @@ window.onload = function () {
 	initChart();
 
 	leafony = new Leafony();
-	// Check BLE availability
+
 	if (!leafony.getBleAvailability()) {
 		alertBox.style.display = '';
 		alertMessage.textContent = 'お使いのデバイスではWebBluetoothがご利用いただけません。'
 	}
 
-	// NOTE: Webbluetooth API requires user actions to run.
-	// leafony.lescan();
+	leafony.onAdvertisementReceived( function ( state ) {
+		onAdvertisementReceived( state );
+	} );
+
 };
 
 
@@ -59,9 +61,7 @@ buttonConnect.addEventListener( 'click', function () {
 	leafony.onStateChange( function ( state ) {
 		onStateChange( state );
 	} );
-	leafony.onAdvertisementReceived( function ( state ) {
-		onAdvertisementReceived( state );
-	} );
+
 	leafony.disableSleep();
 	leafony.connect();
 
@@ -74,7 +74,6 @@ buttonConnect.addEventListener( 'click', function () {
 buttonDisconnect.addEventListener( 'click', function () {
 
 	leafony.disconnect();
-	leafony = new Leafony();
 
 	buttonConnect.style.display = '';
 	buttonDisconnect.style.display = 'none';
@@ -83,7 +82,6 @@ buttonDisconnect.addEventListener( 'click', function () {
 
 
 buttonLescan.addEventListener( 'click', function () {
-	console.log('buttonLescan: click');
 	leafony.lescan();
 
 	buttonLescan.style.display = 'none';
@@ -92,7 +90,6 @@ buttonLescan.addEventListener( 'click', function () {
 
 
 buttonLestop.addEventListener( 'click', function () {
-	console.log('buttonLestop: click');
 	leafony.lestop();
 
 	buttonLescan.style.display = '';
