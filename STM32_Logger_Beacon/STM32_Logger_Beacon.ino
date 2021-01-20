@@ -134,6 +134,7 @@ bool bBleSendData = false;
 
 // EEPROM Ring Buffer
 uint16_t rb_addr = 0; // EEPROMリングバッファのTAILアドレス
+const uint8_t RINGBUFF_OFFSET_ADDR = 2;
 const uint8_t PACKET_LENGTH = 12;
 
 //=====================================================================
@@ -450,10 +451,15 @@ void setupRingBuffer()
   // EEPROMの先頭2byteは次に読み出すレジスタのアドレスを指定
   rb_addr = ((uint16_t)EEPROM.read(1) << 8) + (uint16_t)(EEPROM.read(0));
 
+  // コントロールレジスタを読み出し
+  // wake_intval = EEPROM.read(2);
+  // sleep_intval = EEPROM.read(3);
+  // store_freq = EEPROM.read(4);
+
   // アドレスが不正な場合初期化
-  if (rb_addr >= EEPROM.length() || (rb_addr - 2) % PACKET_LENGTH != 0)
+  if (rb_addr >= EEPROM.length() || (rb_addr - RINGBUFF_OFFSET_ADDR) % PACKET_LENGTH != 0)
   {
-    rb_addr = 2;
+    rb_addr = RINGBUFF_OFFSET_ADDR;
   }
 
 #ifdef DEBUG
@@ -472,7 +478,7 @@ void writeEEPROM()
   // Reset the ring buffer address when the size is not enough;
   if (rb_addr + PACKET_LENGTH >= EEPROM.length())
   {
-    rb_addr = 2;
+    rb_addr = RINGBUFF_OFFSET_ADDR;
   }
 
 #ifdef DEBUG
@@ -603,7 +609,7 @@ void loop()
       Serial.println("Start to send data.");
 #endif
 
-      for (int i = 2; i < rb_addr; i += PACKET_LENGTH)
+      for (int i = RINGBUFF_OFFSET_ADDR; i < rb_addr; i += PACKET_LENGTH)
       {
         char sendData[PACKET_LENGTH];
 
