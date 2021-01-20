@@ -1,22 +1,26 @@
 //=====================================================================
 //  Leafony Platform sample sketch
-//     Application  : STM32 Simple BLE Beacon Example
+//     Application  : STM32 BLE Logger Beacon Example
 //     Processor    : STM32L452RE (Nucleo-64/Nucleo L452RE)
 //     Arduino IDE  : 1.8.12
 //     STM32 Core   : Ver1.9.0
 //
 //     Leaf configuration
-//       (1) AC02 BLE Sugar
-//       (2) AI01 4-Sensors
-//       (3) AP03 STM32 MCU
-//       (4) AZ01 USB
+//       (1) AI01 4-Sensors
+//       (2) AP03 STM32 MCU
+//       (3) AZ01 USB
+//       (4) AC02 BLE Sugar
 //       (5) AV0X Battery Leaf
 //
-//    (c) 2020 Trillion-Node Study Group
+//     Description
+//      センサデータをBeaconで送信しながらSTM32のFlashに書き込み、
+//      Webbluetoothから接続要求があれば、Flashのデータをすべて送信するサンプルスケッチです。
+//
+//    (c) 2021 Trillion-Node Study Group
 //    Released under the MIT license
 //    https://opensource.org/licenses/MIT
 //
-//      Rev.00 2020/10/08 First release
+//      Rev.01 2020/10/08 First release
 //=====================================================================
 //  Required Libraries
 //    https://github.com/ameltech/sme-hts221-library
@@ -38,7 +42,6 @@
 #include "TBGLib.h"
 
 //=====================================================================
-//    https://github.com/adafruit/Adafruit_LIS3DH
 // BLE Local device name
 // 長さは必ず6文字
 //=====================================================================
@@ -67,12 +70,12 @@ String strDeviceName = "Leaf_Z";
 #define BLE_RX PA0      // [A2] PA1
 #define BLE_TX PA1      // [A1] PA0
 
-// // Bus-Aに接続する場合
+// // 58-pin Bus-Aに接続する場合
 // #define BLE_WAKEUP PA8
 // #define BLE_TX PA1
 // #define BLE_RX PA0
 
-// // Bus-Bに接続する場合
+// // 58-pin Bus-Bに接続する場合
 // #define BLE_WAKEUP PB11
 // #define BLE_TX PC5
 // #define BLE_RX PC4
@@ -82,18 +85,18 @@ String strDeviceName = "Leaf_Z";
 //
 //=====================================================================
 // I2C addresses
-#define LIS2DH_ADDRESS 0x19        // Accelerometer (SD0/SA0 pin = VCC)
-#define OPT3001_ADDRESS 0x45       // Ambient Light Sensor (ADDR pin = VCC)
+#define LIS2DH_ADDRESS        0x19 // Accelerometer (SD0/SA0 pin = VCC)
+#define OPT3001_ADDRESS       0x45 // Ambient Light Sensor (ADDR pin = VCC)
 #define LCD_I2C_EXPANDER_ADDR 0x1A // LCD I2C Expander
-#define BATT_ADC_ADDR 0x50         // Battery ADC
+#define BATT_ADC_ADDR         0x50 // Battery ADC
 
 // BLE states
-#define BLE_STATE_STANDBY (0)
-#define BLE_STATE_SCANNING (1)
-#define BLE_STATE_ADVERTISING (2)
-#define BLE_STATE_CONNECTING (3)
+#define BLE_STATE_STANDBY          (0)
+#define BLE_STATE_SCANNING         (1)
+#define BLE_STATE_ADVERTISING      (2)
+#define BLE_STATE_CONNECTING       (3)
 #define BLE_STATE_CONNECTED_MASTER (4)
-#define BLE_STATE_CONNECTED_SLAVE (5)
+#define BLE_STATE_CONNECTED_SLAVE  (5)
 
 //=====================================================================
 // objects
@@ -200,23 +203,23 @@ void setupBLE()
   ble112.ble_evt_system_awake = my_evt_system_awake;
   ble112.ble_rsp_system_get_bt_address = my_rsp_system_get_bt_address;
 
-  uint8_t tm = 0;
   Serialble.begin(9600);
 
   while (!bSystemBootBle)
   {
-    ble112.checkActivity(1000);
+    ble112.checkActivity(100);
   }
 
-  //
+  // ble_rsp_system_get_bt_addressハンドラが呼び出される
   ble112.ble_cmd_system_get_bt_address();
-  while (ble112.checkActivity(1000))
+  while (ble112.checkActivity(100))
     ;
 
-  /* interval_min : 250ms( = 400 x 0.625ms ) */
-  /* interval_max : 500ms( = 800 x 0.625ms ) */
+  // advertising parametersを設定
+  //  interval_min : 250ms( = 400 x 0.625ms )
+  //  interval_max : 500ms( = 800 x 0.625ms )
   ble112.ble_cmd_le_gap_set_adv_parameters(400, 800, 7); /* [BGLIB] <interval_min> <interval_max> <channel_map> */
-  while (ble112.checkActivity(1000))
+  while (ble112.checkActivity(100))
     ;
 }
 
@@ -227,11 +230,10 @@ void StartAdvData()
 {
   char charTemp[7], charBatt[7];
   char userData[15];
-  uint8 dataLen;
-
-  uint8 stLen;
-  uint8 adv_data[25]; // advertising data (max 25bytes)
-  uint8 index = 0;
+  uint8_t dataLen;
+  uint8_t stLen;
+  uint8_t adv_data[25]; // advertising data (max 25bytes)
+  uint8_t index = 0;
 
   // AD Structure 1 (Flags)
   adv_data[index++] = 0x02;                    // field length
@@ -241,7 +243,7 @@ void StartAdvData()
   // AD Structure 2 (Complete Local Name)
   adv_data[index++] = strDeviceName.length() + 1;           // field length
   adv_data[index++] = BGLIB_GAP_AD_TYPE_LOCALNAME_COMPLETE; // AD Type (Complete Local Name)
-  for (uint8 i = 0; i < strDeviceName.length(); i++)
+  for (uint8_t i = 0; i < strDeviceName.length(); i++)
   {
     adv_data[index++] = strDeviceName.charAt(i); // Local Name
   }
@@ -254,14 +256,14 @@ void StartAdvData()
   adv_data[index++] = dataLen + 1; // field lengh
   adv_data[index++] = 0xff;        // AD Type (Manufacturer Specific Data)
 
-  for (uint8 i = 0; i < dataLen; i++)
+  for (uint8_t i = 0; i < dataLen; i++)
   {
     adv_data[index++] = userData[i]; // User Data
   }
 
-  //アドバタイズデータを登録
+  // register advertising packet
   stLen = index;
-  ble112.ble_cmd_le_gap_set_adv_data(SCAN_RSP_ADVERTISING_PACKETS, stLen, adv_data); //SCAN_RSP_ADVERTISING_PACKETS
+  ble112.ble_cmd_le_gap_set_adv_data(SCAN_RSP_ADVERTISING_PACKETS, stLen, adv_data);
   while (ble112.checkActivity(1000))
     ;
 
@@ -276,8 +278,6 @@ void StartAdvData()
 //--------------------------------------------------------------------
 void getSensor()
 {
-  double temp_mv;
-
   // LIS2DH 3軸センサーのデータ取得
   accel.read();
   dataX_g = accel.x_g;
@@ -318,14 +318,14 @@ void getSensor()
   adcVal1 = Wire.read();
   adcVal2 = Wire.read();
 
+  //測定値がFFならバッテリリーフはつながっていない
   if (adcVal1 == 0xff && adcVal2 == 0xff)
   {
-    //測定値がFFならバッテリリーフはつながっていない
     adcVal1 = adcVal2 = 0;
   }
 
   //電圧計算　ADC　* （(リファレンス電圧(3.3V)/ ADCの分解能(256)) * 分圧比（2倍））
-  temp_mv = ((double)((adcVal1 << 4) | (adcVal2 >> 4)) * 3300 * 2) / 256;
+  double temp_mv = ((double)((adcVal1 << 4) | (adcVal2 >> 4)) * 3300 * 2) / 256;
   dataBatt = (float)(temp_mv / 1000);
 
 #ifdef DEBUG
@@ -416,7 +416,7 @@ void sleepBLE()
     ;
 
   digitalWrite(BLE_WAKEUP, LOW);
-  delay(500);
+  // delay(500);
 }
 
 //---------------------------------------
@@ -431,14 +431,14 @@ void wakeupBLE()
 
   uint8_t *last;
   digitalWrite(BLE_WAKEUP, HIGH);
-  delay(500);
+  // delay(500);
 
   ble112.ble_cmd_system_halt(0);
   while (ble112.checkActivity())
     ;
 
   ble112.ble_cmd_le_gap_set_adv_parameters(400, 800, 7); /* [BGLIB] <interval_min> <interval_max> <channel_map> */
-  while (ble112.checkActivity(1000))
+  while (ble112.checkActivity())
     ;
 }
 
@@ -476,7 +476,7 @@ void writeEEPROM()
   }
 
 #ifdef DEBUG
-  Serial.print(F("writeEEPROM(): ADDR="));
+  Serial.print("writeEEPROM(): ADDR=");
   Serial.println(rb_addr);
 #endif
 
@@ -543,13 +543,13 @@ void setup()
   Wire.begin(); // I2C 100KHz
 
 #ifdef DEBUG
-  Serial.println(F("<<< Wake up <<<"));
-  Serial.println(F("========================================="));
-  Serial.println(F("setup start"));
+  Serial.println("<<< Wake up <<<");
+  Serial.println("=========================================");
+  Serial.println("setup start");
 #endif
 
   setupPort();
-  delay(10);
+  // delay(10);
 
   setupRingBuffer();
 
@@ -557,8 +557,8 @@ void setup()
   setupBLE();
 
 #ifdef DEBUG
-  Serial.println(F("setup end"));
-  Serial.println(F("========================================="));
+  Serial.println("setup end");
+  Serial.println("=========================================");
 #endif
 
   wakeupBLE();
@@ -571,18 +571,17 @@ void setup()
 
   StartAdvData();
 #ifdef DEBUG
-  Serial.print(F("Start advertising"));
-  Serial.print(F(" ("));
+  Serial.print("Start advertising (");
   Serial.print(WAKE_INTERVAL);
-  Serial.println(F("s)"));
+  Serial.println("s)");
   Serial.flush();
 #endif
 
-  // Continue Advertising; (check BLE status every 1 secound.)
-  for (int i = 0; i < WAKE_INTERVAL; i++)
+  // Continue Advertising; (check BLE status every 0.1 secound.)
+  for (int i = 0; i < WAKE_INTERVAL * 10; i++)
   {
-    delay(1000);
-    ble112.checkActivity(1);
+    delay(100);
+    ble112.checkActivity();
   }
   // bBleConnected turns true at this time, when the connection is requested;
 
@@ -683,12 +682,12 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
   }
 
 #ifdef DEBUG
-  Serial.print(F("###\tgatt_server_attribute_value: { "));
-  Serial.print(F("connection: "));
+  Serial.print("###\tgatt_server_attribute_value: { ");
+  Serial.print("connection: ");
   Serial.print(msg->connection, HEX);
-  Serial.print(F(", attribute: "));
+  Serial.print(", attribute: ");
   Serial.print((uint16_t)msg->attribute, HEX);
-  Serial.print(F(", att_opcode: "));
+  Serial.print(", att_opcode: ");
   Serial.print(msg->att_opcode, HEX);
   Serial.print(", offset: ");
   Serial.print((uint16_t)msg->offset, HEX);
@@ -696,7 +695,7 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
   Serial.print(msg->value.len, HEX);
   Serial.print(", value_data: ");
   Serial.print(rcv_data);
-  Serial.println(F(" }"));
+  Serial.println(" }");
 #endif
 
   // Command
@@ -714,8 +713,8 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
 void my_evt_le_connection_opend(const ble_msg_le_connection_opend_evt_t *msg)
 {
 #ifdef DEBUG
-  Serial.print(F("###\tconnection_opend: { "));
-  Serial.print(F("address: "));
+  Serial.print("###\tconnection_opend: { ");
+  Serial.print("address: ");
   // this is a "bd_addr" data type, which is a 6-byte uint8_t array
   for (uint8_t i = 0; i < 6; i++)
   {
@@ -734,12 +733,12 @@ void my_evt_le_connection_opend(const ble_msg_le_connection_opend_evt_t *msg)
 void my_evt_le_connection_closed(const struct ble_msg_le_connection_closed_evt_t *msg)
 {
 #ifdef DEBUG
-  Serial.print(F("###\tconnection_closed: { "));
-  Serial.print(F("reason: "));
+  Serial.print("###\tconnection_closed: { ");
+  Serial.print("reason: ");
   Serial.print((uint16_t)msg->reason, HEX);
-  Serial.print(F(", connection: "));
+  Serial.print(", connection: ");
   Serial.print(msg->connection, HEX);
-  Serial.println(F(" }"));
+  Serial.println(" }");
 #endif
 
   bBleConnected = false;
