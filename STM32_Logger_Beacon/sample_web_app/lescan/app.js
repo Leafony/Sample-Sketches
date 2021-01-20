@@ -15,6 +15,7 @@ const textIllum = document.getElementById('textIllum');
 const textBatt = document.getElementById('textBatt');
 const textTempLe = document.getElementById('textTempLe');
 const textBattLe = document.getElementById('textBattLe');
+const textTimeLe = document.getElementById('textTimeLe');
 
 const buttonConnect = document.getElementById('ble-connect-button');
 const buttonDisconnect = document.getElementById('ble-disconnect-button');
@@ -268,8 +269,9 @@ function onAdvertisementReceived( state ) {
 
 	let textDecoder = new TextDecoder('ascii');
 	let asciiString = textDecoder.decode(state).split(',');
-	textTempLe.innerHTML = asciiString[0] + '℃';
-	textBattLe.innerHTML = asciiString[1] + 'V';
+	textTempLe.innerText = asciiString[0] + '℃';
+	textBattLe.innerText = asciiString[1] + 'V';
+	textTimeLe.innerText = 'Last Update: ' + new Date().toTimeString();
 	console.log("onAdvertisementReceived: " + asciiString);
 
 }
