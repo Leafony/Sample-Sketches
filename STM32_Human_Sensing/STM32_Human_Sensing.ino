@@ -1,5 +1,5 @@
 //=====================================================================
-//  Human Sensing
+//  STM32 Human Sensing
 //
 //    (c) 2021 Trillion-Node Study Group
 //    Released under the MIT license

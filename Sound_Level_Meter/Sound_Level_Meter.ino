@@ -7,7 +7,6 @@
 //
 //      Rev.00 2020/05/17  First release
 //=====================================================================
-#define AVR_LED         13
 #define LED1             6
 #define LED2             7
 #define LED3             8
@@ -15,8 +14,8 @@
 #define LED5            10
 #define LED6            11
 
-#define MIC         16
-#define VR          17
+#define MIC             16      // A2
+#define VR              17      // A3
 
 unsigned int dataVR;
 unsigned int dataMic;
@@ -26,8 +25,8 @@ unsigned int dataMic;
 //-----------------------------------------------
 void getSensorData()
 {
-    dataVR = analogRead(A3);
-    dataMic = analogRead(A2);
+    dataVR = analogRead(VR);
+    dataMic = analogRead(MIC);
 
     Serial.println("---------------------");
     Serial.print("MIC  = ");
@@ -97,10 +96,7 @@ void setup() {
   Serial.begin(115200);
   Serial.println("start!!");
 
-  pinMode(AVR_LED, OUTPUT);
-  digitalWrite(AVR_LED, LOW);
-
-  pinMode(LED1, OUTPUT);
+   pinMode(LED1, OUTPUT);
   digitalWrite(LED1, LOW);
   pinMode(LED2, OUTPUT);
   digitalWrite(LED2, LOW);
