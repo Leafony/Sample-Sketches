@@ -49,31 +49,77 @@
     </div>
 
     <div class="row">
-      <div class="col-md-6">
-        <p class="text-center display-1" id="textTempLe">00.0℃</p>
-        <p class="text-center display-1" id="textBattLe">0.00V</p>
+      <div class="col-md-6 text-center">
+        <h2>Beacon Display</h2>
+        <p class="display-1" id="textTempLe">00.0℃</p>
+        <p class="display-1" id="textBattLe">0.00V</p>
         <p class="text-right font-weight-light" id="textTimeLe">Last Update: 0000/00/00 00:00:00</p>
       </div>
       <div class="col-md-6">
+        <h2 class="text-center">Temp & Humid Sensor</h2>
         <div id="chart_temp"></div>
       </div>
       <div class="col-md-6">
+        <h2 class="text-center">Illum Sensor</h2>
         <div id="chart_ilum"></div>
       </div>
       <div class="col-md-6">
+        <h2 class="text-center">Battery ADC</h2>
         <div id="chart_batt"></div>
       </div>
     </div>
 
     <div class="row">
-      <div class="col-sm-10 mx-auto my-5 text-center">
+      <div class="col-sm-8 mx-auto my-5 text-center">
         <button type="button" class="btn btn-primary badge-pill btn-lg btn-block" id="button-download"
-         download="data.csv" href="#">Download CSV</button>
+         download="data.csv" href="#">Download All Plots as CSV</button>
       </div>
     </div>
 
     <div class="row">
       <div class="col-sm-8 mx-auto">
+        <h2>Controller</h2>
+        <div class="alert alert-warning" role="alert" style="display:none;">
+          Error: Connect to Leafony First!
+        </div>
+        <div class="input-group">
+          <p>Wake Time:</p>
+          <input type="text" class="form-control" placeholder="Wake Time" aria-label="Recipient's username with two button addons">
+          <button class="btn btn-outline-secondary" type="button">Check</button>
+          <button class="btn btn-outline-secondary" type="button">Submit</button>
+        </div>
+
+        <div class="input-group">
+          <p>Sleep Time:</p>
+          <input type="text" class="form-control" placeholder="Sleep Time" aria-label="Recipient's username with two button addons">
+          <button class="btn btn-outline-secondary" type="button">Check</button>
+          <button class="btn btn-outline-secondary" type="button">Submit</button>
+        </div>
+
+        <div class="input-group">
+          <p>Sensor ON Frequency:</p>
+          <input type="text" class="form-control" placeholder="Sensor ON Frequency" aria-label="Recipient's username with two button addons">
+          <button class="btn btn-outline-secondary" type="button">Check</button>
+          <button class="btn btn-outline-secondary" type="button">Submit</button>
+        </div>
+
+        <div class="input-group">
+          <p>Data Save Frequency:</p>
+          <input type="text" class="form-control" placeholder="Data Save Frequency" aria-label="Recipient's username with two button addons">
+          <button class="btn btn-outline-secondary" type="button">Check</button>
+          <button class="btn btn-outline-secondary" type="button">Submit</button>
+        </div>
+
+        <div class="input-group">
+          <button class="btn btn-outline-secondary" type="button">Check All</button>
+          <button class="btn btn-outline-secondary" type="button">Submit All</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-8 mx-auto">
+        <h2>Received Data</h2>
         <table id="table-recvdata" class="table table-hover">
           <tbody>
             <tr id="deviceNameTable">
@@ -85,23 +131,23 @@
               <th id="textUniqueName"></th>
             </tr>
             <tr>
-              <th>日時</th>
+              <th>Last Update</th>
               <th id="textDateTime"></th>
             </tr>
             <tr>
-              <th>温度[℃]</th>
+              <th>Temperature [℃]</th>
               <th id="textTemp"></th>
             </tr>
             <tr>
-              <th>湿度[%RH]</th>
+              <th>Humidity [%]</th>
               <th id="textHumid"></th>
             </tr>
             <tr>
-              <th>照度[lux]</th>
+              <th>Illuminance [lux]</th>
               <th id="textIllum"></th>
             </tr>
             <tr>
-              <th>電圧[V]</th>
+              <th>Battery Voltage [V]</th>
               <th id="textBatt"></th>
             </tr>
           </tbody>
