@@ -63,6 +63,14 @@ String strDeviceName = "Leaf_Z";
 #define WAKE_INTERVAL 10
 
 //=====================================================================
+// センサ測定間隔、データ保存間隔の設定
+//  SLEEP_INTERVAL : スリープ時間 (秒)
+//  WAKE_INTERVAL　：パケット送信時間 (秒)
+//=====================================================================
+#define SENS_FREQ 1
+#define SAVE_FREQ 1
+
+//=====================================================================
 // IOピンの名前定義
 //=====================================================================
 // 29-pinの場合
@@ -720,12 +728,35 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
   else if (rcv_data.indexOf("getSleep") == 0)
   {
     // send SLEEP_INTERVAL
-    // bBleSendSleepInterval = true;
-    char *sendData;
-    // uint8_t len = sprintf(sendData, "%05d", (int)SLEEP_INTERVAL);
-    uint8_t len = sprintf(sendData, "%05d", 01234);
-    Serial.print(sendData);
+    char sendData[8];
+    uint8_t len = sprintf(sendData, "%05d", (int)SLEEP_INTERVAL);
     ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
+  }
+  else if (rcv_data.indexOf("getWake") == 0)
+  {
+    // send WAKE_INTERVAL
+    char sendData[8];
+    uint8_t len = sprintf(sendData, "%05d", (int)WAKE_INTERVAL);
+    ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
+  }
+  else if (rcv_data.indexOf("getSensFreq") == 0)
+  {
+    // send SENS_FREQ
+    char sendData[8];
+    uint8_t len = sprintf(sendData, "%05d", (int)SENS_FREQ);
+    ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
+  }
+  else if (rcv_data.indexOf("getSaveFreq") == 0)
+  {
+    // send SAVE_FREQ
+    char sendData[8];
+    uint8_t len = sprintf(sendData, "%05d", (int)SAVE_FREQ);
+    ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
+  }
+  else if (rcv_data.indexOf("setSleep") == 0)
+  {
+    // set SLEEP_INTERVAL
+    // setSleep 5
   }
   else if (rcv_data.indexOf("set") == 0)
   {

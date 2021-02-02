@@ -8,7 +8,7 @@
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <!-- <link rel="stylesheet" href="styles.css"> -->
 
-  <title>STM32 Sensors Logger</title>
+  <title>STM32 Logger Beacon</title>
 </head>
 
 <body class="bg-light">
@@ -28,7 +28,7 @@
   <!-- Main Content -->
   <div class="py-5 bg-dark">
     <div class="text-center text-light col-sm-12">
-      <h1>STM32 Sensors Logger</h1>
+      <h1>STM32 Logger Beacon</h1>
       <div class="col-sm-4 mt-4 mx-auto">
         <button type="button" class="btn btn-primary btn-lg" id="ble-connect-button">Connect</button>
         <button type="button" class="btn btn-danger btn-lg" id="ble-disconnect-button" style="display:none;">Disconnect</button>
@@ -84,35 +84,35 @@
         </div>
         <div class="input-group">
           <p>Wake Time:</p>
-          <input type="text" class="form-control" placeholder="Wake Time" aria-label="Recipient's username with two button addons">
-          <button class="btn btn-outline-secondary" type="button">Check</button>
-          <button class="btn btn-outline-secondary" type="button">Submit</button>
+          <input type="text" class="form-control" placeholder="Wake Time" id="wake-text-input">
+          <button class="btn btn-outline-secondary" type="button" id="check-wake-button">Check</button>
+          <button class="btn btn-outline-secondary" type="button" id="submit-wake-button">Submit</button>
         </div>
 
         <div class="input-group">
           <p>Sleep Time:</p>
-          <input type="text" class="form-control" placeholder="Sleep Time" aria-label="Recipient's username with two button addons">
+          <input type="text" class="form-control" placeholder="Sleep Time" id="sleep-text-input">
           <button class="btn btn-outline-secondary" type="button" id="check-sleep-button">Check</button>
           <button class="btn btn-outline-secondary" type="button" id="submit-sleep-button">Submit</button>
         </div>
 
         <div class="input-group">
           <p>Sensor ON Frequency:</p>
-          <input type="text" class="form-control" placeholder="Sensor ON Frequency" aria-label="Recipient's username with two button addons">
-          <button class="btn btn-outline-secondary" type="button">Check</button>
-          <button class="btn btn-outline-secondary" type="button">Submit</button>
+          <input type="text" class="form-control" placeholder="Sensor ON Frequency" id="sens-text-input">
+          <button class="btn btn-outline-secondary" type="button" id="check-sens-button">Check</button>
+          <button class="btn btn-outline-secondary" type="button" id="submit-sens-button">Submit</button>
         </div>
 
         <div class="input-group">
           <p>Data Save Frequency:</p>
-          <input type="text" class="form-control" placeholder="Data Save Frequency" aria-label="Recipient's username with two button addons">
-          <button class="btn btn-outline-secondary" type="button">Check</button>
-          <button class="btn btn-outline-secondary" type="button">Submit</button>
+          <input type="text" class="form-control" placeholder="Data Save Frequency" id="save-text-input">
+          <button class="btn btn-outline-secondary" type="button" id="check-save-button">Check</button>
+          <button class="btn btn-outline-secondary" type="button" id="submit-save-button">Submit</button>
         </div>
 
         <div class="input-group">
-          <button class="btn btn-outline-secondary" type="button">Check All</button>
-          <button class="btn btn-outline-secondary" type="button">Submit All</button>
+          <button class="btn btn-outline-secondary" type="button" id="check-all-button">Check All</button>
+          <button class="btn btn-outline-secondary" type="button" id="submit-all-button">Submit All</button>
         </div>
       </div>
     </div>

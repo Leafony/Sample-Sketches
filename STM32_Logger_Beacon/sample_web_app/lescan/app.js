@@ -22,8 +22,21 @@ const buttonDisconnect = document.getElementById('ble-disconnect-button');
 const buttonLescan = document.getElementById('ble-lescan-button');
 const buttonLestop = document.getElementById('ble-lestop-button');
 
+const buttonCheckWake  = document.getElementById('check-wake-button');
 const buttonCheckSleep = document.getElementById('check-sleep-button');
+const buttonCheckSens  = document.getElementById('check-sens-button');
+const buttonCheckSave  = document.getElementById('check-save-button');
+const buttonCheckAll   = document.getElementById('check-all-button');
+const buttonSubmitWake  = document.getElementById('submit-wake-button');
 const buttonSubmitSleep = document.getElementById('submit-sleep-button');
+const buttonSubmitSens  = document.getElementById('submit-sens-button');
+const buttonSubmitSave  = document.getElementById('submit-save-button');
+const buttonSubmitAll   = document.getElementById('submit-all-button');
+
+const inputWakeText = document.getElementById('wake-text-input');
+const inputSleepText = document.getElementById('sleep-text-input');
+const inputSensText = document.getElementById('sens-text-input');
+const inputSaveText = document.getElementById('save-text-input');
 
 const alertBox = document.getElementById('alertBox');
 const alertMessage = document.getElementById('alertMessage');
@@ -36,6 +49,8 @@ let chart_temp, chart_ilum, chart_batt;
 // array of received data
 let array_temp, array_humd, array_ilum, array_batt;
 
+// state string
+let recv_state;
 
 window.onload = function () {
 
@@ -46,7 +61,7 @@ window.onload = function () {
 
 	if (!leafony.getBleAvailability()) {
 		alertBox.style.display = '';
-		alertMessage.textContent = 'お使いのデバイスではWebBluetoothがご利用いただけません。'
+		alertMessage.textContent = 'WebBluetooth API is not available on this device.'
 	}
 
 	leafony.onConnected( function () {
@@ -116,10 +131,28 @@ buttonLestop.addEventListener( 'click', function () {
 } );
 
 
+buttonCheckWake.addEventListener( 'click', function () {
+	recv_state = "checkWake";
+	leafony.sendCommand( 'getWake' );
+} );
+
+
 buttonCheckSleep.addEventListener( 'click', function () {
+	recv_state = "checkSleep";
 	leafony.sendCommand( 'getSleep' );
 } );
 
+
+buttonCheckSens.addEventListener( 'click', function () {
+	recv_state = "checkSens";
+	leafony.sendCommand( 'getSensFreq' );
+} );
+
+
+buttonCheckSave.addEventListener( 'click', function () {
+	recv_state = "checkSave";
+	leafony.sendCommand( 'getSaveFreq' );
+} );
 
 function clearTable () {
 
@@ -223,10 +256,10 @@ function initChart () {
 
 
 /**
- * This function is called when bluetooth reveice data.
- * @param {*} state : received buffer
+ * 
+ * @param {*} state 
  */
-function onStateChange(state) {
+function updateChart( state ) {
 	// Reveiced datetime
 	let date = new Date();
 	let year = String(date.getFullYear());
@@ -240,8 +273,8 @@ function onStateChange(state) {
 
 	// Decode received data
 	let data = new Uint8Array(state.data.buffer);
-	console.log(new TextDecoder("utf-8").decode(data));
-
+	// console.log(new TextDecoder("utf-8").decode(data));
+	console.log(data);
 	let temp = (data[0] * 256.0 + data[1]) / 256.0;
 	let humd = (data[2] * 256.0 + data[3]) / 256.0;
 	let illm = data[4] * 256.0 + data[5];
@@ -284,6 +317,46 @@ function onStateChange(state) {
 			array_batt,
 		]
 	});
+
+}
+
+/**
+ * This function is called when bluetooth reveice data.
+ * @param {*} state : received buffer
+ */
+function onStateChange(state) {
+	console.log(recv_state);
+
+	let data = new Uint8Array(state.data.buffer);
+	let recv = new TextDecoder('utf-8').decode(data);
+
+	if (recv_state == 'checkSleep'){
+		inputSleepText.value = parseInt(recv);
+		recv_state = 'main';
+	}
+	else if (recv_state == 'checkWake') {
+		inputWakeText.value = parseInt(recv);
+		recv_state = 'main';
+	}
+	else if (recv_state == 'checkSens') {
+		inputSensText.value = parseInt(recv);
+		recv_state = 'main';
+	}
+	else if (recv_state == 'checkSave') {
+		inputSaveText.value = parseInt(recv);
+		recv_state = 'main';
+	}
+	else if (recv_state == 'checkAll') {
+		recv_state = 'main';
+	}
+	else{
+		if (recv == 'finish') {
+			console.log('Finish!');
+		}
+		else {
+			updateChart(state);
+		}
+	}
 }
 
 
