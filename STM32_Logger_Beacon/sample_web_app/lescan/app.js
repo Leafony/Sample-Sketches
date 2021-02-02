@@ -22,6 +22,9 @@ const buttonDisconnect = document.getElementById('ble-disconnect-button');
 const buttonLescan = document.getElementById('ble-lescan-button');
 const buttonLestop = document.getElementById('ble-lestop-button');
 
+const buttonCheckSleep = document.getElementById('check-sleep-button');
+const buttonSubmitSleep = document.getElementById('submit-sleep-button');
+
 const alertBox = document.getElementById('alertBox');
 const alertMessage = document.getElementById('alertMessage');
 
@@ -32,6 +35,7 @@ let chart_temp, chart_ilum, chart_batt;
 
 // array of received data
 let array_temp, array_humd, array_ilum, array_batt;
+
 
 window.onload = function () {
 
@@ -45,8 +49,24 @@ window.onload = function () {
 		alertMessage.textContent = 'お使いのデバイスではWebBluetoothがご利用いただけません。'
 	}
 
+	leafony.onConnected( function () {
+		buttonConnect.style.display = 'none';
+		buttonDisconnect.style.display = '';
+	});
+
+	// Beacon event
 	leafony.onAdvertisementReceived( function ( state ) {
 		onAdvertisementReceived( state );
+	} );
+
+	// Characteristics event
+	leafony.onStateChange( function ( state ) {
+		onStateChange( state );
+	} );
+
+	// Disconnected event
+	leafony.onDisconnected( function ( state ) {
+		onDisconnected( state );
 	} );
 
 };
@@ -59,16 +79,12 @@ buttonConnect.addEventListener( 'click', function () {
 	initChart();
 
 	// connect to leafony
-	leafony.onStateChange( function ( state ) {
-		onStateChange( state );
-	} );
-
 	leafony.disableSleep();
 	leafony.connect();
 
-	buttonConnect.style.display = 'none';
-	buttonDisconnect.style.display = '';
-
+	// Spinner connect button
+	buttonConnect.disabled = true;
+	buttonConnect.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Connecting...'
 } );
 
 
@@ -78,6 +94,8 @@ buttonDisconnect.addEventListener( 'click', function () {
 
 	buttonConnect.style.display = '';
 	buttonDisconnect.style.display = 'none';
+	buttonConnect.disabled = false;
+	buttonConnect.innerHTML = 'Connect';
 
 } );
 
@@ -95,6 +113,11 @@ buttonLestop.addEventListener( 'click', function () {
 
 	buttonLescan.style.display = '';
 	buttonLestop.style.display = 'none';
+} );
+
+
+buttonCheckSleep.addEventListener( 'click', function () {
+	leafony.sendCommand( 'getSleep' );
 } );
 
 
@@ -198,6 +221,7 @@ function initChart () {
 	});
 }
 
+
 /**
  * This function is called when bluetooth reveice data.
  * @param {*} state : received buffer
@@ -216,6 +240,8 @@ function onStateChange(state) {
 
 	// Decode received data
 	let data = new Uint8Array(state.data.buffer);
+	console.log(new TextDecoder("utf-8").decode(data));
+
 	let temp = (data[0] * 256.0 + data[1]) / 256.0;
 	let humd = (data[2] * 256.0 + data[3]) / 256.0;
 	let illm = data[4] * 256.0 + data[5];
@@ -223,7 +249,7 @@ function onStateChange(state) {
 
 	let unixtime = new Uint32Array(state.data.buffer)[2];
 	let time = new Date(unixtime * 1000);
-	console.log(time, unixtime)
+	// console.log(time, unixtime)
 
 	textDeviceName.innerText = state.devn;
 	textUniqueName.innerText = state.unin;
@@ -274,6 +300,18 @@ function onAdvertisementReceived( state ) {
 	textTimeLe.innerText = 'Last Update: ' + new Date().toTimeString();
 	console.log("onAdvertisementReceived: " + asciiString);
 
+}
+
+
+/**
+ * This function is called when Bluetooth disconnected.
+ * @param {*} state 
+ */
+function onDisconnected( state ) {
+	buttonConnect.style.display = '';
+	buttonDisconnect.style.display = 'none';
+	buttonConnect.disabled = false;
+	buttonConnect.innerHTML = 'Connect';
 }
 
 

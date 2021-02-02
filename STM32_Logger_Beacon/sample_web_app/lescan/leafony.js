@@ -86,10 +86,18 @@ function Leafony() {
         await char.read.startNotifications();
         char.read.addEventListener( 'characteristicvaluechanged', handleData );
 
+        onConnectedCallback();
+
         // ログデータ送信命令
-        setTimeout( sendCommand, 1500, 'get' );
+        setTimeout( sendCommand, 2000, 'getData' );
 
     }
+
+
+    /**
+     * 
+     */
+    function onConnectedCallback () {}
 
     /**
      * Characteristicの値が変化した時に呼び出される関数
@@ -298,6 +306,9 @@ function Leafony() {
     return {
         getBleAvailability: getBleAvailability,
         connect: connect,
+        onConnected: function ( callback ) {
+            onConnectedCallback = callback;
+        },
         onStateChange: function ( callback ) {
             onStateChangeCallback = callback;
         },

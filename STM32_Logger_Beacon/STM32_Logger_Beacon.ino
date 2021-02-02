@@ -59,8 +59,8 @@ String strDeviceName = "Leaf_Z";
 //  SLEEP_INTERVAL : スリープ時間 (秒)
 //  WAKE_INTERVAL　：パケット送信時間 (秒)
 //=====================================================================
-#define SLEEP_INTERVAL (5)
-#define WAKE_INTERVAL (10)
+#define SLEEP_INTERVAL 5
+#define WAKE_INTERVAL 10
 
 //=====================================================================
 // IOピンの名前定義
@@ -131,6 +131,8 @@ volatile bool bSystemBootBle = false;
 volatile uint8_t ble_state = BLE_STATE_STANDBY;
 bool bBleConnected = false;
 bool bBleSendData = false;
+bool bBleSendSleepInterval = false;
+bool bBleSendWakeInterval = false;
 
 // EEPROM Ring Buffer
 uint16_t rb_addr = 0; // EEPROMリングバッファのTAILアドレス
@@ -405,7 +407,7 @@ void wakeupSensor()
 void sleepBLE()
 {
 #ifdef DEBUG
-  Serial.println(F("Sleep BLE"));
+  Serial.println("Sleep BLE");
 #endif
 
   ble112.ble_cmd_le_gap_stop_advertising(0);
@@ -427,7 +429,7 @@ void sleepBLE()
 void wakeupBLE()
 {
 #ifdef DEBUG
-  Serial.println(F("Wakeup BLE"));
+  Serial.println("Wakeup BLE");
 #endif
 
   uint8_t *last;
@@ -626,7 +628,12 @@ void loop()
 #endif
 
       // after all the data trasnported,
+      ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, 6, (const uint8_t *)"finish");
       bBleSendData = false;
+    }
+    else if (false)
+    {
+      // TBD
     }
     else
     {
@@ -704,10 +711,21 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
   Serial.println(" }");
 #endif
 
-  // Command
-  if (rcv_data.indexOf("get") == 0)
+  // Received BLE Commands
+  if (rcv_data.indexOf("getData") == 0)
   {
+    // Start to send EEPROM data
     bBleSendData = true;
+  }
+  else if (rcv_data.indexOf("getSleep") == 0)
+  {
+    // send SLEEP_INTERVAL
+    // bBleSendSleepInterval = true;
+    char *sendData;
+    // uint8_t len = sprintf(sendData, "%05d", (int)SLEEP_INTERVAL);
+    uint8_t len = sprintf(sendData, "%05d", 01234);
+    Serial.print(sendData);
+    ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
   }
   else if (rcv_data.indexOf("set") == 0)
   {
