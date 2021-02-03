@@ -17,11 +17,15 @@ const textTempLe = document.getElementById('textTempLe');
 const textBattLe = document.getElementById('textBattLe');
 const textTimeLe = document.getElementById('textTimeLe');
 
+const alertBox = document.getElementById('alertBox');
+const alertMessage = document.getElementById('alertMessage');
+
 const buttonConnect = document.getElementById('ble-connect-button');
 const buttonDisconnect = document.getElementById('ble-disconnect-button');
 const buttonLescan = document.getElementById('ble-lescan-button');
 const buttonLestop = document.getElementById('ble-lestop-button');
 
+const alertController = document.getElementById('alert-controller');
 const buttonCheckWake  = document.getElementById('check-wake-button');
 const buttonCheckSleep = document.getElementById('check-sleep-button');
 const buttonCheckSens  = document.getElementById('check-sens-button');
@@ -32,29 +36,27 @@ const buttonSubmitSleep = document.getElementById('submit-sleep-button');
 const buttonSubmitSens  = document.getElementById('submit-sens-button');
 const buttonSubmitSave  = document.getElementById('submit-save-button');
 const buttonSubmitAll   = document.getElementById('submit-all-button');
-
 const inputWakeText = document.getElementById('wake-text-input');
 const inputSleepText = document.getElementById('sleep-text-input');
 const inputSensText = document.getElementById('sens-text-input');
 const inputSaveText = document.getElementById('save-text-input');
 
-const alertBox = document.getElementById('alertBox');
-const alertMessage = document.getElementById('alertMessage');
 
 const buttonDownload = document.getElementById("button-download");
 
+
 let leafony;
 let chart_temp, chart_ilum, chart_batt;
-
-// array of received data
 let array_temp, array_humd, array_ilum, array_batt;
 
-// state string
-let recv_state;
+let recv_state; // string
 
+
+/**
+ * 
+ */
 window.onload = function () {
 
-	clearTable();
 	initChart();
 
 	leafony = new Leafony();
@@ -87,6 +89,9 @@ window.onload = function () {
 };
 
 
+/**
+ * Connect button
+ */
 buttonConnect.addEventListener( 'click', function () {
 
 	// initialize display
@@ -103,6 +108,9 @@ buttonConnect.addEventListener( 'click', function () {
 } );
 
 
+/**
+ * Disconnect button
+ */
 buttonDisconnect.addEventListener( 'click', function () {
 
 	leafony.disconnect();
@@ -115,6 +123,9 @@ buttonDisconnect.addEventListener( 'click', function () {
 } );
 
 
+/**
+ * Scanning button
+ */
 buttonLescan.addEventListener( 'click', function () {
 	leafony.lescan();
 
@@ -123,6 +134,9 @@ buttonLescan.addEventListener( 'click', function () {
 } );
 
 
+/**
+ * Stop scanning button
+ */
 buttonLestop.addEventListener( 'click', function () {
 	leafony.lestop();
 
@@ -131,29 +145,77 @@ buttonLestop.addEventListener( 'click', function () {
 } );
 
 
+/**
+ * Wake time check button
+ */
 buttonCheckWake.addEventListener( 'click', function () {
 	recv_state = "checkWake";
-	leafony.sendCommand( 'getWake' );
+	sendCommand( 'getWake' );
 } );
 
 
+/**
+ * Sleep time check button
+ */
 buttonCheckSleep.addEventListener( 'click', function () {
 	recv_state = "checkSleep";
-	leafony.sendCommand( 'getSleep' );
+	sendCommand( 'getSleep' );
 } );
 
 
+/**
+ * Sens frequency check button
+ */
 buttonCheckSens.addEventListener( 'click', function () {
 	recv_state = "checkSens";
-	leafony.sendCommand( 'getSensFreq' );
+	sendCommand( 'getSensFreq' );
 } );
 
 
+/**
+ * Save frequency check button
+ */
 buttonCheckSave.addEventListener( 'click', function () {
 	recv_state = "checkSave";
-	leafony.sendCommand( 'getSaveFreq' );
+	sendCommand( 'getSaveFreq' );
 } );
 
+
+/**
+ * Wake time submit button
+ */
+buttonSubmitWake.addEventListener( 'click', function () {
+	sendCommand( 'setWake ' + toString(inputWakeText.value));
+} );
+
+
+/**
+ * Sleep time submit button
+ */
+buttonSubmitSleep.addEventListener( 'click', function () {
+	sendCommand( 'setSleep ' + toString(inputSleepText.value));
+} );
+
+
+/**
+ * Sens frequency submit button
+ */
+buttonSubmitSens.addEventListener( 'click', function () {
+	sendCommand( 'setSensFreq ' + toString(inputSensText.value));
+} );
+
+
+/**
+ * Save frequency submit button
+ */
+buttonSubmitSave.addEventListener( 'click', function () {
+	sendCommand( 'setSaveFreq ' + toString(inputSaveText.value));
+} );
+
+
+/**
+ * 
+ */
 function clearTable () {
 
 	textDeviceName.innerHTML = '';
@@ -168,7 +230,7 @@ function clearTable () {
 
 
 /**
- * Initialize Chart
+ * Initialize Charts
  */
 function initChart () {
 	array_temp = ['Temperature'];
@@ -256,8 +318,8 @@ function initChart () {
 
 
 /**
- * 
- * @param {*} state 
+ * Update charts
+ * @param {*} state: received ble state from onStateChange handler
  */
 function updateChart( state ) {
 	// Reveiced datetime
@@ -361,7 +423,7 @@ function onStateChange(state) {
 
 
 /**
- * This function is called when Bluetooth receive advertising packet.
+ * This function is called when Bluetooth receives advertising packet.
  * @param {*} state 
  */
 function onAdvertisementReceived( state ) {
@@ -377,7 +439,7 @@ function onAdvertisementReceived( state ) {
 
 
 /**
- * This function is called when Bluetooth disconnected.
+ * This function is called when Bluetooth is disconnected.
  * @param {*} state 
  */
 function onDisconnected( state ) {
@@ -389,7 +451,20 @@ function onDisconnected( state ) {
 
 
 /**
- * Download CSV
+ * Send command to Leafony.
+ * If leafony is not connected, show alert popups.
+ * @param {string} command
+ */
+function sendCommand( command ) {
+	if ( leafony.isConnected() ) {
+		leafony.sendCommand( command );
+	} else {
+		alertController.style.display = "";
+	}
+}
+
+/**
+ * Download CSV button
  */
 buttonDownload.addEventListener( 'click', function () {
 

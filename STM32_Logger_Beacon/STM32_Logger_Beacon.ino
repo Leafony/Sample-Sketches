@@ -756,7 +756,7 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
   else if (rcv_data.indexOf("setSleep") == 0)
   {
     // set SLEEP_INTERVAL
-    // setSleep 5
+    // Serial.println(rcv_data.replace("setSleep ", ""));
   }
   else if (rcv_data.indexOf("set") == 0)
   {

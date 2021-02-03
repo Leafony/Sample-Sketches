@@ -86,7 +86,7 @@ function Leafony() {
         await char.read.startNotifications();
         char.read.addEventListener( 'characteristicvaluechanged', handleData );
 
-        onConnectedCallback();
+        onConnected();
 
         // ログデータ送信命令
         setTimeout( sendCommand, 2000, 'getData' );
@@ -95,9 +95,28 @@ function Leafony() {
 
 
     /**
-     * 
+     * 接続が確立したときに呼び出される関数
+     */
+    function onConnected () {
+        onConnectedCallback();
+    }
+
+    /**
+     * 接続が確立したときに呼び出されるコールバック
      */
     function onConnectedCallback () {}
+
+
+    /**
+     * 接続を確認する関数
+     */
+    function isConnected () {
+        if ( !device ) {
+            return false;
+        }
+
+        return device.gatt.connected;
+    }
 
     /**
      * Characteristicの値が変化した時に呼び出される関数
@@ -309,6 +328,7 @@ function Leafony() {
         onConnected: function ( callback ) {
             onConnectedCallback = callback;
         },
+        isConnected: isConnected,
         onStateChange: function ( callback ) {
             onStateChangeCallback = callback;
         },
