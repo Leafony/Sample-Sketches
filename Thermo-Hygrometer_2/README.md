@@ -1,0 +1,1 @@
+HTS221のライブラリをSmartEverything HTS221からAdafruit HTS221に変更
