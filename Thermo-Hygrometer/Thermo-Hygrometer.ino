@@ -1,7 +1,7 @@
 //=====================================================================
 //  Thermo-Hygrometer
 //
-//    (c) 2020 Trillion-Node Study Group
+//    (c) 2021 Trillion-Node Study Group
 //    Released under the MIT license
 //    https://opensource.org/licenses/MIT
 //
@@ -30,6 +30,7 @@ float HM1 = 80.0;     // 湿度計等測定値
 void setup() {
   // initialize serial communication at 115200 second per second:
   Serial.begin(115200);
+  Wire.begin();             // I2C 100kHz
   // initialize i2c communication with HTS221:
   smeHumidity.begin();
   delay(10);
