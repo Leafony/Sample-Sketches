@@ -8,7 +8,7 @@
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <!-- <link rel="stylesheet" href="styles.css"> -->
 
-  <title>STM32 Logger Beacon</title>
+  <title>Leafony Logger Beacon</title>
 </head>
 
 <body class="bg-light">
@@ -28,17 +28,9 @@
   <!-- Main Content -->
   <div class="py-5 bg-dark">
     <div class="text-center text-light col-sm-12">
-      <h1>STM32 Logger Beacon</h1>
-      <div class="col-sm-4 mt-4 mx-auto">
-        <button type="button" class="btn btn-primary btn-lg" id="ble-connect-button">Connect</button>
-        <button type="button" class="btn btn-danger btn-lg" id="ble-disconnect-button" style="display:none;">Disconnect</button>
-        <button type="button" class="btn btn-primary btn-lg" id="ble-lescan-button">Start Scanning</button>
-        <button type="button" class="btn btn-danger btn-lg" id="ble-lestop-button" style="display:none;">Stop Scanning</button>
-      </div>
+      <h1>Leafony Logger Beacon</h1>
     </div>
   </div>
-
-
 
   <div class="container">
     <br>
@@ -49,36 +41,63 @@
     </div>
 
     <div class="row">
-      <div class="col-md-6 text-center">
-        <h2>Beacon Display</h2>
+      <div class="col-md-12 text-center">
+        <p>1.  Press <b>Scan Beacon</b> button to start scanning beacon.</p>
+        <button type="button" class="btn btn-primary" id="ble-lescan-button">Scan Beacon</button>
+        <button type="button" class="btn btn-danger" id="ble-lestop-button" style="display:none;">Stop Scan</button>
+        <hr>
+      </div>
+      <div class="col-md-12 text-center">
+        <p>2. Display updated when beacon packet is received.</p>
         <p class="display-1" id="textTempLe">00.0℃</p>
         <p class="display-1" id="textBattLe">0.00V</p>
         <p class="text-right font-weight-light" id="textTimeLe">Last Update: 0000/00/00 00:00:00</p>
+        <hr>
       </div>
-      <div class="col-md-6">
-        <h2 class="text-center">Temp & Humid Sensor</h2>
-        <div id="chart_temp"></div>
-      </div>
-      <div class="col-md-6">
-        <h2 class="text-center">Illum Sensor</h2>
-        <div id="chart_ilum"></div>
-      </div>
-      <div class="col-md-6">
-        <h2 class="text-center">Battery ADC</h2>
-        <div id="chart_batt"></div>
+      <div class="col-md-12 text-center">
+        <p>3. Push <b>Success!</b> when it successfully works.</p>
+        <a type="button" class="btn btn-success" href="#section-ble-connect">Success!</a>
       </div>
     </div>
 
+    <hr>
+
     <div class="row">
-      <div class="col-sm-8 mx-auto my-5 text-center">
+      <div class="col-md-12 text-center" id="section-ble-connect">
+        <p>4. Press <b>Connect button</b> to read out flash memory on Leafony.</p>
+        <button type="button" class="btn btn-primary btn-lg" id="ble-connect-button">Connect</button>
+        <button type="button" class="btn btn-danger btn-lg" id="ble-disconnect-button" style="display:none;">Disconnect</button>
+        <hr>
+      </div>
+
+
+      <div class="col-md-12">
+        <p class="text-center">5. After a while, logged data is transported and charts are updated.</p>
+        <h2 class="text-center">Temp & Humid Sensor</h2>
+        <div id="chart_temp"></div>
+      </div>
+      <div class="col-md-12">
+        <h2 class="text-center">Illum Sensor</h2>
+        <div id="chart_ilum"></div>
+      </div>
+      <div class="col-md-12">
+        <h2 class="text-center">Battery ADC</h2>
+        <div id="chart_batt"></div>
+        <hr>
+      </div>
+
+      <div class="col-md-12 text-center">
+        <p>6. You can download the plots as a csv file.</p>
         <button type="button" class="btn btn-primary badge-pill btn-lg btn-block" id="button-download"
          download="data.csv" href="#">Download All Plots as CSV</button>
+        <hr>
       </div>
+
     </div>
 
     <div class="row">
       <div class="col-sm-8 mx-auto">
-        <h2>Controller</h2>
+        <h2>Settings</h2>
         <div class="alert alert-warning" role="alert" style="display:none;" id="alert-controller">
           Error: Connect to Leafony First!
           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
