@@ -1,14 +1,14 @@
 //=====================================================================
-//  Thermo-Hygrometer
-//
+//  Thermo-hygrometer
+//  Change the library to Adafruit_HTS221
 //    (c) 2021 Trillion-Node Study Group
 //    Released under the MIT license
 //    https://opensource.org/licenses/MIT
 //
-//      Rev.00 2020/05/05  First release
+//      Rev.00 2021/02/08  First release
 //=====================================================================
 #include <Wire.h>
-#include <HTS221.h>
+#include <Adafruit_HTS221.h>                // humidity and temperature sensor
 
 //---------------------------
 // 2点補正用データ
@@ -27,19 +27,30 @@ float HM0 = 60.0;     // 湿度計等測定値
 float HL1 = 80.0;     // 4-Sensors湿度測定値
 float HM1 = 80.0;     // 湿度計等測定値
 
+Adafruit_HTS221 hts;
+
 void setup() {
   // initialize serial communication at 115200 second per second:
   Serial.begin(115200);
-  Wire.begin();             // I2C 100kHz
   // initialize i2c communication with HTS221:
-  smeHumidity.begin();
+ if (!hts.begin_I2C()) {
+   Serial.println("Failed to find HTS221");
+    while (1) { delay(10); }
+  }
+  hts.setDataRate(HTS221_RATE_1_HZ);
+
   delay(10);
 }
 
 void loop() {
+  sensors_event_t temp;
+  sensors_event_t humidity;
+
+  hts.getEvent(&humidity, &temp);             // populate temp and humidity objects with fresh data
+
   // read temperature and humidity:
-  float dataTemp = (float)smeHumidity.readTemperature();
-  float dataHumid = (float)smeHumidity.readHumidity();
+  float dataTemp = (float)temp.temperature;
+  float dataHumid = (float)humidity.relative_humidity;
 
   // calibration:
   dataTemp = TM0 + (TM1 - TM0) * (dataTemp - TL0) / (TL1 - TL0);      // 温度補正

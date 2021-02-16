@@ -180,5 +180,5 @@ void i2c_read(int device_address, int reg_address, int lengrh, unsigned char* re
 * I2C 受信バッファクリア
 **********************************************/
 void clearI2CReadbuf(){
-  memcpy(i2c_receiveBuf, 0x00, I2C_RECEIVE_BUF_LENGTH);
+  memset(&i2c_receiveBuf[0], 0x00, sizeof(i2c_receiveBuf));
 }
