@@ -12,6 +12,7 @@ function Leafony() {
     const CHARACTERISTIC_READ_UUID = "442f1571-8a00-9a28-cbe1-e1d4212d53eb";
     const CHARACTERISTIC_WRITE_UUID = "442f1572-8a00-9a28-cbe1-e1d4212d53eb";
 
+    // const NAME_FILTER = '/^Leaf_[A-Z]$/';
     const NAME_FILTER = 'Leaf_Z';
 
     let state = {};
@@ -61,6 +62,8 @@ function Leafony() {
 
             server = await device.gatt.connect();
 
+            onConnected(uniqueName);
+
             connectService( server );
         } catch ( error ) {
             console.log( error );
@@ -86,10 +89,9 @@ function Leafony() {
         await char.read.startNotifications();
         char.read.addEventListener( 'characteristicvaluechanged', handleData );
 
-        onConnected();
 
         // ログデータ送信命令
-        setTimeout( sendCommand, 2000, 'getData' );
+        // setTimeout( sendCommand, 2000, 'getData' );
 
     }
 
@@ -97,8 +99,8 @@ function Leafony() {
     /**
      * 接続が確立したときに呼び出される関数
      */
-    function onConnected () {
-        onConnectedCallback();
+    function onConnected ( ) {
+        onConnectedCallback(uniqueName);
     }
 
     /**
@@ -280,7 +282,7 @@ function Leafony() {
                 console.log('  UUIDs: ' + event.uuids);
                 event.manufacturerData.forEach((valueDataView, key) => {
                   logDataView('Manufacturer', key, valueDataView);
-                  onAdvertisementReceivedCallback( valueDataView.buffer );
+                  onAdvertisementReceivedCallback( event.device.name, valueDataView.buffer );
                 });
                 event.serviceData.forEach((valueDataView, key) => {
                   logDataView('Service', key, valueDataView);

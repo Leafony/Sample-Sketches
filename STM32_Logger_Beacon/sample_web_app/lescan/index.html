@@ -49,9 +49,10 @@
       </div>
       <div class="col-md-12 text-center">
         <p>2. Display updated when beacon packet is received.</p>
-        <p class="display-1" id="textTempLe">00.0℃</p>
-        <p class="display-1" id="textBattLe">0.00V</p>
-        <p class="text-right font-weight-light" id="textTimeLe">Last Update: 0000/00/00 00:00:00</p>
+        <p class="display-4" id="textDevNameLe">Device Name</p>
+        <p class="display-4" id="textTempLe">00.0℃</p>
+        <p class="display-4" id="textBattLe">0.00V</p>
+        <p class="font-weight-light" id="textTimeLe">Last Update: 0000/00/00 00:00:00</p>
         <hr>
       </div>
       <div class="col-md-12 text-center">
@@ -64,12 +65,22 @@
 
     <div class="row">
       <div class="col-md-12 text-center" id="section-ble-connect">
-        <p>4. Press <b>Connect button</b> to read out flash memory on Leafony.</p>
+        <p>4. Press <b>Connect button</b> to connect to Leafony.</p>
         <button type="button" class="btn btn-primary btn-lg" id="ble-connect-button">Connect</button>
         <button type="button" class="btn btn-danger btn-lg" id="ble-disconnect-button" style="display:none;">Disconnect</button>
+      </div>
+
+      <div class="col-md-12 text-center" id="section-ble-connect">
+        <b>Device Name: </b>
+        <p id="textUniqueName"></p>
         <hr>
       </div>
 
+      <div class="col-md-12 text-center" id="section-ble-connect">
+        <p>4. Press <b>Get Data button</b> to read out flash memory on Leafony.</p>
+        <button type="button" class="btn btn-primary btn-lg" id="ble-get-button">Get Data</button>
+        <hr>
+      </div>
 
       <div class="col-md-12">
         <p class="text-center">5. After a while, logged data is transported and charts are updated.</p>
@@ -139,7 +150,18 @@
       </div>
     </div>
 
+    <hr>
+
     <div class="row">
+      <div class="col-md-12 text-center" id="section-ble-connect">
+        <p>7. Press <b>Disconnect button</b> to disconnect to Leafony.</p>
+        <button type="button" class="btn btn-danger btn-lg" id="ble-disconnect-button">Disconnect</button>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="row" style="display:none;">
       <div class="col-sm-8 mx-auto">
         <h2>Received Data</h2>
         <table id="table-recvdata" class="table table-hover">

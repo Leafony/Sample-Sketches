@@ -619,7 +619,7 @@ void loop()
       Serial.println("Start to send data.");
 #endif
 
-      for (int i = RINGBUFF_OFFSET_ADDR; i < rb_addr; i += PACKET_LENGTH)
+      for (int i = RINGBUFF_OFFSET_ADDR; i < EEPROM.length(); i += PACKET_LENGTH)
       {
         char sendData[PACKET_LENGTH];
 

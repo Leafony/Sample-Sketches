@@ -13,6 +13,7 @@ const textTemp = document.getElementById('textTemp');
 const textHumid = document.getElementById('textHumid');
 const textIllum = document.getElementById('textIllum');
 const textBatt = document.getElementById('textBatt');
+const textDevNameLe = document.getElementById('textDevNameLe');
 const textTempLe = document.getElementById('textTempLe');
 const textBattLe = document.getElementById('textBattLe');
 const textTimeLe = document.getElementById('textTimeLe');
@@ -22,6 +23,7 @@ const alertMessage = document.getElementById('alertMessage');
 
 const buttonConnect = document.getElementById('ble-connect-button');
 const buttonDisconnect = document.getElementById('ble-disconnect-button');
+const buttonGetData = document.getElementById('ble-get-button');
 const buttonLescan = document.getElementById('ble-lescan-button');
 const buttonLestop = document.getElementById('ble-lestop-button');
 
@@ -66,14 +68,16 @@ window.onload = function () {
 		alertMessage.textContent = 'WebBluetooth API is not available on this device.'
 	}
 
-	leafony.onConnected( function () {
+	leafony.onConnected( function (uniqueName) {
 		buttonConnect.style.display = 'none';
 		buttonDisconnect.style.display = '';
+
+		textUniqueName.innerText = uniqueName;
 	});
 
 	// Beacon event
-	leafony.onAdvertisementReceived( function ( state ) {
-		onAdvertisementReceived( state );
+	leafony.onAdvertisementReceived( function ( devname, state ) {
+		onAdvertisementReceived( devname, state );
 	} );
 
 	// Characteristics event
@@ -120,6 +124,14 @@ buttonDisconnect.addEventListener( 'click', function () {
 	buttonConnect.disabled = false;
 	buttonConnect.innerHTML = 'Connect';
 
+} );
+
+
+/**
+ * Get Data button
+ */
+buttonGetData.addEventListener( 'click', function () {
+	sendCommand( 'getData' );
 } );
 
 
@@ -392,6 +404,7 @@ function onStateChange(state) {
 	let data = new Uint8Array(state.data.buffer);
 	let recv = new TextDecoder('utf-8').decode(data);
 
+
 	if (recv_state == 'checkSleep'){
 		inputSleepText.value = parseInt(recv);
 		recv_state = 'main';
@@ -426,10 +439,11 @@ function onStateChange(state) {
  * This function is called when Bluetooth receives advertising packet.
  * @param {*} state 
  */
-function onAdvertisementReceived( state ) {
+function onAdvertisementReceived( devname, state ) {
 
 	let textDecoder = new TextDecoder('ascii');
 	let asciiString = textDecoder.decode(state).split(',');
+	textDevNameLe.innerText = devname;
 	textTempLe.innerText = asciiString[0] + '℃';
 	textBattLe.innerText = asciiString[1] + 'V';
 	textTimeLe.innerText = 'Last Update: ' + new Date().toTimeString();
