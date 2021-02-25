@@ -263,7 +263,8 @@ function Leafony() {
         try {
             scan = await navigator.bluetooth.requestLEScan({
                 filters: [
-                    {name: NAME_FILTER},
+                    // {name: NAME_FILTER},  // Devices with name NAME_FILTER
+                    {namePrefix: NAME_PREFIX},  // Deices with name starting with NAME_PREFIX
                 ],
                 // acceptAllAdvertisements = true,
             });
