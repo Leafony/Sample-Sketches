@@ -108,7 +108,7 @@ buttonConnect.addEventListener( 'click', function () {
 
 	// Spinner connect button
 	buttonConnect.disabled = true;
-	buttonConnect.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Connecting...'
+	buttonConnect.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Connecting...';
 } );
 
 
@@ -131,6 +131,8 @@ buttonDisconnect.addEventListener( 'click', function () {
  * Get Data button
  */
 buttonGetData.addEventListener( 'click', function () {
+	buttonGetData.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Receiving data...';
+	buttonGetData.disabled = true;
 	sendCommand( 'getData' );
 } );
 
@@ -262,6 +264,10 @@ function initChart () {
 		  },
 		},
 		axis: {
+			x: {
+				min: 0,
+				// max: 50
+			},
 			y: {
 				max: 40,
 				min: -10,
@@ -293,6 +299,10 @@ function initChart () {
 			}
 		},
 		axis: {
+			x: {
+				min: 0,
+				// max: 50
+			},
 			y: {
 				max: 10000,
 				min: 0,
@@ -316,6 +326,10 @@ function initChart () {
 			}
 		},
 		axis: {
+			x: {
+				min: 0,
+				// max: 50
+			},
 			y: {
 				max: 4,
 				min: 0,
@@ -372,6 +386,7 @@ function updateChart( state ) {
 	array_ilum.push(illm);
 	array_batt.push(batt);
 
+	/*
 	// Update charts
 	chart_temp.load({
 		columns: [
@@ -391,6 +406,7 @@ function updateChart( state ) {
 			array_batt,
 		]
 	});
+	*/
 
 }
 
@@ -427,8 +443,32 @@ function onStateChange(state) {
 	else{
 		if (recv == 'finish') {
 			console.log('Finish!');
+			buttonGetData.innerHTML = 'Get Data';
+			buttonGetData.disabled = false;
+
+			// Update charts
+			chart_temp.load({
+				columns: [
+					array_temp,
+					array_humd,
+				]
+			});
+
+			chart_ilum.load({
+				columns: [
+					array_ilum,
+				]
+			});
+
+			chart_batt.load({
+				columns: [
+					array_batt,
+				]
+			});
+
 		}
 		else {
+			// buttonGetData.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Receiving data...';
 			updateChart(state);
 		}
 	}
