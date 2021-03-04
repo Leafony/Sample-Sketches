@@ -297,7 +297,7 @@ void StartAdvData()
 //--------------------------------------------------------------------
 // センサの値を取得
 //--------------------------------------------------------------------
-void getSensor()
+void getSensors()
 {
   // LIS2DH 3軸センサーのデータ取得
   accel.read();
@@ -366,7 +366,7 @@ void getSensor()
 // sleep sensors
 // センサーリーフをスリープさせる
 //-----------------------------------------
-void sleepSensor()
+void sleepSensors()
 {
   // LIS2DH sleep
   accel.setDataRate(LIS3DH_DATARATE_POWERDOWN);
@@ -390,7 +390,7 @@ void sleepSensor()
 // wakeup sensors
 // センサーリーフをスリープから復帰させる
 //-----------------------------------------
-void wakeupSensor()
+void wakeupSensors()
 {
 #ifdef DEBUG
   Serial.println(F("Wakeup Senser"));
@@ -436,7 +436,7 @@ void sleepBLE()
   while (ble112.checkActivity())
     ;
 
-  digitalWrite(BLE_WAKEUP, LOW);
+  // digitalWrite(BLE_WAKEUP, LOW);
   // delay(500);
 }
 
@@ -450,9 +450,9 @@ void wakeupBLE()
   Serial.println("Wakeup BLE");
 #endif
 
-  uint8_t *last;
+  digitalWrite(BLE_WAKEUP, LOW);
   digitalWrite(BLE_WAKEUP, HIGH);
-  // delay(500);
+  delay(10);
 
   ble112.ble_cmd_system_halt(0);
   while (ble112.checkActivity())
@@ -522,10 +522,10 @@ void writeEEPROM()
   EEPROM.write(rb_addr + 5, illum & 0xFF);
   EEPROM.write(rb_addr + 6, (battVolt >> 8) & 0xFF);
   EEPROM.write(rb_addr + 7, battVolt & 0xFF);
-  EEPROM.write(rb_addr + 8, (u_time >> 24) & 0xFF);
-  EEPROM.write(rb_addr + 9, (u_time >> 16) & 0xFF);
-  EEPROM.write(rb_addr + 10, (u_time >> 8) & 0xFF);
-  EEPROM.write(rb_addr + 11, (u_time >> 0) & 0xFF);
+  EEPROM.write(rb_addr + 8, (u_time >> 0) & 0xFF);
+  EEPROM.write(rb_addr + 9, (u_time >> 8) & 0xFF);
+  EEPROM.write(rb_addr + 10, (u_time >> 16) & 0xFF);
+  EEPROM.write(rb_addr + 11, (u_time >> 24) & 0xFF);
 
   // write next ring buffer address
   rb_addr += PACKET_LENGTH;
@@ -546,6 +546,9 @@ void writeEEPROM()
 #endif
 }
 
+/**
+ * 
+ */
 uint32_t getTimestamp() {
   if (rtc.isTimeSet()){
     uint8_t year = rtc.getYear();
@@ -553,29 +556,44 @@ uint32_t getTimestamp() {
     uint8_t day = rtc.getDay();
     uint8_t hours = rtc.getHours();
     uint8_t minutes = rtc.getMinutes();
-    uint8_t secounds = rtc.getSeconds();
+    uint8_t seconds = rtc.getSeconds();
 
-    DateTime date (year, month, day, hours, minutes, secounds);
+#ifdef DEBUG
+  Serial.print("getTimestamp(): Now ");
+  Serial.print(year + 2000);
+  Serial.print("/");
+  Serial.print(month);
+  Serial.print("/");
+  Serial.print(day);
+  Serial.print(" ");
+  Serial.print(hours);
+  Serial.print(":");
+  Serial.print(minutes);
+  Serial.print(":");
+  Serial.print(seconds);
+  Serial.print(" (GMT+0)");
+#endif
+
+    DateTime date (year, month, day, hours, minutes, seconds);
     return date.unixtime();
   }
   return 0;
 }
 
-void shutdownAllDevices()
+void sleepAllDevices()
 {
   sleepBLE();
+  sleepSensors();
 
 #ifdef DEBUG
-  Serial.print("Shutdown STM32 (restart after ");
+  Serial.print("STM32 deepsleep (restart after ");
   Serial.print(SLEEP_INTERVAL);
   Serial.println(" seconds)");
   Serial.flush();
 #endif
-  LowPower.shutdown(SLEEP_INTERVAL * 1000);
 
-#ifdef DEBUG
-  Serial.println(F("This will never been called!"));
-#endif
+  LowPower.deepSleep(SLEEP_INTERVAL * 1000);
+
 }
 
 void setup()
@@ -595,6 +613,7 @@ void setup()
   setupPort();
   // delay(10);
 
+  /*
   setupRingBuffer();
 
   setupSensor();
@@ -607,9 +626,9 @@ void setup()
 
   wakeupBLE();
 
-  wakeupSensor();
-  getSensor();
-  sleepSensor();
+  wakeupSensors();
+  getSensors();
+  sleepSensors();
 
   // if time is set via bluetooth, then start to write EEPROM
   Serial.print("RTC is Time Set: ");
@@ -639,13 +658,56 @@ void setup()
   {
     shutdownAllDevices();
   }
+  */
 }
 
 void loop()
 {
-  if (bBleConnected)
-  {
-    // when ble is connected, this scope will run continuously.
+  if (!bBleConnected)
+  { // when BLE is not connected.
+    setupRingBuffer();
+
+    setupSensor();
+    setupBLE();
+
+    #ifdef DEBUG
+      Serial.println("setup end");
+      Serial.println("=========================================");
+    #endif
+
+    wakeupBLE();
+
+    wakeupSensors();
+    getSensors();
+    sleepSensors();
+
+    // if time is set via bluetooth, then start to write EEPROM
+    if (rtc.isTimeSet()) {
+      writeEEPROM();
+    }
+
+    StartAdvData();
+    #ifdef DEBUG
+      Serial.print("Start advertising (");
+      Serial.print(WAKE_INTERVAL);
+      Serial.println("s)");
+    #endif
+
+    // Continue Advertising; (check BLE status every 0.1 secound.)
+    for (int i = 0; i < WAKE_INTERVAL * 10; i++)
+    {
+      delay(100);
+      ble112.checkActivity();
+    }
+    // bBleConnected turns true at this time, when the connection is requested;
+
+    // when the connection is not requested, shutdown all devices during SLEEP_INTERVAL seconds;
+    if (!bBleConnected)
+    {
+      sleepAllDevices();
+    }
+  } else
+  { // when ble is connected, this scope will run continuously.
     if (bBleSendData)
     {
 #ifdef DEBUG
@@ -681,11 +743,7 @@ void loop()
       ble112.checkActivity(100);
     }
   }
-  else
-  {
-    // when ble is disconnected, shutdown all devices.
-    shutdownAllDevices();
-  }
+
 }
 
 // ================================================================
@@ -806,12 +864,27 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
     // read timestamp
     uint32_t unixtime = rcv_data.substring(8).toInt();
     DateTime timestamp (unixtime);
-    rtc.setYear(timestamp.year());
+    rtc.setYear(timestamp.year() - 2000);
     rtc.setMonth(timestamp.month());
     rtc.setDay(timestamp.day());
     rtc.setHours(timestamp.hour());
     rtc.setMinutes(timestamp.minute());
     rtc.setSeconds(timestamp.second());
+
+#ifdef DEBUG
+    Serial.println(unixtime);
+    Serial.print(timestamp.year());
+    Serial.print("/");
+    Serial.print(timestamp.month());
+    Serial.print("/");
+    Serial.print(timestamp.day());
+    Serial.print(" ");
+    Serial.print(timestamp.hour());
+    Serial.print(":");
+    Serial.print(timestamp.minute());
+    Serial.print(":");
+    Serial.println(timestamp.second());
+#endif
   }
 }
 
