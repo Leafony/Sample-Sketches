@@ -29,6 +29,7 @@ const buttonLescan = document.getElementById('ble-lescan-button');
 const buttonLestop = document.getElementById('ble-lestop-button');
 
 const alertController = document.getElementById('alert-controller');
+const buttonCheckVersion  = document.getElementById('check-version-button');
 const buttonCheckWake  = document.getElementById('check-wake-button');
 const buttonCheckSleep = document.getElementById('check-sleep-button');
 const buttonCheckSens  = document.getElementById('check-sens-button');
@@ -39,6 +40,7 @@ const buttonSubmitSleep = document.getElementById('submit-sleep-button');
 const buttonSubmitSens  = document.getElementById('submit-sens-button');
 const buttonSubmitSave  = document.getElementById('submit-save-button');
 const buttonSubmitAll   = document.getElementById('submit-all-button');
+const inputVersionText = document.getElementById('version-text-input');
 const inputWakeText = document.getElementById('wake-text-input');
 const inputSleepText = document.getElementById('sleep-text-input');
 const inputSensText = document.getElementById('sens-text-input');
@@ -159,6 +161,15 @@ buttonLestop.addEventListener( 'click', function () {
 
 	buttonLescan.style.display = '';
 	buttonLestop.style.display = 'none';
+} );
+
+
+/**
+ * Wake time check button
+ */
+buttonCheckVersion.addEventListener( 'click', function () {
+	recv_state = "checkVersion";
+	sendCommand( 'version' );
 } );
 
 
@@ -433,7 +444,11 @@ function onStateChange(state) {
 	let data = new Uint8Array(state.data.buffer);
 	let recv = new TextDecoder('utf-8').decode(data);
 
-	if (recv_state == 'checkSleep'){
+	if (recv_state == 'checkVersion'){
+		inputVersionText.value = recv;
+		recv_state = 'main';
+	}
+	else if (recv_state == 'checkSleep'){
 		inputSleepText.value = parseInt(recv);
 		recv_state = 'main';
 	}

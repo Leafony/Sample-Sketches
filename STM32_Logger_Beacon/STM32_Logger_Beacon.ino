@@ -47,7 +47,7 @@
 // BLE Local device name
 // 長さは必ず6文字
 //=====================================================================
-const String FIRMWARE_VERSION = "2021.02.001";
+const String FIRMWARE_VERSION = "2021.03.001";
 
 //=====================================================================
 // BLE Local device name
@@ -809,9 +809,9 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
   else if (rcv_data.startsWith("version"))
   {
     char sendData[16];
-    uint8_t len = sprintf(sendData, "%c", FIRMWARE_VERSION);
-    ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
-  } else if (rcv_data.startsWith("setTime"))
+    ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, FIRMWARE_VERSION.length(), (const uint8_t *)FIRMWARE_VERSION.c_str());
+  }
+  else if (rcv_data.startsWith("setTime"))
   {
     // setTime <timestamp uint32>
     // read timestamp
