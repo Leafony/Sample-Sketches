@@ -42,7 +42,7 @@
 
     <div class="row">
       <div class="col-md-12 text-center">
-        <p>1.  Press <b>Scan Beacon</b> button to start scanning beacon.</p>
+        <p>1.  Press <b>Scan Beacon</b> button to start scanning beacon. (Android or Mac only. Please see <a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">the documentation</a>.)</p>
         <button type="button" class="btn btn-primary" id="ble-lescan-button">Scan Beacon</button>
         <button type="button" class="btn btn-danger" id="ble-lestop-button" style="display:none;">Stop Scan</button>
         <hr>
@@ -87,29 +87,32 @@
         <button type="button" class="btn btn-primary" id="ble-get-button">Get Data</button>
         <hr>
       </div>
+    </div>
 
+    <div class="row">
       <div class="col-md-12">
-        <p class="text-center">5. After a while, logged data is transported and charts are updated.</p>
+        <p class="text-center">6. After a while, logged data is transported and charts are updated.</p>
+      </div>
+      <div class="col-xl-4">
         <h2 class="text-center">Temp & Humid Sensor</h2>
         <div id="chart_temp"></div>
       </div>
-      <div class="col-md-12">
+      <div class="col-xl-4">
         <h2 class="text-center">Illum Sensor</h2>
         <div id="chart_ilum"></div>
       </div>
-      <div class="col-md-12">
+      <div class="col-xl-4">
         <h2 class="text-center">Battery ADC</h2>
         <div id="chart_batt"></div>
         <hr>
       </div>
 
       <div class="col-md-12 text-center">
-        <p>6. You can download the plots as a csv file.</p>
+        <p>7. You can download the plots as a csv file.</p>
         <button type="button" class="btn btn-primary badge-pill btn-lg btn-block" id="button-download"
          download="data.csv" href="#">Download All Plots as CSV</button>
         <hr>
       </div>
-
     </div>
 
     <div class="row">
@@ -121,32 +124,40 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="input-group">
-          <p>Wake Time:</p>
-          <input type="text" class="form-control" placeholder="Wake Time" id="wake-text-input">
-          <button class="btn btn-outline-secondary" type="button" id="check-wake-button">Check</button>
-          <button class="btn btn-outline-secondary" type="button" id="submit-wake-button">Submit</button>
+        <div class="form-group">
+          <label for="wake-text-input">Wake Time</label>
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Wake Time" id="wake-text-input">
+            <button class="btn btn-outline-secondary" type="button" id="check-wake-button">Check</button>
+            <button class="btn btn-outline-secondary" type="button" id="submit-wake-button">Submit</button>
+          </div>
         </div>
 
-        <div class="input-group">
-          <p>Sleep Time:</p>
-          <input type="text" class="form-control" placeholder="Sleep Time" id="sleep-text-input">
-          <button class="btn btn-outline-secondary" type="button" id="check-sleep-button">Check</button>
-          <button class="btn btn-outline-secondary" type="button" id="submit-sleep-button">Submit</button>
+        <div class="form-group">
+          <label for="sleep-text-input">Sleep Time</label>
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Sleep Time" id="sleep-text-input">
+            <button class="btn btn-outline-secondary" type="button" id="check-sleep-button">Check</button>
+            <button class="btn btn-outline-secondary" type="button" id="submit-sleep-button">Submit</button>
+          </div>
         </div>
 
-        <div class="input-group">
-          <p>Sensor ON Frequency:</p>
-          <input type="text" class="form-control" placeholder="Sensor ON Frequency" id="sens-text-input">
-          <button class="btn btn-outline-secondary" type="button" id="check-sens-button">Check</button>
-          <button class="btn btn-outline-secondary" type="button" id="submit-sens-button">Submit</button>
+        <div class="form-group">
+          <label for="sens-text-input">Sensor ON Frequency</label>
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Sensor ON Frequency" id="sens-text-input">
+            <button class="btn btn-outline-secondary" type="button" id="check-sens-button">Check</button>
+            <button class="btn btn-outline-secondary" type="button" id="submit-sens-button">Submit</button>
+          </div>
         </div>
 
-        <div class="input-group">
-          <p>Data Save Frequency:</p>
-          <input type="text" class="form-control" placeholder="Data Save Frequency" id="save-text-input">
-          <button class="btn btn-outline-secondary" type="button" id="check-save-button">Check</button>
-          <button class="btn btn-outline-secondary" type="button" id="submit-save-button">Submit</button>
+        <div class="form-group">
+          <label for="save-text-input">Data Save Frequency</label>
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Data Save Frequency" id="save-text-input">
+            <button class="btn btn-outline-secondary" type="button" id="check-save-button">Check</button>
+            <button class="btn btn-outline-secondary" type="button" id="submit-save-button">Submit</button>
+          </div>
         </div>
 
         <div class="input-group">
@@ -160,8 +171,7 @@
 
     <div class="row">
       <div class="col-md-12 text-center" id="section-ble-connect">
-        <p>7. Press <b>Disconnect button</b> to disconnect to Leafony.</p>
-        <button type="button" class="btn btn-danger" id="ble-disconnect-button">Disconnect</button>
+        <p>8. Press <b>Disconnect button</b> to disconnect to Leafony.</p>
       </div>
     </div>
 

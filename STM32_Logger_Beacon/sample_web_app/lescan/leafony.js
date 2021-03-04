@@ -12,8 +12,8 @@ function Leafony() {
     const CHARACTERISTIC_READ_UUID = "442f1571-8a00-9a28-cbe1-e1d4212d53eb";
     const CHARACTERISTIC_WRITE_UUID = "442f1572-8a00-9a28-cbe1-e1d4212d53eb";
 
-    // const NAME_FILTER = '/^Leaf_[A-Z]$/';
-    const NAME_FILTER = 'Leaf_Z';
+    // const NAME_FILTER = 'Leaf_Z';
+    const NAME_PREFIX = 'Leaf_';
 
     let state = {};
     let char = {};
@@ -48,7 +48,8 @@ function Leafony() {
         try {
             device = await navigator.bluetooth.requestDevice({
                 filters: [
-                    {name: NAME_FILTER}
+                    // {name: NAME_FILTER},  // Devices with name NAME_FILTER
+                    {namePrefix: NAME_PREFIX},  // Deices with name starting with NAME_PREFIX
                 ],
                 optionalServices: [ 'generic_access', SERVICE_UUID],
             });
@@ -262,7 +263,8 @@ function Leafony() {
         try {
             scan = await navigator.bluetooth.requestLEScan({
                 filters: [
-                    {name: NAME_FILTER},
+                    // {name: NAME_FILTER},  // Devices with name NAME_FILTER
+                    {namePrefix: NAME_PREFIX},  // Deices with name starting with NAME_PREFIX
                 ],
                 // acceptAllAdvertisements = true,
             });

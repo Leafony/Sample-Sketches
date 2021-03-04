@@ -2,7 +2,7 @@
 //  Leafony Platform sample sketch
 //     Application  : BLE 4-Sensers demo
 //     Processor    : ATmega328P (3.3V /8MHz)
-//     Confirmed in Arduino IDE 1.8.13
+//     Confirmed in Arduino IDE 1.8.7
 //
 //     Leaf configuration
 //       (1) AC02 BLE Sugar
