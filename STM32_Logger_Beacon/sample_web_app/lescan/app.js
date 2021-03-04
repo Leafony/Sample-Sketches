@@ -52,6 +52,7 @@ const buttonDownload = document.getElementById("button-download");
 let leafony;
 let chart_temp, chart_ilum, chart_batt;
 let array_temp, array_humd, array_ilum, array_batt;
+let array_time;
 
 let recv_state; // string
 
@@ -253,6 +254,7 @@ function clearTable () {
  * Initialize Charts
  */
 function initChart () {
+	array_time = ['times'];
 	array_temp = ['Temperature'];
 	array_humd = ['Humidity'];
 	array_ilum = ['Illuminance'];
@@ -261,7 +263,10 @@ function initChart () {
 	chart_temp = c3.generate({
 	    bindto: '#chart_temp',
 	    data: {
+		  x: 'times',
+		  xFormat: '%Y/%m/%d %H:%M:%S',
 	      columns: [
+			array_time,
 			array_temp,
 			array_humd,
 		  ],
@@ -271,8 +276,13 @@ function initChart () {
 		},
 		axis: {
 			x: {
-				min: 0,
-				// max: 50
+				type: 'timeseries',
+				localtime: true,
+				tick: {
+					format: '%Y/%m/%d %H:%M:%S',
+				},
+				// min: "2021/03/04 10:00:00",
+				// max: "2022/03/04 23:00:00",
 			},
 			y: {
 				max: 40,
@@ -291,13 +301,16 @@ function initChart () {
 					position: 'outer-middle',
 				}
 			}
-		}
+		},
 	});
 
 	chart_ilum = c3.generate({
 		bindto: '#chart_ilum',
 		data: {
+			x: 'times',
+			xFormat: '%Y/%m/%d %H:%M:%S',
 			columns: [
+				array_time,
 				array_ilum,
 			],
 			colors: {
@@ -306,8 +319,13 @@ function initChart () {
 		},
 		axis: {
 			x: {
-				min: 0,
-				// max: 50
+				type: 'timeseries',
+				localtime: true,
+				tick: {
+					format: '%Y/%m/%d %H:%M:%S',
+				},
+				// min: "2021/03/04 10:00:00",
+				// max: "2022/03/04 23:00:00",
 			},
 			y: {
 				max: 10000,
@@ -324,7 +342,10 @@ function initChart () {
 	chart_batt = c3.generate({
 		bindto: '#chart_batt',
 		data: {
+			x: 'times',
+			xFormat: '%Y/%m/%d %H:%M:%S',
 			columns: [
+				array_time,
 				array_batt,
 			],
 			colors: {
@@ -333,8 +354,13 @@ function initChart () {
 		},
 		axis: {
 			x: {
-				min: 0,
-				// max: 50
+				type: 'timeseries',
+				localtime: true,
+				tick: {
+					format: '%Y/%m/%d %H:%M:%S',
+				},
+				// min: "2021/03/04 10:00:00",
+				// max: "2022/03/04 23:00:00",
 			},
 			y: {
 				max: 4,
@@ -367,8 +393,6 @@ function updateChart( state ) {
 
 	// Decode received data
 	let data = new Uint8Array(state.data.buffer);
-	// console.log(new TextDecoder("utf-8").decode(data));
-	console.log(data);
 	let temp = (data[0] * 256.0 + data[1]) / 256.0;
 	let humd = (data[2] * 256.0 + data[3]) / 256.0;
 	let illm = data[4] * 256.0 + data[5];
@@ -376,7 +400,13 @@ function updateChart( state ) {
 
 	let unixtime = new Uint32Array(state.data.buffer)[2];
 	let time = new Date(unixtime * 1000);
-	// console.log(time, unixtime)
+	var str_time = time.getFullYear()
+    				+ '/' + ('0' + (time.getMonth() + 1)).slice(-2)
+    				+ '/' + ('0' + time.getDate()).slice(-2)
+    				+ ' ' + ('0' + time.getHours()).slice(-2)
+    				+ ':' + ('0' + time.getMinutes()).slice(-2)
+    				+ ':' + ('0' + time.getSeconds()).slice(-2);
+	console.log(str_time, unixtime, temp, humd, illm, batt);
 
 	textDeviceName.innerText = state.devn;
 	textUniqueName.innerText = state.unin;
@@ -387,32 +417,11 @@ function updateChart( state ) {
 	textBatt.innerText = batt;
 
 	// Append sensors values to array
+	array_time.push(str_time);
 	array_temp.push(temp);
 	array_humd.push(humd);
 	array_ilum.push(illm);
 	array_batt.push(batt);
-
-	/*
-	// Update charts
-	chart_temp.load({
-		columns: [
-			array_temp,
-			array_humd,
-		]
-	});
-
-	chart_ilum.load({
-		columns: [
-			array_ilum,
-		]
-	});
-
-	chart_batt.load({
-		columns: [
-			array_batt,
-		]
-	});
-	*/
 
 }
 
@@ -421,11 +430,8 @@ function updateChart( state ) {
  * @param {*} state : received buffer
  */
 function onStateChange(state) {
-	console.log(recv_state);
-
 	let data = new Uint8Array(state.data.buffer);
 	let recv = new TextDecoder('utf-8').decode(data);
-
 
 	if (recv_state == 'checkSleep'){
 		inputSleepText.value = parseInt(recv);
@@ -455,6 +461,7 @@ function onStateChange(state) {
 			// Update charts
 			chart_temp.load({
 				columns: [
+					array_time,
 					array_temp,
 					array_humd,
 				]
@@ -462,19 +469,20 @@ function onStateChange(state) {
 
 			chart_ilum.load({
 				columns: [
+					array_time,
 					array_ilum,
 				]
 			});
 
 			chart_batt.load({
 				columns: [
+					array_time,
 					array_batt,
 				]
 			});
 
 		}
 		else {
-			// buttonGetData.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Receiving data...';
 			updateChart(state);
 		}
 	}
