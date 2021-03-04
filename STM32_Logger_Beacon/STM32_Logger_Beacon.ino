@@ -611,54 +611,7 @@ void setup()
 #endif
 
   setupPort();
-  // delay(10);
 
-  /*
-  setupRingBuffer();
-
-  setupSensor();
-  setupBLE();
-
-#ifdef DEBUG
-  Serial.println("setup end");
-  Serial.println("=========================================");
-#endif
-
-  wakeupBLE();
-
-  wakeupSensors();
-  getSensors();
-  sleepSensors();
-
-  // if time is set via bluetooth, then start to write EEPROM
-  Serial.print("RTC is Time Set: ");
-  Serial.println(rtc.isTimeSet());
-  if (rtc.isTimeSet()) {
-    writeEEPROM();
-  }
-
-  StartAdvData();
-#ifdef DEBUG
-  Serial.print("Start advertising (");
-  Serial.print(WAKE_INTERVAL);
-  Serial.println("s)");
-  Serial.flush();
-#endif
-
-  // Continue Advertising; (check BLE status every 0.1 secound.)
-  for (int i = 0; i < WAKE_INTERVAL * 10; i++)
-  {
-    delay(100);
-    ble112.checkActivity();
-  }
-  // bBleConnected turns true at this time, when the connection is requested;
-
-  // when the connection is not requested, shutdown all devices during SLEEP_INTERVAL seconds;
-  if (!bBleConnected)
-  {
-    shutdownAllDevices();
-  }
-  */
 }
 
 void loop()
