@@ -51,6 +51,7 @@
         <p>2. Display updated when beacon packet is received.</p>
         <p class="display-4" id="textDevNameLe">Device Name</p>
         <p class="display-4" id="textTempLe">00.0℃</p>
+        <p class="display-4" id="textHumidLe" style="display:none;">00%</p>
         <p class="display-4" id="textBattLe">0.00V</p>
         <p class="font-weight-light" id="textTimeLe">Last Update: 0000/00/00 00:00:00</p>
         <hr>
@@ -66,8 +67,8 @@
     <div class="row">
       <div class="col-md-12 text-center" id="section-ble-connect">
         <p>4. Press <b>Connect button</b> to connect to Leafony.</p>
-        <button type="button" class="btn btn-primary btn-lg" id="ble-connect-button">Connect</button>
-        <button type="button" class="btn btn-danger btn-lg" id="ble-disconnect-button" style="display:none;">Disconnect</button>
+        <button type="button" class="btn btn-primary" id="ble-connect-button">Connect</button>
+        <button type="button" class="btn btn-danger" id="ble-disconnect-button" style="display:none;">Disconnect</button>
       </div>
 
       <div class="col-md-12 text-center" id="section-ble-connect">
@@ -77,8 +78,13 @@
       </div>
 
       <div class="col-md-12 text-center" id="section-ble-connect">
-        <p>4. Press <b>Get Data button</b> to read out flash memory on Leafony.</p>
-        <button type="button" class="btn btn-primary btn-lg" id="ble-get-button">Get Data</button>
+        <button type="button" class="btn btn-primary" id="set-time-button">Set Time</button>
+        <hr>
+      </div>
+
+      <div class="col-md-12 text-center" id="section-ble-connect">
+        <p>5. Press <b>Get Data button</b> to read out flash memory on Leafony.</p>
+        <button type="button" class="btn btn-primary" id="ble-get-button">Get Data</button>
         <hr>
       </div>
 
@@ -155,7 +161,7 @@
     <div class="row">
       <div class="col-md-12 text-center" id="section-ble-connect">
         <p>7. Press <b>Disconnect button</b> to disconnect to Leafony.</p>
-        <button type="button" class="btn btn-danger btn-lg" id="ble-disconnect-button">Disconnect</button>
+        <button type="button" class="btn btn-danger" id="ble-disconnect-button">Disconnect</button>
       </div>
     </div>
 

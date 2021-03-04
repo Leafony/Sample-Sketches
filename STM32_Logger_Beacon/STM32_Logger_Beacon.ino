@@ -35,6 +35,8 @@
 #include <EEPROM.h>
 
 #include "STM32LowPower.h"
+#include <STM32RTC.h>
+#include "RTClib.h"
 
 #include <Adafruit_LIS3DH.h>
 #include <HTS221.h>
@@ -117,6 +119,8 @@ ClosedCube_OPT3001 light;
 HardwareSerial Serialble(BLE_TX, BLE_RX);
 BGLib ble112((HardwareSerial *)&Serialble, 0, 0);
 
+// RTC
+STM32RTC& rtc = STM32RTC::getInstance();
 //=====================================================================
 // Variables
 //=====================================================================
@@ -239,7 +243,7 @@ void setupBLE()
 //-----------------------------------------------
 void StartAdvData()
 {
-  char charTemp[7], charBatt[7];
+  char charTemp[7], charHumid[7], charBatt[7];
   char userData[15];
   uint8_t dataLen;
   uint8_t stLen;
@@ -483,7 +487,7 @@ void setupRingBuffer()
 void writeEEPROM()
 {
   uint16_t temp, humid, illum, battVolt;
-  uint32_t u_time = 0; // TODO: support logging time.
+  uint32_t u_time = getTimestamp();
 
   // Reset the ring buffer address when the size is not enough;
   if (rb_addr + PACKET_LENGTH >= EEPROM.length())
@@ -493,7 +497,9 @@ void writeEEPROM()
 
 #ifdef DEBUG
   Serial.print("writeEEPROM(): ADDR=");
-  Serial.println(rb_addr);
+  Serial.print(rb_addr);
+  Serial.print(" timestamp=");
+  Serial.println(u_time);
 #endif
 
   // Write the sensors data to EEPROM
@@ -534,6 +540,21 @@ void writeEEPROM()
 #endif
 }
 
+uint32_t getTimestamp() {
+  if (rtc.isTimeSet()){
+    uint8_t year = rtc.getYear();
+    uint8_t month = rtc.getMonth();
+    uint8_t day = rtc.getDay();
+    uint8_t hours = rtc.getHours();
+    uint8_t minutes = rtc.getMinutes();
+    uint8_t secounds = rtc.getSeconds();
+
+    DateTime date (year, month, day, hours, minutes, secounds);
+    return date.unixtime();
+  }
+  return 0;
+}
+
 void shutdownAllDevices()
 {
   sleepBLE();
@@ -557,6 +578,7 @@ void setup()
   LowPower.begin(); // Configure low power
 
   Wire.begin(); // I2C 100KHz
+  rtc.begin(); // initialize RTC 24H format
 
 #ifdef DEBUG
   Serial.println("<<< Wake up <<<");
@@ -583,7 +605,12 @@ void setup()
   getSensor();
   sleepSensor();
 
-  writeEEPROM();
+  // if time is set via bluetooth, then start to write EEPROM
+  Serial.print("RTC is Time Set: ");
+  Serial.println(rtc.isTimeSet());
+  if (rtc.isTimeSet()) {
+    writeEEPROM();
+  }
 
   StartAdvData();
 #ifdef DEBUG
@@ -720,47 +747,65 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
 #endif
 
   // Received BLE Commands
-  if (rcv_data.indexOf("getData") == 0)
+  if (rcv_data.startsWith("getData"))
   {
     // Start to send EEPROM data
     bBleSendData = true;
   }
-  else if (rcv_data.indexOf("getSleep") == 0)
+  else if (rcv_data.startsWith("getSleep"))
   {
     // send SLEEP_INTERVAL
     char sendData[8];
     uint8_t len = sprintf(sendData, "%05d", (int)SLEEP_INTERVAL);
     ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
   }
-  else if (rcv_data.indexOf("getWake") == 0)
+  else if (rcv_data.startsWith("getWake"))
   {
     // send WAKE_INTERVAL
     char sendData[8];
     uint8_t len = sprintf(sendData, "%05d", (int)WAKE_INTERVAL);
     ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
   }
-  else if (rcv_data.indexOf("getSensFreq") == 0)
+  else if (rcv_data.startsWith("getSensFreq"))
   {
     // send SENS_FREQ
     char sendData[8];
     uint8_t len = sprintf(sendData, "%05d", (int)SENS_FREQ);
     ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
   }
-  else if (rcv_data.indexOf("getSaveFreq") == 0)
+  else if (rcv_data.startsWith("getSaveFreq"))
   {
     // send SAVE_FREQ
     char sendData[8];
     uint8_t len = sprintf(sendData, "%05d", (int)SAVE_FREQ);
     ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
   }
-  else if (rcv_data.indexOf("setSleep") == 0)
+  else if (rcv_data.startsWith("setSleep"))
   {
     // set SLEEP_INTERVAL
     // Serial.println(rcv_data.replace("setSleep ", ""));
   }
-  else if (rcv_data.indexOf("set") == 0)
+  else if (rcv_data.startsWith("setData"))
   {
     bBleSendData = false;
+  }
+  else if (rcv_data.startsWith("version"))
+  {
+    char sendData[16];
+    uint8_t len = sprintf(sendData, "%c", FIRMWARE_VERSION);
+    ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
+  } else if (rcv_data.startsWith("setTime"))
+  {
+    // setTime <timestamp uint32>
+    // read timestamp
+    uint32_t unixtime = rcv_data.substring(8).toInt();
+    DateTime timestamp (unixtime);
+    rtc.setYear(timestamp.year());
+    rtc.setMonth(timestamp.month());
+    rtc.setDay(timestamp.day());
+    rtc.setHours(timestamp.hour());
+    rtc.setMinutes(timestamp.minute());
+    rtc.setSeconds(timestamp.second());
   }
 }
 

@@ -15,6 +15,7 @@ const textIllum = document.getElementById('textIllum');
 const textBatt = document.getElementById('textBatt');
 const textDevNameLe = document.getElementById('textDevNameLe');
 const textTempLe = document.getElementById('textTempLe');
+const textHumidLe = document.getElementById('textHumidLe');
 const textBattLe = document.getElementById('textBattLe');
 const textTimeLe = document.getElementById('textTimeLe');
 
@@ -43,6 +44,7 @@ const inputSleepText = document.getElementById('sleep-text-input');
 const inputSensText = document.getElementById('sens-text-input');
 const inputSaveText = document.getElementById('save-text-input');
 
+const buttonSetTime  = document.getElementById('set-time-button');
 
 const buttonDownload = document.getElementById("button-download");
 
@@ -224,6 +226,10 @@ buttonSubmitSave.addEventListener( 'click', function () {
 	sendCommand( 'setSaveFreq ' + toString(inputSaveText.value));
 } );
 
+
+buttonSetTime.addEventListener( 'click', function () {
+	sendCommand( 'setTime ' + timeStamp());
+} );
 
 /**
  * 
@@ -445,6 +451,7 @@ function onAdvertisementReceived( devname, state ) {
 	let asciiString = textDecoder.decode(state).split(',');
 	textDevNameLe.innerText = devname;
 	textTempLe.innerText = asciiString[0] + '℃';
+	// textHumidLe.innerText = asciiString[1] + '%';
 	textBattLe.innerText = asciiString[1] + 'V';
 	textTimeLe.innerText = 'Last Update: ' + new Date().toTimeString();
 	console.log("onAdvertisementReceived: " + asciiString);
@@ -502,3 +509,13 @@ buttonDownload.addEventListener( 'click', function () {
 	delete csvText;
 	delete blob;
 });
+
+
+/**
+ * Get Hex Timestamp Value
+ */
+function timeStamp() {
+	let timestamp = new Date().getTime();
+	timestamp = Math.floor(timestamp / 1000);
+	return timestamp;
+}
