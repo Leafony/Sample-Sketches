@@ -265,11 +265,11 @@ function clearTable () {
  * Initialize Charts
  */
 function initChart () {
-	array_time = ['times'];
-	array_temp = ['Temperature'];
-	array_humd = ['Humidity'];
-	array_ilum = ['Illuminance'];
-	array_batt = ['Battery'];
+	array_time = ['times', new Date(0)];
+	array_temp = ['Temperature', 0];
+	array_humd = ['Humidity', 0];
+	array_ilum = ['Illuminance', 0];
+	array_batt = ['Battery', 0];
 
 	chart_temp = c3.generate({
 	    bindto: '#chart_temp',
@@ -494,6 +494,16 @@ function onStateChange(state) {
 			buttonGetData.disabled = false;
 
 			array_time.pop(); // TODO: [bugfix] "finish"が保存されてしまうのを解決する
+			array_temp.pop();
+			array_humd.pop();
+			array_ilum.pop();
+			array_batt.pop();
+
+			array_time.splice(1, 1); // グラフに最初から登録しているデータを消す
+			array_temp.splice(1, 1);
+			array_humd.splice(1, 1);
+			array_ilum.splice(1, 1);
+			array_batt.splice(1, 1);
 
 			// Update charts
 			chart_temp.load({
