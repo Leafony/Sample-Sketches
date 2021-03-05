@@ -292,8 +292,8 @@ function initChart () {
 				tick: {
 					format: '%Y/%m/%d %H:%M:%S',
 				},
-				// min: "2021/03/04 10:00:00",
-				// max: "2022/03/04 23:00:00",
+				// min: new Date(2021, 03, 04, 10, 00, 0, 0),
+				// max: new Date(2021, 03, 06, 10, 00, 0, 0),
 			},
 			y: {
 				max: 40,
@@ -472,6 +472,10 @@ function onStateChange(state) {
 			console.log('Finish!');
 			buttonGetData.innerHTML = 'Get Data';
 			buttonGetData.disabled = false;
+
+			array_time.pop();
+			array_temp.pop();
+			array_humd.pop();
 
 			// Update charts
 			chart_temp.load({

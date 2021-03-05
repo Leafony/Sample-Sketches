@@ -157,6 +157,7 @@ uint16_t rb_addr = 0; // EEPROMリングバッファのTAILアドレス
 const uint8_t RINGBUFF_OFFSET_ADDR = 2;
 const uint8_t PACKET_LENGTH = 12;
 
+
 //=====================================================================
 // IOピンの入出力設定
 // 接続するリーフに合わせて設定する
@@ -166,6 +167,7 @@ void setupPort()
   pinMode(BLE_WAKEUP, OUTPUT);    // BLE Wakeup/Sleep
   digitalWrite(BLE_WAKEUP, HIGH); // BLE Wakeup
 }
+
 
 //-----------------------------------------------
 // sensor
@@ -202,6 +204,7 @@ void setupSensor()
     errorConfig = light.writeConfig(newConfig); //retry
   }
 }
+
 
 //-----------------------------------------------
 // BLE
@@ -243,6 +246,7 @@ void setupBLE()
   while (ble112.checkActivity(100))
     ;
 }
+
 
 //-----------------------------------------------
 // アドバタイズするデータの設定
@@ -293,6 +297,7 @@ void StartAdvData()
   while (ble112.checkActivity(1000))
     ;
 }
+
 
 //--------------------------------------------------------------------
 // センサの値を取得
@@ -362,6 +367,7 @@ void getSensors()
 #endif
 }
 
+
 //-----------------------------------------
 // sleep sensors
 // センサーリーフをスリープさせる
@@ -385,6 +391,7 @@ void sleepSensors()
     errorConfig = light.writeConfig(newConfig);
   }
 }
+
 
 //-----------------------------------------
 // wakeup sensors
@@ -418,6 +425,7 @@ void wakeupSensors()
   }
 }
 
+
 //---------------------------------------
 // sleep BLE
 // BLE リーフをスリープさせる
@@ -439,6 +447,7 @@ void sleepBLE()
   // digitalWrite(BLE_WAKEUP, LOW);
   // delay(500);
 }
+
 
 //---------------------------------------
 // wakeup BLE
@@ -462,6 +471,7 @@ void wakeupBLE()
   while (ble112.checkActivity())
     ;
 }
+
 
 //---------------------------------------
 // EEPROM
@@ -490,6 +500,10 @@ void setupRingBuffer()
 #endif
 }
 
+
+/**
+ * 
+ */
 void writeEEPROM()
 {
   uint16_t temp, humid, illum, battVolt;
@@ -546,6 +560,7 @@ void writeEEPROM()
 #endif
 }
 
+
 /**
  * 
  */
@@ -580,6 +595,10 @@ uint32_t getTimestamp() {
   return 0;
 }
 
+
+/**
+ * 
+ */
 void sleepAllDevices()
 {
   sleepBLE();
@@ -596,6 +615,10 @@ void sleepAllDevices()
 
 }
 
+
+/**
+ * 
+ */
 void setup()
 {
   Serial.begin(115200);
@@ -614,6 +637,10 @@ void setup()
 
 }
 
+
+/**
+ * 
+ */
 void loop()
 {
   if (!bBleConnected)
@@ -698,6 +725,7 @@ void loop()
   }
 
 }
+
 
 // ================================================================
 // INTERNAL BGLIB CLASS CALLBACK FUNCTIONS
