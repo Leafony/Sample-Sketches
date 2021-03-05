@@ -291,6 +291,14 @@ function initChart () {
 				localtime: true,
 				tick: {
 					format: '%Y/%m/%d %H:%M:%S',
+					rotate: -50,
+					multiline: false,
+					count: 10,
+					culling: {
+						max: 10,
+					},
+					height: 130,
+					outer: false,
 				},
 				// min: new Date(2021, 03, 04, 10, 00, 0, 0),
 				// max: new Date(2021, 03, 06, 10, 00, 0, 0),
@@ -334,9 +342,15 @@ function initChart () {
 				localtime: true,
 				tick: {
 					format: '%Y/%m/%d %H:%M:%S',
+					rotate: -50,
+					multiline: false,
+					count: 10,
+					culling: {
+						max: 10,
+					},
+					height: 130,
+					outer: false,
 				},
-				// min: "2021/03/04 10:00:00",
-				// max: "2022/03/04 23:00:00",
 			},
 			y: {
 				max: 10000,
@@ -369,9 +383,15 @@ function initChart () {
 				localtime: true,
 				tick: {
 					format: '%Y/%m/%d %H:%M:%S',
+					rotate: -50,
+					multiline: false,
+					count: 10,
+					culling: {
+						max: 10,
+					},
+					height: 130,
+					outer: false,
 				},
-				// min: "2021/03/04 10:00:00",
-				// max: "2022/03/04 23:00:00",
 			},
 			y: {
 				max: 4,
@@ -473,9 +493,7 @@ function onStateChange(state) {
 			buttonGetData.innerHTML = 'Get Data';
 			buttonGetData.disabled = false;
 
-			array_time.pop();
-			array_temp.pop();
-			array_humd.pop();
+			array_time.pop(); // TODO: [bugfix] "finish"が保存されてしまうのを解決する
 
 			// Update charts
 			chart_temp.load({
