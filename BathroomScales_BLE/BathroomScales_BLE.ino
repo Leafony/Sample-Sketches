@@ -125,6 +125,8 @@ volatile bool bInterval = false;
 //------------------------------
 // HX711
 //------------------------------
+float newCalibrationValue = 19800;
+
 const int calVal_eepromAdress = 0;
 unsigned long t = 0;
 float dataWeight = 0;
@@ -477,7 +479,7 @@ void calibrate() {
     }
   }
 
-  float newCalibrationValue = 18793;
+//  float newCalibrationValue = 18793;
   LoadCell.setCalFactor(newCalibrationValue);
 
   EEPROM.put(calVal_eepromAdress, newCalibrationValue);
