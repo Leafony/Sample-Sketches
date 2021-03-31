@@ -479,7 +479,7 @@ void wakeupBLE()
 void setupRingBuffer()
 {
   // read ring buffer start address from RTC backup register
-  rb_addr = rtc_read_backup_reg(8);
+  rb_addr = getBackupRegister(RTC_BKP_DR3);
 
   // コントロールレジスタを読み出し
   // wake_intval = EEPROM.read(2);
@@ -543,7 +543,7 @@ void writeEEPROM()
 
   // write next ring buffer address to RTC backup register
   rb_addr += PACKET_LENGTH;
-  rtc_write_backup_reg(8, rb_addr);
+  setBackupRegister(RTC_BKP_DR3, rb_addr);
 
 #ifdef DEBUG
   Serial.print("temp = ");
