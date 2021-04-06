@@ -112,7 +112,7 @@ void setup() {
   pinMode(MIC, INPUT);
   pinMode(VR, INPUT);
 
-  //起動テスト(LED)
+  // Startup test(LED)
   digitalWrite(LED1,HIGH);
   delay(200);
   digitalWrite(LED2,HIGH);
