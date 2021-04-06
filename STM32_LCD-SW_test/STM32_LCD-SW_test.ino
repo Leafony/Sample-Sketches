@@ -56,7 +56,7 @@ void setup(){
   i2c_write_byte(I2C_EXPANDER_ADDR, 0x01, 0x01);      // LCD Power on
   
   //LCD Initialize
-  lcd.begin(8, 2);                                    // 8文字, 2行
+  lcd.begin(8, 2);                                    // 8 characters, 2 lines
   lcd.setContrast(30);
   lcd.clear();
 
@@ -70,7 +70,7 @@ void setup(){
   i2c_write_byte(I2C_EXPANDER_ADDR, 0x01, 0x01);      // LCD Power on
 
   // LCD Initialize
-  lcd.begin(8, 2);                                    // 8文字, 2行
+  lcd.begin(8, 2);                                    // 8 characters, 2 lines
   lcd.setContrast(30);
   lcd.clear();
 
