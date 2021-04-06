@@ -21,7 +21,7 @@ unsigned int dataVR;
 unsigned int dataMic;
 
 //-----------------------------------------------
-// VRとMICデータを取得する
+// Get VR and MIC data
 //-----------------------------------------------
 void getSensorData()
 {
@@ -36,7 +36,7 @@ void getSensorData()
 }
 
 //-----------------------------------------------
-// VRとMICの値にあわせてLEDを点灯、消灯させる
+// Turn the LEDs on and off according to the VR and MIC values.
 //-----------------------------------------------
 void dispSensorData()
 {
