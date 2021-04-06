@@ -11,21 +11,21 @@
 #include <HTS221.h>
 
 //---------------------------
-// 2点補正用データ
+// Data for two-point correction
 //---------------------------
-// 温度補正用データ0
-float TL0 = 25.0;     // 4-Sensors温度測定値
-float TM0 = 25.0;     // 温度計等測定値
-// 温度補正用データ1
-float TL1 = 40.0;     // 4-Sensors温度測定値
-float TM1 = 40.0;     // 温度計等測定値
+// Temperature correction data 0
+float TL0 = 25.0;     // 4-Sensors Temperature measurement value
+float TM0 = 25.0;     // Thermometer and other measurements value
+// Temperature correction data 1
+float TL1 = 40.0;     // 4-Sensors Temperature measurement value
+float TM1 = 40.0;     // Thermometer and other measurements value
 
-// 湿度補正用データ0
-float HL0 = 60.0;     // 4-Sensors湿度測定値
-float HM0 = 60.0;     // 湿度計等測定値
-// 湿度補正用データ1
-float HL1 = 80.0;     // 4-Sensors湿度測定値
-float HM1 = 80.0;     // 湿度計等測定値
+// Humidity correction data 0
+float HL0 = 60.0;     // 4-Sensors Humidity measurement value
+float HM0 = 60.0;     // Hygrometer and other measurements value
+// Humidity correction data 1
+float HL1 = 80.0;     // 4-Sensors Humidity measurement value
+float HM1 = 80.0;     // Hygrometer and other measurements value
 
 void setup() {
   // initialize serial communication at 115200 bit per second:

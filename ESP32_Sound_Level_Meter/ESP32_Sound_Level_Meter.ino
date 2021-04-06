@@ -8,8 +8,8 @@
 //      Rev.00 2020/08/20  First release
 //=====================================================================
 
-// LED4-6:VRのレベル表示
-// LED1-3:MICの音圧レベル表示
+// LED4-6:VR level display
+// LED1-3:MIC sound pressure level display
 
 #define LED1              14            // D6  IO14
 #define LED2              15            // D7  IO15
@@ -24,7 +24,7 @@ unsigned int dataVR;
 unsigned int dataMic;
 
 //-----------------------------------------------
-// VRとMICデータを取得する
+// Get VR and MIC data
 //-----------------------------------------------
 void getSensorData(){
     dataVR = analogRead(VR);
@@ -38,7 +38,7 @@ void getSensorData(){
 }
 
 //-----------------------------------------------
-// VRとMICの値にあわせてLEDを点灯、消灯させる
+// Turn the LEDs on and off according to the VR and MIC values.
 //-----------------------------------------------
 void dispSensorData(){
     if (dataVR < 1500){

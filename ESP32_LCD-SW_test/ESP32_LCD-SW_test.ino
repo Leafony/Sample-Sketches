@@ -27,39 +27,13 @@
 #include <ST7032.h>                 // LCD
 
 //-----------------------------------------------
-// IOピン一覧
-//-----------------------------------------------
-//  D0  IO3   (RXD)
-//  D1  IO1   (TXD)
-//  D2  IO4   (INT0)
-//  D3  IO27  (INT1)
-//  D4  IO12  (H-MISO)
-//  D5  IO13  (H-MOSI)
-//  D6  IO14  (H-SCK)
-//  D7  IO15  (H-SS)
-//  D8  IO17  (UART_TX)
-//  D9  IO16  (UART_RX)
-//  D10 IO5   (SS)
-//  D11 IO23  (MOSI)
-//  D12 IO19  (MISO)
-//  D13 IO18  (SCK)
-//  D14 IO21  (SDA)
-//  D15 IO22  (SCL)
-//  A0  IO36
-//  A1  IO25  (UART_TX)
-//  A2  IO26  (UART_RX)
-//  A3  IO39
-//  A4  IO34
-//  A5  IO35
-
-//-----------------------------------------------
-// IOピンの名前定義
-// 接続するリーフに合わせて定義する
+// IO pin name definition
+// Define it according to the leaf to be connected.
 //-----------------------------------------------
 #define SW1   4                   // D2 IO4
 
 //-----------------------------------------------
-// プログラム内で使用する定数定義
+// Define constants to be used in the program
 //-----------------------------------------------
 #define I2C_EXPANDER_ADDR   0x1A
 
@@ -84,7 +58,7 @@ void setup(){
   i2c_write_byte(I2C_EXPANDER_ADDR, 0x01, 0x01);      // LCD Power on
   
   //LCD Initialize
-  lcd.begin(8, 2);                      // 8文字, 2行
+  lcd.begin(8, 2);                      // 8 characters, 2 lines
   lcd.setContrast(30);
   lcd.clear();
 
@@ -98,7 +72,7 @@ void setup(){
   i2c_write_byte(I2C_EXPANDER_ADDR, 0x01, 0x01);      // LCD Power on
 
   // LCD Initialize
-  lcd.begin(8, 2);                      // 8文字, 2行
+  lcd.begin(8, 2);                      // 8 characters, 2 lines
   lcd.setContrast(30);
   lcd.clear();
 
@@ -150,10 +124,10 @@ void loop() {
 }
 
 //=====================================================================
-// I2C　制御関数
+// I2C control function
 //=====================================================================
 //-----------------------------------------------
-//I2C スレーブデバイスに1バイト書き込む
+// I2C Write 1 byte to the slave device
 //-----------------------------------------------
 void i2c_write_byte(int device_address, int reg_address, int write_data){
   Wire.beginTransmission(device_address);
@@ -163,7 +137,7 @@ void i2c_write_byte(int device_address, int reg_address, int write_data){
 }
 
 //-----------------------------------------------
-//I2C スレーブデバイスから1バイト読み込む
+// I2C Read 1 byte from the slave device
 //-----------------------------------------------
 unsigned char i2c_read_byte(int device_address, int reg_address){
 

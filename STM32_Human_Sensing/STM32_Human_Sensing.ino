@@ -19,11 +19,11 @@ unsigned char i2c_recvBuf[I2C_RECV_BUF_LENGTH];
 double irData;
 double tempData;
 
-// 人を検出したら呼び出される関数
+// Function to be called when a person is detected
 void onHumanDetected()
 {
   Serial.println("Detect!");
-  tone(PB4, 262, 300);  // ビープ音を鳴らす
+  tone(PB4, 262, 300);  // Make a beep sound
 }
 
 void setup() {
@@ -35,28 +35,28 @@ void setup() {
 
   //人感センサ設定
   i2c_write_byte(I2C_PIR_ADDR, 0x20, 0xFF); //CNTL1  Resrt
-  i2c_write_byte(I2C_PIR_ADDR, 0x2A, 0xF2); //CNTL11 人感アルゴリズム有効/割り込み出力有効
-  i2c_write_byte(I2C_PIR_ADDR, 0x25, 0x0F); //CNTL6  センサゲイン205%(最大)
-  i2c_write_byte(I2C_PIR_ADDR, 0x2B, 0xFF); //CNTL12 Mode=1 start Meas(連続測定モード)
+  i2c_write_byte(I2C_PIR_ADDR, 0x2A, 0xF2); //CNTL11 Human detection algorithm enabled / Interrupt output enabled
+  i2c_write_byte(I2C_PIR_ADDR, 0x25, 0x0F); //CNTL6  Sensor gain 205% (maximum)
+  i2c_write_byte(I2C_PIR_ADDR, 0x2B, 0xFF); //CNTL12 Mode=1 start Meas(Continuous measurement mode)
   delay(1000);
 
-  //人接近検知割り込み
+  // Human proximity detection interrupt
   attachInterrupt(PC7, onHumanDetected, FALLING );
 }
 
 void loop() {
-  // バッファをクリア
+  // Clear buffer
   clearI2CReadbuf();
-  // レジスタ読み出し
+  // Register read
   i2c_read(I2C_PIR_ADDR, 0x04, 6, i2c_recvBuf);
 
-  //IRセンサ
+  // IR Sensor
   irData = clacIR();
   Serial.print("IR    = ");
   Serial.print(irData,2);
   Serial.println(" pA");
 
-  //センサ温度
+  // Sensor temperature
   tempData = clacTemp();
   Serial.print("TSENS = ");
   Serial.print(tempData,2);
@@ -101,7 +101,7 @@ double clacIR()
 
 
 /**********************************************
-* I2C スレーブデバイスに1バイト書き込む
+* I2C Write 1 byte to the slave device
 **********************************************/
 void i2c_write_byte(int device_address, int reg_address, int write_data){
   Wire.beginTransmission(device_address);
@@ -112,7 +112,7 @@ void i2c_write_byte(int device_address, int reg_address, int write_data){
 
 
 /**********************************************
-* I2C スレーブデバイスから1バイト読み込む
+* I2C Read 1 byte from the slave device
 **********************************************/
 unsigned char i2c_read_byte(int device_address, int reg_address){
 
@@ -130,7 +130,7 @@ unsigned char i2c_read_byte(int device_address, int reg_address){
 
 
 /**********************************************
-* I2C スレーブデバイスに複数バイト書き込む
+* I2C Write multiple bytes to the slave device
 **********************************************/
 void i2c_write(int device_address, int reg_address, int lengrh, unsigned char* write_byte){
 
@@ -144,7 +144,7 @@ void i2c_write(int device_address, int reg_address, int lengrh, unsigned char* w
 
 
 /**********************************************
-* I2C スレーブデバイスから複数バイト読み込む
+* I2C Read multiple bytes from the slave device
 **********************************************/
 void i2c_read(int device_address, int reg_address, int lengrh, unsigned char* read_byte){
 
@@ -160,7 +160,7 @@ void i2c_read(int device_address, int reg_address, int lengrh, unsigned char* re
 
 
 /**********************************************
-* I2C 受信バッファクリア
+* I2C Receive buffer clear
 **********************************************/
 void clearI2CReadbuf(){
   memset(&i2c_recvBuf[0], 0x00, sizeof(i2c_recvBuf));

@@ -26,13 +26,13 @@
 #include <ST7032.h>                 // LCD
 
 //-----------------------------------------------
-// IOピンの名前定義
-// 接続するリーフに合わせて定義する
+// IO pin name definition
+// Define it according to the leaf to be connected.
 //-----------------------------------------------
 #define SW1         PC7             // D2  (INT0)
 
 //-----------------------------------------------
-// プログラム内で使用する定数定義
+// Define constants to be used in the program
 //-----------------------------------------------
 #define I2C_EXPANDER_ADDR   0x1A
 
@@ -122,10 +122,10 @@ void loop(){
 }
 
 //=====================================================================
-// I2C　制御関数
+// I2C control function
 //=====================================================================
 //-----------------------------------------------
-//I2C スレーブデバイスに1バイト書き込む
+// I2C Write 1 byte to the slave device
 //-----------------------------------------------
 void i2c_write_byte(int device_address, int reg_address, int write_data){
   Wire.beginTransmission(device_address);
@@ -135,7 +135,7 @@ void i2c_write_byte(int device_address, int reg_address, int write_data){
 }
 
 //-----------------------------------------------
-//I2C スレーブデバイスから1バイト読み込む
+// I2C Read 1 byte from the slave device
 //-----------------------------------------------
 unsigned char i2c_read_byte(int device_address, int reg_address){
 

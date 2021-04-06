@@ -44,7 +44,7 @@ void setup () {
   // to be restarted by clearing the STOP bit. Let's do this to ensure
   // the RTC is running.
   rtc.start();
-  rtc.writeSqwPinMode(PCF8523_OFF);                       // 低消費電力化
+  rtc.writeSqwPinMode(PCF8523_OFF);                       // Low consumption of electricity
 
 }
 

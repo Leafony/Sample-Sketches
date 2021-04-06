@@ -125,7 +125,7 @@ void loop(){
 // I2C control function
 //=====================================================================
 //-----------------------------------------------
-//I2C Write 1 byte to the slave device
+// I2C Write 1 byte to the slave device
 //-----------------------------------------------
 void i2c_write_byte(int device_address, int reg_address, int write_data){
   Wire.beginTransmission(device_address);
@@ -135,7 +135,7 @@ void i2c_write_byte(int device_address, int reg_address, int write_data){
 }
 
 //-----------------------------------------------
-//I2C Read 1 byte from the slave device
+// I2C Read 1 byte from the slave device
 //-----------------------------------------------
 unsigned char i2c_read_byte(int device_address, int reg_address){
 

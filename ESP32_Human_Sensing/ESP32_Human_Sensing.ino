@@ -21,47 +21,21 @@
 #include <Wire.h>                           // I2C
 
 //-----------------------------------------------
-// IOピン一覧
-//-----------------------------------------------
-//  D0  IO3   (RXD)
-//  D1  IO1   (TXD)
-//  D2  IO4   (INT0)
-//  D3  IO27  (INT1)
-//  D4  IO12  (H-MISO)
-//  D5  IO13  (H-MOSI)
-//  D6  IO14  (H-SCK)
-//  D7  IO15  (H-SS)
-//  D8  IO17  (UART_TX)
-//  D9  IO16  (UART_RX)
-//  D10 IO5   (SS)
-//  D11 IO23  (MOSI)
-//  D12 IO19  (MISO)
-//  D13 IO18  (SCK)
-//  D14 IO21  (SDA)
-//  D15 IO22  (SCL)
-//  A0  IO36
-//  A1  IO25  (UART_TX)
-//  A2  IO26  (UART_RX)
-//  A3  IO39
-//  A4  IO34
-//  A5  IO35
-
-//-----------------------------------------------
-// IOピンの名前定義
-// 接続するリーフに合わせて定義する
+// IO pin name definition
+// Define it according to the leaf to be connected.
 //-----------------------------------------------
 #define PIR_INT             4                   // D2 IO4
 #define BUZZER_OUT          13                  // D5 IO13 buzzer output
 
 //------------------------------
-// Tone設定
+// Tone setting
 //------------------------------
 #define LEDC_CHANNEL_0      0       // use first channel of 16 channels (started from zero)
 #define LEDC_TIMER_13_BIT   13      // use 13 bit precission for LEDC timer
 #define LEDC_BASE_FREQ      5000    // use 5000 Hz as a LEDC base frequency
 
 //-----------------------------------------------
-// プログラム内で使用する定数定義
+// Define constants to be used in the program
 //-----------------------------------------------
 #define I2C_PIR_ADDR   0x65
 #define I2C_SEND_BUF_LENGTH 10
@@ -103,10 +77,10 @@ void setup(){
 }
 
 //---------------------------------------------------------------------
-// 割り込み設定
+// Interrupt setting
 //---------------------------------------------------------------------
 //----------------------------------------------
-// 人を検出したら呼び出される関数
+// Function to be called when a person is detected
 //----------------------------------------------
 void onHumanDetected(){
   HumanDetected = 1;
@@ -117,22 +91,22 @@ void onHumanDetected(){
 //=====================================================================
 void loop(){
 
-  // レジスタ読み出し
+  // Register read
   i2c_read(I2C_PIR_ADDR, 0x04, 6, i2c_recvBuf);
-  // IRセンサ
+  // IR Sensor
   irData = clacIR();
   Serial.print("IR   = ");
   Serial.print(irData,2);
   Serial.println(" pA");
 
-  // センサ温度
+  // Sensor temperature
   tempData = clacTemp();
   Serial.print("TSENS = ");
   Serial.print(tempData,2);
   Serial.println(" deg");
   Serial.println("===================================");
 
-  if (HumanDetected == 1){          // 人の接近を検知
+  if (HumanDetected == 1){          // Human proximity detection
     Serial.println("Detect!");
 
     // Beep
@@ -177,10 +151,10 @@ double clacIR(){
 }
 
 //=====================================================================
-// I2C　制御関数
+// I2C control function
 //=====================================================================
 //-----------------------------------------------
-// I2C スレーブデバイスに1バイト書き込む
+// I2C Write 1 byte to the slave device
 //-----------------------------------------------
 void i2c_write_byte(int device_address, int reg_address, int write_data){
   Wire.beginTransmission(device_address);
@@ -190,7 +164,7 @@ void i2c_write_byte(int device_address, int reg_address, int write_data){
 }
 
 //-----------------------------------------------
-// I2C スレーブデバイスから1バイト読み込む
+// I2C Read 1 byte from the slave device
 //-----------------------------------------------
 unsigned char i2c_read_byte(int device_address, int reg_address){
   int read_data = 0;
@@ -206,7 +180,7 @@ unsigned char i2c_read_byte(int device_address, int reg_address){
 }
 
 //-----------------------------------------------
-// I2C スレーブデバイスに複数バイト書き込む
+// I2C Write multiple bytes to the slave device
 //-----------------------------------------------
 void i2c_write(int device_address, int reg_address, int lengrh, unsigned char* write_byte){
   Wire.beginTransmission(device_address);
@@ -218,7 +192,7 @@ void i2c_write(int device_address, int reg_address, int lengrh, unsigned char* w
 }
 
 //-----------------------------------------------
-// I2C スレーブデバイスから複数バイト読み込む
+// I2C Read multiple bytes from the slave device
 //-----------------------------------------------
 void i2c_read(int device_address, int reg_address, int lengrh, unsigned char* read_byte){
   Wire.beginTransmission(device_address);
