@@ -67,15 +67,15 @@ static int printHtmlBody(WiFiClient client, int update, String ipAddress) {
         SERIAL_PRINTLN("T4/D5/28pin :" + String(touchData) + " :Touch detected");
     }
 
-    client.print("更新間隔 = ");
+    client.print("Update interval = ");
     client.print(update);
-    client.println(" 秒</p>");
+    client.println(" second</p>");
     client.println("<hr>");
     client.print("<p>http://");
     client.print(ipAddress);
     client.println("<form method=\"GET\" action=\"http://" + ipAddress + "/\">");
-    client.println("自動更新:<input type=\"submit\" name=\"INT\" value=\"0 停止\">");
-    client.println("<input type=\"submit\" name=\"INT\" value=\"1 秒\">");
+    client.println("automatic update:<input type=\"submit\" name=\"INT\" value=\"0 Stop\">");
+    client.println("<input type=\"submit\" name=\"INT\" value=\"1 second\">");
     client.println("</form>");
     client.println("</body>");
     return 0;

@@ -227,7 +227,7 @@ void setup() {
 
   if (dispLCD==1){
     i2c_write_byte(LCD_I2C_EXPANDER_ADDR, 0x03, 0xFE);
-    i2c_write_byte(LCD_I2C_EXPANDER_ADDR, 0x01, 0x01);      //LCD power ON
+    i2c_write_byte(LCD_I2C_EXPANDER_ADDR, 0x01, 0x01);      // LCD power ON
     // LCD settings
     lcd.begin(8, 2);
     lcd.setContrast(30);
@@ -252,7 +252,7 @@ void setup() {
   while (ble112.checkActivity(1000));
   delay(1000);
 
-  MsTimer2::start();                        // Timer2 inverval start
+  MsTimer2::start();                        // Timer inverval start
 #ifdef SERIAL_MONITOR
     Serial.println(F(""));
     Serial.println("=========================================");
@@ -643,7 +643,7 @@ void bt_sendData(){
   // BLE Send Data
   //-------------------------
   if( bBLEsendData == true ){     // BLE transmission
-    // WebBluetoothアプリ用フォーマット
+    // Format for WebBluetooth application
     sendLen = sprintf(sendData, "%04s,%04s,%04s,%04s,%04s,%01s\n", temp, humid, light, tilt, battVolt, pips);
     // Send to BLE device
     ble112.ble_cmd_gatt_server_send_characteristic_notification( 1, 0x000C, sendLen, (const uint8 *)sendData );
@@ -755,7 +755,7 @@ void setupBLE(){
         (2),                                    // field length
         BGLIB_GAP_AD_TYPE_FLAGS,                // field type (0x01)
         (6),                                    // data
-        (1),                                    // field length (1は仮の初期値)
+        (1),                                    // field length (1 is a temporary default value.)
         BGLIB_GAP_AD_TYPE_LOCALNAME_COMPLETE    // field type (0x09)
     };
     /*  */
@@ -768,17 +768,17 @@ void setupBLE(){
     /*   */
     stLen = (5 + lenStr2);
     ble112.ble_cmd_le_gap_set_adv_data( SCAN_RSP_ADVERTISING_PACKETS, stLen, ad_data );
-    while (ble112.checkActivity(1000));                 /* 受信チェック */
+    while (ble112.checkActivity(1000));                 /* Receive check */
 
     /* interval_min :   40ms( =   64 x 0.625ms ) */
     /* interval_max : 1000ms( = 1600 x 0.625ms ) */
     ble112.ble_cmd_le_gap_set_adv_parameters( 64, 1600, 7 );    /* [BGLIB] <interval_min> <interval_max> <channel_map> */
-    while (ble112.checkActivity(1000));                         /* [BGLIB] 受信チェック */
+    while (ble112.checkActivity(1000));                         /* [BGLIB] Receive check */
 
     /* start */
     //ble112.ble_cmd_le_gap_start_advertising(1, LE_GAP_GENERAL_DISCOVERABLE, LE_GAP_UNDIRECTED_CONNECTABLE);
     ble112.ble_cmd_le_gap_start_advertising( 0, LE_GAP_USER_DATA, LE_GAP_UNDIRECTED_CONNECTABLE );    // index = 0
-    while (ble112.checkActivity(1000));                 /* 受信チェック */
+    while (ble112.checkActivity(1000));                 /* Receive check */
     /*  */
 }
 

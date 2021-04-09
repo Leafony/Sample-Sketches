@@ -1,9 +1,9 @@
 /**
- * @fileoverview Leafony Bluetoothリーフクラス
+ * @fileoverview Leafony Bluetooth leaf class
  */
 
  /**
-  * Leafonyクラス
+  * Leafony class
   * @param none
   */
 function Leafony() {
@@ -28,7 +28,7 @@ function Leafony() {
     var isApple = os.match(/iPhone|iPad|iPod|Mac/);
 
     /**
-     * Bluetoothリーフと接続する関数
+     * Functions to connect to a BLE leaf
      * @param none
      * @return none
      */
@@ -57,12 +57,12 @@ function Leafony() {
     }
 
     /**
-     * Bluetooth GATT接続後serviceとcharacteristicに接続する関数
+     * Function to connect to service and characteristic after Bluetooth GATT connection
      * @param {*} server 
      */
     async function connectService ( server ) {
 
-        // デバイス名を取得 (Apple製品は未対応)
+        // Get device name (Apple products are not supported)
         if (!isApple) {
             await getDeviceName( server );
         }
@@ -79,7 +79,7 @@ function Leafony() {
     }
 
     /**
-     * Characteristicの値が変化した時に呼び出される関数
+     * Function to be called when the value of Characteristic changes.
      * @param {*} event 
      */
     function handleData( event ) {
@@ -108,12 +108,12 @@ function Leafony() {
     }
 
     /**
-     * characteristicの値が変化した時に呼び出されるユーザ任意処理
+     * User-defined process called when the value of a characteristic changes.
      */
     function onStateChangeCallback() {}
 
     /**
-     * Bluetoothと切断する関数
+     * Function to disconnect from Bluetooth
      */
     function disconnect () {
 
@@ -130,7 +130,7 @@ function Leafony() {
     }
 
     /**
-     * Bluetoothと切断された時に呼び出される関数
+     * Function called when disconnected from Bluetooth.
      * @param {*} event 
      */
     function onDisconnected ( event ) {
@@ -145,12 +145,12 @@ function Leafony() {
     }
 
     /**
-     * Bluetoothと切断された時に実行されるユーザ処理
+     * User process to be executed when disconnected from Bluetooth.
      */
     function onDisconnectedCallback () {}
 
     /**
-     * Sleep有効時、Bluetoothと再接続する関数
+     * Function to reconnect with Bluetooth when Sleep is enabled.
      */
     function reconnect() {
 
@@ -175,7 +175,7 @@ function Leafony() {
     }
 
     /**
-     * 再接続処理記述を簡単にするための再帰関数
+     * Recursive functions to simplify the description of reconnection processes.
      * @param {*} max 
      * @param {*} delay 
      * @param {*} toTry 
@@ -199,7 +199,7 @@ function Leafony() {
 
 
     /**
-     * デバイス名を取得する関数
+     * Function to get the device name
      * @param {*} server 
      */
     async function getDeviceName( server ) {
@@ -214,7 +214,7 @@ function Leafony() {
 
 
     /**
-     * Bluetoothにコマンドを送信する関数
+     * Function to send commands to Bluetooth
      * @param {*} cmd 
      */
     async function sendCommand( cmd ) {

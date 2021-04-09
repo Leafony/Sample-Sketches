@@ -1,3 +1,1 @@
-Arduino IDEは 1.8.7で動作を確認。
-AVRボードはアップデートしてはいけません。(1.6.23で動作を確認)
-
+The Arduino IDE was tested with 1.8.7 and the AVR board with 1.6.23.

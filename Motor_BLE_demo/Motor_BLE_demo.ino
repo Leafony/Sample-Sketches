@@ -30,82 +30,59 @@
 
 //===============================================
 // BLE Unique Name (Local device name)
-// 最大16文字（ASCIIコード）まで
+// Up to 16 characters (ASCII code)
 //===============================================
 //                     |1234567890123456|
 String strDeviceName = "Motor_AC02";
 
 //===============================================
-// シリアルモニタへの出力
-//      #define SERIAL_MONITOR = 出力あり
-//    //#define SERIAL_MONITOR = 出力なし（コメントアウトする）
+// Output to serial monitor
+//      #define SERIAL_MONITOR = With output
+//    //#define SERIAL_MONITOR = Without output (Comment out)
 //===============================================
 //#define SERIAL_MONITOR
 
 //===============================================
-// シリアルモニタへのデバッグ出力
-//      #define DEBUG = 出力あり
-//    //#define DEBUG = 出力なし（コメントアウトする）
+// Debug output to serial monitor
+//      #define DEBUG = With output
+//    //#define DEBUG = Without output (Comment out)
 //===============================================
 //#define DEBUG
 
 //-----------------------------------------------
-// 送信間隔の設定
-//  SEND_INTERVAL  :送信間隔（センサーデータを送る間隔  1秒単位
+// Setting the transmission interval
+//  SEND_INTERVAL  : transmission interval (Set the interval for sending sensor data in 1 second increments.)
 //-----------------------------------------------
 #define SEND_INTERVAL   (1)             // 1s
 
 //-----------------------------------------------
-// IOピン一覧
+// IO pin name definition
+// Define it according to the leaf to be connected.
 //-----------------------------------------------
-//  D0              0                   // PD0  (RXD)
-//  D1              1                   // PD1  (TXD)
-//  D2              2                   // PD2  (INT0)
-//  D3              3                   // PD3  (INT1)
-//  D4              4                   // PD4
-//  D5              5                   // PD5
-//  D6              6                   // PD6
-//  D7              7                   // PD7
-//  D8              8                   // PB0  (S-UART2_RX)
-//  D9              9                   // PB1  (S-UART2_TX)
-//  D10             10                  // PB2  (SS)
-//  D11             11                  // PB3  (MOSI)
-//  D12             12                  // PB4  (MISO)
-//  D13             13                  // PB5  (SCK/LED)
-
-//  D14             14                  // [A0] PC0
-//  D15             15                  // [A1] PC1
-//  D16             16                  // [A2] PC2
-//  D17             17                  // [A3] PC3
-
-//-----------------------------------------------
-// IOピンの名前定義
-// 接続するリーフに合わせて定義する
-//-----------------------------------------------
-#define VM_ON           3                   // モータ電源制御
-#define A_IN1           12                  // 回転制御1
-#define A_IN2           4                   // 回転制御2
-#define A_PWM           5                   // 速度制御PWM
+#define VM_ON           3                   // Motor power control
+#define A_IN1           12                  // Rotation control 1
+#define A_IN2           4                   // Rotation control 2
+#define A_PWM           5                   // Speed control PWM
 
 #define D7_BLE_WAKEUP   7                   // PD7
 #define D13_LED         13                  // PB5  (SCK/LED)
 
-#define rdMoisture      A0                  // 土壌水分センサ入力
+#define rdMoisture      A0                  // Soil moisture sensor input
 #define D15_BLE_TX      15                  // [A1] PC1
 #define D16_BLE_RX      16                  // [A2] PC2
 
 //-----------------------------------------------
-// プログラム内で使用する定数定義
+// Define constants to be used in the program
 //-----------------------------------------------
 //------------------------------
-// I2Cアドレス
+// I2C address
 //------------------------------
 #define OPT3001_ADDRESS         0x45        // Ambient Light Sensor (ADDR pin = VCC)
 #define BATT_ADC_ADDR           0x50        // Battery ADC
 
 //------------------------------
 // Loop interval
-// MsTimer2のタイマー割り込み発生間隔(ms)
+// Timer interrupt interval (ms)
 //------------------------------
 #define LOOP_INTERVAL 125                   // 125ms interval
 
@@ -134,12 +111,12 @@ BGLib ble112((HardwareSerial *)&Serialble, 0, 0 );
 ClosedCube_OPT3001 light;
 
 //---------------------------------------------------------------------
-// プログラムで使用する変数定義
+// Define variables to be used in the program
 //---------------------------------------------------------------------
-String receiveData = "MNS";                   // MNS:モータ停止 PLS:モータ回転
+String receiveData = "MNS";                   // MNS:Motor stop PLS:Motor start
 
 //------------------------------
-// シリアルモニタ表示用データ
+// Data for serial monitor display
 //------------------------------
 #ifdef SERIAL_MONITOR
 String titleData1 = "Moi";
@@ -156,7 +133,7 @@ String unitData5 = "V";
 #endif
 
 //------------------------------
-// センサデータ
+// Sensor data
 //------------------------------
 float data1 = 0;          // Moisture
 float data2 = 0;          // Temperature
@@ -186,21 +163,21 @@ volatile bool bInterval = false;
 Adafruit_HTS221 hts;
 
 //--------------------
-// 2点補正用データ
+// Data for two-point correction
 //--------------------
-// 温度補正用データ0
-float TL0 = 25.0;     // 4-Sensors温度測定値
-float TM0 = 25.0;     // 温度計等測定値
-// 温度補正用データ1
-float TL1 = 40.0;     // 4-Sensors温度測定値
-float TM1 = 40.0;     // 温度計等測定値
+// Temperature correction data 0
+float TL0 = 25.0;     // 4-Sensors Temperature measurement value
+float TM0 = 25.0;     // Thermometer and other measurements value
+// Temperature correction data 1
+float TL1 = 40.0;     // 4-Sensors Temperature measurement value
+float TM1 = 40.0;     // Thermometer and other measurements value
 
-// 湿度補正用データ0
-float HL0 = 60.0;     // 4-Sensors湿度測定値
-float HM0 = 60.0;     // 湿度計等測定値
-// 湿度補正用データ1
-float HL1 = 80.0;     // 4-Sensors湿度測定値
-float HM1 = 80.0;     // 湿度計等測定値
+// Humidity correction data 0
+float HL0 = 60.0;     // 4-Sensors Humidity measurement value
+float HM0 = 60.0;     // Hygrometer and other measurements value
+// Humidity correction data 1
+float HL1 = 80.0;     // 4-Sensors Humidity measurement value
+float HM1 = 80.0;     // Hygrometer and other measurements value
 
 //------------------------------
 // BLE
@@ -248,17 +225,17 @@ void setup() {
 }
 
 //-----------------------------------------------
-// IOピンの入出力設定
-// 接続するリーフに合わせて設定する
+// IO pin input/output settings
+// Configure the settings according to the leaf to be connected.
 //-----------------------------------------------
 void setupPort(){
-  pinMode(VM_ON, OUTPUT);                   // モータ電源制御
-  digitalWrite(VM_ON, LOW);                 // モータ電源Off
+  pinMode(VM_ON, OUTPUT);                   // Motor power control
+  digitalWrite(VM_ON, LOW);                 // Motor power off
 
   // ch Aの制御用ピン設定
-  pinMode(A_IN1, OUTPUT);                   // 回転制御1
-  pinMode(A_IN2, OUTPUT);                   // 回転制御2
-  pinMode(A_PWM, OUTPUT);                   // PWMによるスピード制御 (0-255)
+  pinMode(A_IN1, OUTPUT);                   // Rotation control 1
+  pinMode(A_IN2, OUTPUT);                   // Rotation control 2
+  pinMode(A_PWM, OUTPUT);                   // Speed control by PWM (0-255)
 
   pinMode(D7_BLE_WAKEUP, OUTPUT);           // D7  PD7 : BLE Wakeup/Sleep
   digitalWrite(D7_BLE_WAKEUP, HIGH);        // BLE Wakeup
@@ -266,11 +243,11 @@ void setupPort(){
   pinMode(D13_LED, OUTPUT);                 // D13 PB5 : LED
   digitalWrite(D13_LED, LOW);               // LED off
 
-  pinMode(rdMoisture, INPUT);               // A0 土壌水分センサ
+  pinMode(rdMoisture, INPUT);               // A0 Soil moisture sensor
 }
 
 //---------------------------------------------------------------------
-// 各デバイスの初期設定
+// Initial settings for each device
 //---------------------------------------------------------------------
 //------------------------------
 // Sensor
@@ -308,12 +285,12 @@ void setupSensor(){
 }
 
 //=====================================================================
-// 割り込み処理
+// Interrupt
 //=====================================================================
 //----------------------------------------------
-// 割り込み処理初期設定
+// Interrupt initialization
 // Timer interrupt (interval=125ms, int=overflow)
-// メインループのタイマー割り込み設定
+// Timer interrupt setting for main loop
 //----------------------------------------------
 void setupTCInt(){
   MsTimer2::set(LOOP_INTERVAL, intTimer);
@@ -321,7 +298,7 @@ void setupTCInt(){
 
 //----------------------------------------------
 // Timer INT
-// タイマー割り込み関数
+// Timer interrupt function
 //----------------------------------------------
 void intTimer(){
   bInterval = true;
@@ -335,7 +312,7 @@ void intTimer(){
 //---------------------------------------------------------------------
 void loop(){
   //-----------------------------------------------------
-  // Timer interval 125ms で1回ループ
+  // Timer interval Loop once in 125ms
   //-----------------------------------------------------
   if (bInterval == true){
      bInterval = false;
@@ -343,7 +320,7 @@ void loop(){
     //--------------------------------------------
     loopCounter();                    // loop counter
     //--------------------------------------------
-    // 1sに1回実行する
+    // Run once in 1s
     //--------------------------------------------
     if(event1s == true){
       event1s = false;                // initialize parameter
@@ -351,16 +328,16 @@ void loop(){
       bt_sendData();                  // Data send
 
       if(receiveData == "PLS"){
-        digitalWrite(VM_ON, HIGH);          // モータ電源On
+        digitalWrite(VM_ON, HIGH);          // Motor power On
         delay(10);
-        chA_CW();                           // モータA: 正転
-        analogWrite(A_PWM, 255);            // モータA: フルスピード
+        chA_CW();                           // Motor A: Forward rotation
+        analogWrite(A_PWM, 255);            // Motor A: full speed
       }
       else if(receiveData == "MNS"){
-        analogWrite(A_PWM, 0);              // モータA: 0
+        analogWrite(A_PWM, 0);              // Motor A: 0
         chA_stop();
         delay(10);
-        digitalWrite(VM_ON, LOW);          // モータ電源Off
+        digitalWrite(VM_ON, LOW);          // Motor power Off
       }
     }
   }
@@ -369,8 +346,8 @@ void loop(){
 
 //---------------------------------------------------------------------
 // Counter
-// メインループのループ回数をカウントし
-// 1秒間隔でセンサーデータの取得とBLEの送信をONにする
+// Count the number of loops in the main loop and turn on sensor data acquisition
+// and BLE transmission at 1-second intervals
 //---------------------------------------------------------------------
 void loopCounter(){
   iLoop1s += 1;
@@ -390,8 +367,8 @@ void loopCounter(){
 
 //---------------------------------------------------------------------
 // Sensor
-// センサーデータ取得がONのとき、各センサーからデータを取得
-// コンソール出力がONのときシリアルに測定値と計算結果を出力する
+// When sensor data acquisition is ON, data is acquired from each sensor
+// Serial output of measured values and calculation results when console output is ON
 //---------------------------------------------------------------------
 void loopSensor(){
     //----------------------------
@@ -401,23 +378,23 @@ void loopSensor(){
 
     //-------------------------
     // HTS221
-    // 温湿度センサーデータ取得
+    // Temperature and humidity sensor data acquisition
     //-------------------------
     sensors_event_t humidity;
     sensors_event_t temp;
     hts.getEvent(&humidity, &temp);               // populate temp and humidity objects with fresh data
-    data2 = temp.temperature;                     // 温度
-    data3 =humidity.relative_humidity;            // 湿度
+    data2 = temp.temperature;                     // Temperature
+    data3 =humidity.relative_humidity;            // Humidity
 
     //-------------------------
-    // 温度と湿度の2点補正
+    // Two-point correction for temperature and humidity
     //-------------------------
-    data2=TM0+(TM1-TM0)*(data2-TL0)/(TL1-TL0);    // 温度補正
-    data3=HM0+(HM1-HM0)*(data3-HL0)/(HL1-HL0);    // 湿度補正
+    data2=TM0+(TM1-TM0)*(data2-TL0)/(TL1-TL0);    // Temperature correction
+    data3=HM0+(HM1-HM0)*(data3-HL0)/(HL1-HL0);    // Humidity correction
 
     //-------------------------
     // OPT3001
-    // 照度センサーデータ取得
+    // Illuminance sensor data acquisition
     //-------------------------
     OPT3001 result = light.readResult();
 
@@ -427,7 +404,7 @@ void loopSensor(){
 
   //-------------------------
   // ADC081C027（ADC)
-  // 電池リーフ電池電圧取得
+  // Battery leaf battery voltage acquisition
   //-------------------------
   double Vbat_mv;
   uint8_t adcVal1 = 0;
@@ -441,18 +418,18 @@ void loopSensor(){
   adcVal2 = Wire.read();
 
   if (adcVal1 == 0xff && adcVal2 == 0xff) {
-    //測定値がFFならバッテリリーフはつながっていない
+    // If the measured value is FF, the battery leaf is not connected.
     adcVal1 = adcVal2 = 0;
   }
 
-  //電圧計算　ADC * ((リファレンス電圧(3.3V)/ ADCの分解能(256)) * 分圧比(2倍))
+  // Voltage calculation :　ADC　* ((Reference voltage(3.3V)/ ADC resolution(256)) * Divided voltage ratio(2)
   Vbat_mv = ((double)((adcVal1 << 4) | (adcVal2 >> 4)) * 3300 * 2) / 256;
   data5 = (float)(Vbat_mv / 1000);
 }
 
 //---------------------------------------------------------------------
 // Send sensor data
-// センサーデータをセントラルに送る文字列に変換してBLEリーフへデータを送る
+// Convert sensor data into a string to be sent to Central and send the data to BLE Leaf.
 //---------------------------------------------------------------------
 void bt_sendData(){
   float value;
@@ -461,9 +438,9 @@ void bt_sendData(){
   uint8 sendLen;
 
   //-------------------------
-  //センサーデータを文字列に変換
-  //dtostrf(変換する数字,変換される文字数,小数点以下の桁数,変換した文字の格納先);
-  //変換される文字数を-にすると変換される文字は左詰め、+なら右詰めとなる
+  // Convert sensor data to strings
+  // dtostrf(Number to be converted, number of characters to be converted, number of decimal places, where to store the converted characters);
+  // If the number of characters to be converted is set to -, the converted characters will be left-justified; if +, they will be right-justified.
   //-------------------------
   //-------------------------
   // Data1 Moisture
@@ -521,15 +498,15 @@ void bt_sendData(){
   // BLE Send Data
   //-------------------------
   if( bBLEsendData == true ){
-    // WebBluetoothアプリ用フォーマット
+    // Format for WebBluetooth application
     sendLen = sprintf(sendData, "%04s,%04s,%04s,%04s,%04s\n", sendData1, sendData2, sendData3, sendData4, sendData5);
-    // BLEデバイスへの送信
+    // Send to BLE device
     ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, sendLen, (const uint8 *)sendData);
 
     while (ble112.checkActivity(1000));
   }
     //-------------------------
-    // シリアルモニタ表示
+    // Serial monitor display
     //-------------------------
 #ifdef SERIAL_MONITOR
     Serial.println("--- sensor data ---");    
@@ -540,7 +517,7 @@ void bt_sendData(){
     Serial.println(titleData5 + " =" + "\t" + String(data5) + " [" + unitData5 +"]");
 
 /*
-    // 1行で表示する場合
+    // To display in one line
     Serial.print("###\tSensor data: { ");
     Serial.print(titleData1 + "=" + String(data1) + ", ");
     Serial.print(titleData2 + "=" + String(data2) + ", ");
@@ -554,7 +531,7 @@ void bt_sendData(){
 
 //---------------------------------------
 // trim
-// 文字列配列からSPを削除する
+// Removing SP from a string array
 //---------------------------------------
 void trim(char * data){
   int i = 0, j = 0;
@@ -570,10 +547,10 @@ void trim(char * data){
 }
 
 //=====================================================================
-// Motor　制御関数
+// Motor control function
 //=====================================================================
 //-----------------------------------------------
-// ch A 正転
+// ch A forward
 //-----------------------------------------------
 void chA_CW(){
   digitalWrite(A_IN1, HIGH);
@@ -581,7 +558,7 @@ void chA_CW(){
 }
 
 //-----------------------------------------------
-// ch A 逆転
+// ch A reverse
 //-----------------------------------------------
 void chA_CCW(){
   digitalWrite(A_IN1, LOW);
@@ -589,7 +566,7 @@ void chA_CCW(){
 }
 
 //-----------------------------------------------
-// ch A ブレーキ
+// ch A brake
 //-----------------------------------------------
 void chA_brake(){
   digitalWrite(A_IN1, HIGH);
@@ -597,7 +574,7 @@ void chA_brake(){
 }
 
 //-----------------------------------------------
-// ch A Stop (フリー)
+// ch A Stop (Free)
 //-----------------------------------------------
 void chA_stop(){
   digitalWrite(A_IN1, LOW);
@@ -605,10 +582,10 @@ void chA_stop(){
 }
 
 //=====================================================================
-// I2C　制御関数
+// I2C control function
 //=====================================================================
 //-----------------------------------------------
-// I2C スレーブデバイスに1バイト書き込む
+// I2C Write 1 byte to the slave device
 //-----------------------------------------------
 void i2c_write_byte(int device_address, int reg_address, int write_data){
   Wire.beginTransmission(device_address);
@@ -618,7 +595,7 @@ void i2c_write_byte(int device_address, int reg_address, int write_data){
 }
 
 //-----------------------------------------------
-// I2C スレーブデバイスから1バイト読み込む
+// I2C Read 1 byte from the slave device
 //-----------------------------------------------
 unsigned char i2c_read_byte(int device_address, int reg_address){
   int read_data = 0;
@@ -668,13 +645,13 @@ void setupBLE(){
 
     uint8_t tm=0;
     Serialble.begin(9600);
-    while (!Serialble && tm <150){                                // Serial起動待ち タイムアウト1.5s
+    while (!Serialble && tm <150){                                // Waiting for Serial to start Timeout 1.5s
       tm++;
       delay(10);
     }
 
     tm=0;
-    while (!bSystemBootBle && tm <150){                           // BLE起動待ち
+    while (!bSystemBootBle && tm <150){                           // Waiting for BLE to start
       ble112.checkActivity(100);
       tm++;
       delay(10);
@@ -686,7 +663,7 @@ void setupBLE(){
         (2),                                    // field length
         BGLIB_GAP_AD_TYPE_FLAGS,                // field type (0x01)
         (6),                                    // data
-        (1),                                    // field length (1は仮の初期値)
+        (1),                                    // field length (1 is a temporary default value.)
         BGLIB_GAP_AD_TYPE_LOCALNAME_COMPLETE    // field type (0x09)
     };
     /*  */
@@ -699,36 +676,36 @@ void setupBLE(){
     /*   */
     stLen = (5 + lenStr2);
     ble112.ble_cmd_le_gap_set_adv_data( SCAN_RSP_ADVERTISING_PACKETS, stLen, ad_data );
-    while (ble112.checkActivity(1000));                 /* 受信チェック */
+    while (ble112.checkActivity(1000));                 /* Receive check */
 
     /* interval_min :   40ms( =   64 x 0.625ms ) */
     /* interval_max : 1000ms( = 1600 x 0.625ms ) */
     ble112.ble_cmd_le_gap_set_adv_parameters( 64, 1600, 7 );    /* [BGLIB] <interval_min> <interval_max> <channel_map> */
-    while (ble112.checkActivity(1000));                         /* [BGLIB] 受信チェック */
+    while (ble112.checkActivity(1000));                         /* [BGLIB] Receive check */
 
     /* start */
     //ble112.ble_cmd_le_gap_start_advertising(1, LE_GAP_GENERAL_DISCOVERABLE, LE_GAP_UNDIRECTED_CONNECTABLE);
     ble112.ble_cmd_le_gap_start_advertising( 0, LE_GAP_USER_DATA, LE_GAP_UNDIRECTED_CONNECTABLE );    // index = 0
-    while (ble112.checkActivity(1000));                 /* 受信チェック */
+    while (ble112.checkActivity(1000));                 /* Receive check */
     /*  */
 }
 
 //-----------------------------------------
-// BLEからデータが送信されていたらデータを取得し、取得データに従い
-// 処理を実施
+// If data is sent from the BLE, acquire the data
+// and perform processing according to the acquired data.
 //-----------------------------------------
 void loopBleRcv( void ){
     // keep polling for new data from BLE
-    ble112.checkActivity(0);                    /* 受信チェック */
+    ble112.checkActivity(0);                    /* Receive check */
 
     /*  */
     if (ble_state == BLE_STATE_STANDBY) {
-        bBLEconnect = false;                    /* [BLE] 接続状態 */
+        bBLEconnect = false;                    /* [BLE] connection state */
     } else if (ble_state == BLE_STATE_ADVERTISING) {
-        bBLEconnect = false;                    /* [BLE] 接続状態 */
+        bBLEconnect = false;                    /* [BLE] connection state */
     } else if (ble_state == BLE_STATE_CONNECTED_SLAVE) {
         /*  */
-        bBLEconnect = true;                     /* [BLE] 接続状態 */
+        bBLEconnect = true;                     /* [BLE] connection state */
         /*  */
     }
 }
@@ -740,7 +717,7 @@ void loopBleRcv( void ){
 // called when the module begins sending a command
 void onBusy() {
     // turn LED on when we're busy
-    digitalWrite( D13_LED, HIGH );              // ビジーの場合LED点灯
+    digitalWrite( D13_LED, HIGH );
 }
 
 //-----------------------------------------------
@@ -760,7 +737,7 @@ void onTimeout() {
     ble_encrypted = 0;
     ble_bonding = 0xFF;
     /*  */
-    bBLEconnect = false;                    /* [BLE] 接続状態 */
+    bBLEconnect = false;                    /* [BLE] connection state */
     bBLEsendData = false;
 }
 
@@ -859,7 +836,7 @@ void my_evt_le_connection_closed( const struct ble_msg_le_connection_closed_evt_
     ble_encrypted = 0;
     ble_bonding = 0xFF;
     /*  */
-    bBLEconnect = false;                    /* [BLE] 接続状態 */
+    bBLEconnect = false;                    /* [BLE] connection state */
     bBLEsendData = false;
 }
 /*  */

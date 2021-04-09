@@ -28,34 +28,34 @@
 
 //===============================================
 // BLE Unique Name (Local device name)
-// 最大16文字（ASCIIコード）まで
+// Up to 16 characters (ASCII code)
 //===============================================
 //                     |1234567890123456|
 String strDeviceName = "Leafony_AW";
 
 //===============================================
-// シリアルモニタへの出力
-//      #define SERIAL_MONITOR = 出力あり
-//    //#define SERIAL_MONITOR = 出力なし（コメントアウトする）
+// Output to serial monitor
+//      #define SERIAL_MONITOR = With output
+//    //#define SERIAL_MONITOR = Without output (Comment out)
 //===============================================
 #define SERIAL_MONITOR
 
 //===============================================
-// シリアルモニタへのデバック出力
-//      #define DEBUG = 出力あり
-//    //#define DEBUG = 出力なし（コメントアウトする）
+// Debug output to serial monitor
+//      #define DEBUG = With output
+//    //#define DEBUG = Without output (Comment out)
 //===============================================
 //#define DEBUG
 
 //-----------------------------------------------
-// 送信間隔の設定
-//  SEND_INTERVAL  :送信間隔（センサーデータを送る間隔  1秒単位
+// Setting the transmission interval
+//  SEND_INTERVAL  :transmission interval (Set the interval for sending sensor data in 1 second increments.)
 //-----------------------------------------------
 #define SEND_INTERVAL   (1)                 // 1s
 
 //-----------------------------------------------
-// IOピンの名前定義
-// 接続するリーフに合わせて定義する
+// IO pin name definition
+// Define it according to the leaf to be connected.
 //-----------------------------------------------
 const int HX711_dout    =  4;      //mcu > HX711 dout pin
 const int HX711_sck     =  5;      //mcu > HX711 sck pin
@@ -64,16 +64,16 @@ const int D15_BLE_TX    = 15;
 const int D16_BLE_RX    = 16;
 
 //-----------------------------------------------
-// プログラム内で使用する定数定義
+// Define constants to be used in the program
 //-----------------------------------------------
 //------------------------------
-// I2Cアドレス
+// I2C address
 //------------------------------
 #define BATT_ADC_ADDR   0x50                // Battery ADC
 
 //------------------------------
 // Loop interval
-// MsTimer2のタイマー割り込み発生間隔(ms)
+// Timer interrupt interval (ms)
 //------------------------------
 #define LOOP_INTERVAL 125                   // 125ms interval
 
@@ -93,7 +93,7 @@ const int D16_BLE_RX    = 16;
 //------------------------------
 // Sensor
 //------------------------------
-//HX711 constructor:
+// HX711 constructor:
 HX711_ADC LoadCell(HX711_dout, HX711_sck);
 
 
@@ -104,7 +104,7 @@ SoftwareSerial Serialble(D16_BLE_RX, D15_BLE_TX);
 BGLib ble112((HardwareSerial *)&Serialble, 0, 0 );
 
 //---------------------------------------------------------------------
-// プログラムで使用する変数定義
+// Define variables to be used in the program
 //---------------------------------------------------------------------
 //------------------------------
 // Loop counter
@@ -184,8 +184,8 @@ void setup() {
 }
 
 //-----------------------------------------------
-// IOピンの入出力設定
-// 接続するリーフに合わせて設定する
+// IO pin input/output settings
+// Configure the settings according to the leaf to be connected.
 //-----------------------------------------------
 void setupPort(){
   pinMode(D7_BLE_WAKEUP, OUTPUT);           // PD7 : digital 7 = BLE Wakeup/Sleep
@@ -194,7 +194,7 @@ void setupPort(){
 }
 
 //---------------------------------------------------------------------
-// 各デバイスの初期設定
+// Initial settings for each device
 //---------------------------------------------------------------------
 //------------------------------
 // Sensor
@@ -219,12 +219,12 @@ void setupSensor(){
 }
 
 //=====================================================================
-// 割り込み処理
+// Interrupt
 //=====================================================================
 //----------------------------------------------
-// 割り込み処理初期設定
+// Interrupt initialization
 // Timer interrupt (interval=125ms, int=overflow)
-// メインループのタイマー割り込み設定
+// Timer interrupt setting for main loop
 //----------------------------------------------
 void setupTCInt(){
   MsTimer2::set(LOOP_INTERVAL, intTimer);
@@ -232,7 +232,7 @@ void setupTCInt(){
 
 //----------------------------------------------
 // Timer INT
-// タイマー割り込み関数
+// Timer interrupt function
 //----------------------------------------------
 void intTimer(){
   bInterval = true;
@@ -248,7 +248,7 @@ void loop(){
   loopHX711();
 
   //-----------------------------------------------------
-  // Timer interval 125ms で1回ループ
+  // Timer interval Loop once in 125ms
   //-----------------------------------------------------
   if (bInterval == true){
      bInterval = false;
@@ -256,7 +256,7 @@ void loop(){
     //--------------------------------------------
     loopCounter();                    // loop counter
     //--------------------------------------------
-    // 1sに1回実行する
+    // Run once in 1s
     //--------------------------------------------
     if(event1s == true){
       event1s = false;                // initialize parameter
@@ -269,8 +269,8 @@ void loop(){
 
 //---------------------------------------------------------------------
 // Counter
-// メインループのループ回数をカウントし
-// 1秒間隔でセンサーデータの取得とBLEの送信をONにする
+// Count the number of loops in the main loop and turn on sensor data acquisition
+// and BLE transmission at 1-second intervals
 //---------------------------------------------------------------------
 void loopCounter(){
   iLoop1s += 1;
@@ -341,14 +341,14 @@ void loopHX711(){
 
 //---------------------------------------------------------------------
 // Sensor
-// センサーデータ取得がONのとき、各センサーからデータを取得
-// コンソール出力がONのときシリアルに測定値と計算結果を出力する
+// When sensor data acquisition is ON, data is acquired from each sensor
+// Serial output of measured values and calculation results when console output is ON
 //---------------------------------------------------------------------
 void loopSensor(){
 
   //-------------------------
   // ADC081C027（ADC)
-  // 電池リーフ電池電圧取得
+  // Battery leaf battery voltage acquisition
   //-------------------------
   double temp_mv;
   uint8_t adcVal1 = 0;
@@ -362,18 +362,18 @@ void loopSensor(){
   adcVal2 = Wire.read();
 
   if (adcVal1 == 0xff && adcVal2 == 0xff) {
-    //測定値がFFならバッテリリーフはつながっていない
+    // If the measured value is FF, the battery leaf is not connected.
     adcVal1 = adcVal2 = 0;
   }
 
-  //電圧計算　ADC　* （(リファレンス電圧(3.3V)/ ADCの分解能(256)) * 分圧比（２倍））
+  // Voltage calculation :　ADC　* ((Reference voltage(3.3V)/ ADC resolution(256)) * Divided voltage ratio(2)
   temp_mv = ((double)((adcVal1 << 4) | (adcVal2 >> 4)) * 3300 * 2) / 256;
   dataBatt = (float)(temp_mv / 1000);
 }
 
 //---------------------------------------------------------------------
 // Send sensor data
-// センサーデータをセントラルに送る文字列に変換してBLEリーフへデータを送る
+// Convert sensor data into a string to be sent to Central and send the data to BLE Leaf.
 //---------------------------------------------------------------------
 void bt_sendData(){
   float value;
@@ -382,9 +382,9 @@ void bt_sendData(){
   uint8 sendLen;
 
   //-------------------------
-  //センサーデータを文字列に変換
-  //dtostrf(変換する数字,変換される文字数,小数点以下の桁数,変換した文字の格納先);
-  //変換される文字数を-にすると変換される文字は左詰め、+なら右詰めとなる
+  // Convert sensor data to strings
+  // dtostrf(Number to be converted, number of characters to be converted, number of decimal places, where to store the converted characters);
+  // If the number of characters to be converted is set to -, the converted characters will be left-justified; if +, they will be right-justified.
   //-------------------------
 
   //-------------------------
@@ -412,19 +412,19 @@ void bt_sendData(){
   //-------------------------
   // BLE Send Data
   //-------------------------
-  if( bBLEsendData == true ){     // BLE送信
-    // WebBluetoothアプリ用フォーマット
+  if( bBLEsendData == true ){     // BLE transmission
+    // Format for WebBluetooth application
     sendLen = sprintf(sendData, "%04s,%04s\n", weight, battVolt);
-    // BLEデバイスへの送信
+    // Send to BLE device
     ble112.ble_cmd_gatt_server_send_characteristic_notification( 1, 0x000C, sendLen, (const uint8 *)sendData );
     while (ble112.checkActivity(1000));
   }
     //-------------------------
-    // シリアルモニタ表示
+    // Serial monitor display
     //-------------------------
 #ifdef SERIAL_MONITOR
 /*
-    // 複数行に表示する場合
+    // To display on multiple lines
     Serial.println("--- sensor data ---");    
     Serial.println("  Weight[kg]     = " + String(dataWeight));
     Serial.println("  Bat[V]        = " + String(dataBatt));
@@ -436,7 +436,7 @@ void bt_sendData(){
 
 //---------------------------------------
 // trim
-// 文字列配列からSPを削除する
+// Removing SP from a string array
 //---------------------------------------
 void trim(char * data){
   int i = 0, j = 0;
@@ -523,10 +523,10 @@ void changeSavedCalFactor() {
 }
 
 //=====================================================================
-// I2C　制御関数
+// I2C control function
 //=====================================================================
 //-----------------------------------------------
-//I2C スレーブデバイスに1バイト書き込む
+//I2C Write 1 byte to the slave device
 //-----------------------------------------------
 void i2c_write_byte(int device_address, int reg_address, int write_data){
   Wire.beginTransmission(device_address);
@@ -536,7 +536,7 @@ void i2c_write_byte(int device_address, int reg_address, int write_data){
 }
 
 //-----------------------------------------------
-//I2C スレーブデバイスから1バイト読み込む
+//I2C Read 1 byte from the slave device
 //-----------------------------------------------
 unsigned char i2c_read_byte(int device_address, int reg_address){
   int read_data = 0;
@@ -592,7 +592,7 @@ void setupBLE(){
         (2),                                    // field length
         BGLIB_GAP_AD_TYPE_FLAGS,                // field type (0x01)
         (6),                                    // data
-        (1),                                    // field length (1は仮の初期値)
+        (1),                                    // field length (1 is a temporary default value.)
         BGLIB_GAP_AD_TYPE_LOCALNAME_COMPLETE    // field type (0x09)
     };
     /*  */
@@ -605,36 +605,36 @@ void setupBLE(){
     /*   */
     stLen = (5 + lenStr2);
     ble112.ble_cmd_le_gap_set_adv_data( SCAN_RSP_ADVERTISING_PACKETS, stLen, ad_data );
-    while (ble112.checkActivity(1000));                 /* 受信チェック */
+    while (ble112.checkActivity(1000));                 /* Receive check */
 
     /* interval_min :   40ms( =   64 x 0.625ms ) */
     /* interval_max : 1000ms( = 1600 x 0.625ms ) */
     ble112.ble_cmd_le_gap_set_adv_parameters( 64, 1600, 7 );    /* [BGLIB] <interval_min> <interval_max> <channel_map> */
-    while (ble112.checkActivity(1000));                         /* [BGLIB] 受信チェック */
+    while (ble112.checkActivity(1000));                         /* [BGLIB] Receive check */
 
     /* start */
     //ble112.ble_cmd_le_gap_start_advertising(1, LE_GAP_GENERAL_DISCOVERABLE, LE_GAP_UNDIRECTED_CONNECTABLE);
     ble112.ble_cmd_le_gap_start_advertising( 0, LE_GAP_USER_DATA, LE_GAP_UNDIRECTED_CONNECTABLE );    // index = 0
-    while (ble112.checkActivity(1000));                 /* 受信チェック */
+    while (ble112.checkActivity(1000));                 /* Receive check */
     /*  */
 }
 
 //-----------------------------------------
-// BLEからデータが送信されていたらデータを取得し、取得データに従い
-// 処理を実施
+// If data is sent from the BLE, acquire the data
+// and perform processing according to the acquired data.
 //-----------------------------------------
 void loopBleRcv( void ){
     // keep polling for new data from BLE
-    ble112.checkActivity(0);                    /* 受信チェック */
+    ble112.checkActivity(0);                    /* Receive check */
 
     /*  */
     if (ble_state == BLE_STATE_STANDBY) {
-        bBLEconnect = false;                    /* [BLE] 接続状態 */
+        bBLEconnect = false;                    /* [BLE] connection state */
     } else if (ble_state == BLE_STATE_ADVERTISING) {
-        bBLEconnect = false;                    /* [BLE] 接続状態 */
+        bBLEconnect = false;                    /* [BLE] connection state */
     } else if (ble_state == BLE_STATE_CONNECTED_SLAVE) {
         /*  */
-        bBLEconnect = true;                     /* [BLE] 接続状態 */
+        bBLEconnect = true;                     /* [BLE] connection state */
         /*  */
     }
 }
@@ -666,7 +666,7 @@ void onTimeout() {
     ble_encrypted = 0;
     ble_bonding = 0xFF;
     /*  */
-    bBLEconnect = false;                    /* [BLE] 接続状態 */
+    bBLEconnect = false;                    /* [BLE] connection state */
     bBLEsendData = false;
 }
 
@@ -756,7 +756,7 @@ void my_evt_le_connection_closed( const struct ble_msg_le_connection_closed_evt_
     ble_encrypted = 0;
     ble_bonding = 0xFF;
     /*  */
-    bBLEconnect = false;                    /* [BLE] 接続状態 */
+    bBLEconnect = false;                    /* [BLE] connection state */
     bBLEsendData = false;
 }
 /*  */
