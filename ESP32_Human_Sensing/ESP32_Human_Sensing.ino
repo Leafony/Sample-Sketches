@@ -62,16 +62,16 @@ void setup(){
 
   //人感センサ設定
   i2c_write_byte(I2C_PIR_ADDR, 0x20, 0xFF); //CNTL1  Resrt 
-  i2c_write_byte(I2C_PIR_ADDR, 0x2A, 0xF2); //CNTL11 人感アルゴリズム有効/割り込み出力有効
-  i2c_write_byte(I2C_PIR_ADDR, 0x25, 0x0F); //CNTL6  センサゲイン205%(最大)
-  i2c_write_byte(I2C_PIR_ADDR, 0x2B, 0xFF); //CNTL12 Mode=1 start Meas(連続測定モード)
+  i2c_write_byte(I2C_PIR_ADDR, 0x2A, 0xF2); //CNTL11 Human detection algorithm enabled / Interrupt output enabled
+  i2c_write_byte(I2C_PIR_ADDR, 0x25, 0x0F); //CNTL6  Sensor gain 205% (maximum)
+  i2c_write_byte(I2C_PIR_ADDR, 0x2B, 0xFF); //CNTL12 Mode=1 start Meas(Continuous measurement mode)
    delay(1000);
 
   // Beep
   ledcSetup(LEDC_CHANNEL_0, LEDC_BASE_FREQ, LEDC_TIMER_13_BIT);
   ledcAttachPin(BUZZER_OUT, LEDC_CHANNEL_0);
 
-  // 人接近検知割り込み
+  // Human proximity detection interrupt
   attachInterrupt(PIR_INT,onHumanDetected , FALLING );
 
 }

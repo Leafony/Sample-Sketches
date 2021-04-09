@@ -15,23 +15,8 @@
 //		https://opensource.org/licenses/MIT
 //
 //      Rev.00 2019/08/20 First release
-//      Rev.01 2020/07/29 不要部分削除等体裁修正
+//      Rev.01 2020/07/29 Modification of appearance such as deletion of unnecessary parts
 //=====================================================================
-// use libraries
-//  Adafruit Unified Sensor Driver
-//    https://github.com/adafruit/Adafruit_Sensor
-//  Adafruit Bus IO Library
-//    https://github.com/adafruit/Adafruit_BusIO
-//  Adafruit LIS3DH
-//    https://github.com/adafruit/Adafruit_LIS3DH
-//  SmartEverything ST HTS221 Humidity Sensor
-//    https://github.com/ameltech/sme-hts221-library
-//  ClosedCube Arduino Library for ClosedCube OPT3001
-//    https://github.com/closedcube/ClosedCube_OPT3001_Arduino
-//  ST7032 - Arduino LiquidCrystal compatible library
-//    https://github.com/tomozh/arduino_ST7032
-//=====================================================================
-
 //---------------------------------------------------------------------
 // difinition
 //---------------------------------------------------------------------
@@ -46,40 +31,17 @@
 //=====================================================================
 
 //===============================================
-// シリアルモニタへの出力
-//      #define SERIAL_MONITOR = 出力あり
-//	  //#define SERIAL_MONITOR = 出力なし（コメントアウトする）
+// Output to serial monitor
+//      #define SERIAL_MONITOR = With output
+//    //#define SERIAL_MONITOR = Without output (Comment out)
 //===============================================
 #define SERIAL_MONITOR
 
 //-----------------------------------------------
-// IOピン一覧
-//-----------------------------------------------
-//  D0              0                   // PD0  (RXD)
-//  D1              1                   // PD1  (TXD)
-//  D2              2                   // PD2  (INT0)
-//  D3              3                   // PD3  (INT1)
-//  D4              4                   // PD4
-//  D5              5                   // PD5
-//  D6              6                   // PD6
-//  D7              7                   // PD7
-//  D8              8                   // PB0  (S-UART2_RX)
-//  D9              9                   // PB1  (S-UART2_TX)
-//  D10             10                  // PB2  (SS)
-//  D11             11                  // PB3  (MOSI)
-//  D12             12                  // PB4  (MISO)
-//  D13             13                  // PB5  (SCK/LED)
-
-//  D14             14                  // [A0] PC0
-//  D15             15                  // [A1] PC1
-//  D16             16                  // [A2] PC2
-//  D17             17                  // [A3] PC3
-
-//-----------------------------------------------
-// プログラム内で使用する定数定義
+// Define constants to be used in the program
 //-----------------------------------------------
 //------------------------------
-// I2Cアドレス
+// I2C address
 //------------------------------
 #define LIS2DH_ADDRESS          0x19        // Accelerometer (SD0/SA0 pin = VCC)
 #define OPT3001_ADDRESS         0x45        // Ambient Light Sensor (ADDR pin = VCC)
@@ -88,7 +50,7 @@
 
 //-----------------------------------------------
 // loop interval
-// MsTimer2のタイマー割り込み発生間隔(ms)
+// Timer interrupt interval (ms)
 //-----------------------------------------------
 #define LOOP_INTERVAL 125                   // 125ms interval
 
@@ -107,7 +69,7 @@ Adafruit_LIS3DH accel = Adafruit_LIS3DH();
 ClosedCube_OPT3001 light;      
 
 //---------------------------------------------------------------------
-// プログラムで使用する変数定義
+// Define variables to be used in the program
 //---------------------------------------------------------------------
 //---------------------------
 // LCD
@@ -142,21 +104,21 @@ float dataTemp;
 float dataHumid;
 
 //--------------------
-// 2点補正用データ
+// Data for two-point correction
 //--------------------
-// 温度補正用データ0
-float TL0 = 25.0;     // 4-Sensors温度測定値
-float TM0 = 25.0;     // 温度計等測定値
-// 温度補正用データ1
-float TL1 = 40.0;     // 4-Sensors温度測定値
-float TM1 = 40.0;     // 温度計等測定値
+// Temperature correction data 0
+float TL0 = 25.0;     // 4-Sensors Temperature measurement value
+float TM0 = 25.0;     // Thermometer and other measurements value
+// Temperature correction data 1
+float TL1 = 40.0;     // 4-Sensors Temperature measurement value
+float TM1 = 40.0;     // Thermometer and other measurements value
 
-// 湿度補正用データ0
-float HL0 = 60.0;     // 4-Sensors湿度測定値
-float HM0 = 60.0;     // 湿度計等測定値
-// 湿度補正用データ1
-float HL1 = 80.0;     // 4-Sensors湿度測定値
-float HM1 = 80.0;     // 湿度計等測定値
+// Humidity correction data 0
+float HL0 = 60.0;     // 4-Sensors Humidity measurement value
+float HM0 = 60.0;     // Hygrometer and other measurements value
+// Humidity correction data 1
+float HL1 = 80.0;     // 4-Sensors Humidity measurement value
+float HM1 = 80.0;     // Hygrometer and other measurements value
 
 //------------------------------
 // OPT3001 : Ambient Light Sensor
@@ -180,8 +142,8 @@ void setup(){
 #endif
 
   i2c_write_byte(LCD_I2C_EXPANDER_ADDR, 0x03, 0xFE);
-  i2c_write_byte(LCD_I2C_EXPANDER_ADDR, 0x01, 0x01);      // LCD 電源ON
-  // LCD設定
+  i2c_write_byte(LCD_I2C_EXPANDER_ADDR, 0x01, 0x01);      // LCD power ON
+  // LCD settings
   lcd.begin(8, 2);
   lcd.setContrast(30);
   lcd.clear();   
@@ -209,14 +171,14 @@ void setup(){
 }
 
 //-----------------------------------------------
-// IOピンの入出力設定
-// 接続するリーフに合わせて設定する
+// IO pin input/output settings
+// Configure the settings according to the leaf to be connected.
 //-----------------------------------------------
 void setupPort(){
 }
 
 //---------------------------------------------------------------------
-// 各デバイスの初期設定
+// Initial settings for each device
 //---------------------------------------------------------------------
 //------------------------------
 // Sensor
@@ -252,17 +214,17 @@ void setupSensor(){
   errorConfig = light.writeConfig(newConfig);
   
   if(errorConfig != NO_ERROR){
-    errorConfig = light.writeConfig(newConfig);   //retry
+    errorConfig = light.writeConfig(newConfig);   // retry
   }
 }
 
 //=====================================================================
-// 割り込み処理
+// Interrupt
 //=====================================================================
 //-----------------------------------------------
-// 割り込み処理初期設定
+// Interrupt initialization
 // Timer interrupt (interval=125ms, int=overflow)
-// メインループのタイマー割り込み設定
+// Timer interrupt setting for main loop
 //-----------------------------------------------
 void setupTCInt(){
   MsTimer2::set(LOOP_INTERVAL, intTimer);
@@ -270,7 +232,7 @@ void setupTCInt(){
 
 //----------------------------------------------
 // Timer INT
-// タイマー割り込み関数
+// Timer interrupt function
 //----------------------------------------------
 void intTimer(){
   bInterval = true;
@@ -284,14 +246,14 @@ void intTimer(){
 //---------------------------------------------------------------------
 void loop(){
   //-----------------------------------------------------
-  // Timer interval　125ms で1回ループ
+  // TTimer interval Loop once in 125ms
   //-----------------------------------------------------
   if (bInterval == true){
      bInterval = false; 
     //--------------------------------------------    
     loopCounter();                    // loop counter
     //--------------------------------------------
-    // 1sに1回実行する
+    // Run once in 1s
     //--------------------------------------------
     if (event1s == true){
       event1s = false;                  // initialize parameter
@@ -303,8 +265,8 @@ void loop(){
 
 //---------------------------------------------------------------------
 // Counter
-// メインループのループ回数をカウントし
-// 1秒間隔でセンサーデータの取得をONにする
+// Count the number of loops in the main loop and turn on sensor data acquisition
+// at 1-second intervals
 //---------------------------------------------------------------------
 void loopCounter(){
   iLoop1s += 1;
@@ -319,19 +281,19 @@ void loopCounter(){
 
 //---------------------------------------------------------------------
 // Sensor
-// センサーデータ取得がONのとき、各センサーからデータを取得
-// コンソール出力がONのときシリアルに測定値と計算結果を出力する
+// When sensor data acquisition is ON, data is acquired from each sensor
+// Serial output of measured values and calculation results when console output is ON
 //---------------------------------------------------------------------
 void loopSensor(){
   double temp_mv;
     //-------------------------
     // LIS2DH
-    // 3軸センサーのデータ取得
+    // Data acquisition for 3-axis sensors
     //-------------------------
     accel.read();
-    dataX_g = accel.x_g;    //X軸
-    dataY_g = accel.y_g;    //Y軸
-    dataZ_g = accel.z_g;    //Z軸
+    dataX_g = accel.x_g;    // X-axis
+    dataY_g = accel.y_g;    // Y-axis
+    dataZ_g = accel.z_g;    // Z-axis
 
     if(dataZ_g >= 1.0){
       dataZ_g = 1.00;
@@ -343,20 +305,20 @@ void loopSensor(){
     
     //-------------------------
     // HTS221
-    // 温湿度センサーデータ取得
+    // Temperature and humidity sensor data acquisition
     //-------------------------
-    dataTemp = (float)smeHumidity.readTemperature();  //温度
-    dataHumid = (float)smeHumidity.readHumidity();    //湿度
+    dataTemp = (float)smeHumidity.readTemperature();  // Temperature
+    dataHumid = (float)smeHumidity.readHumidity();    // Humidity
 
     //-------------------------
-    // 温度と湿度の2点補正
+    // Two-point correction for temperature and humidity
     //-------------------------
-    dataTemp=TM0+(TM1-TM0)*(dataTemp-TL0)/(TL1-TL0);      // 温度補正
-    dataHumid=HM0+(HM1-HM0)*(dataHumid-HL0)/(HL1-HL0);    // 湿度補正
+    dataTemp=TM0+(TM1-TM0)*(dataTemp-TL0)/(TL1-TL0);      // Temperature correction
+    dataHumid=HM0+(HM1-HM0)*(dataHumid-HL0)/(HL1-HL0);    // Humidity correction
 
     //-------------------------
     // OPT3001
-    // 照度センサーデータ取得
+    // Illuminance sensor data acquisition
     //-------------------------
     OPT3001 result = light.readResult();
 
@@ -366,7 +328,7 @@ void loopSensor(){
 
   //-------------------------
   // ADC081C027（ADC)
-  // 電池リーフ電池電圧取得
+  // Battery leaf battery voltage acquisition
   //-------------------------
   uint8_t adcVal1 = 0;
   uint8_t adcVal2 = 0;
@@ -379,16 +341,16 @@ void loopSensor(){
   adcVal2 = Wire.read();
 
   if (adcVal1 == 0xff && adcVal2 == 0xff) { 
-    //測定値がFFならバッテリリーフはつながっていない
+    // If the measured value is FF, the battery leaf is not connected.
     adcVal1 = adcVal2 = 0;
   }
 
-  //電圧計算　ADC　* （(リファレンス電圧(3.3V)/ ADCの分解能(256)) * 分圧比（２倍））
+  // Voltage calculation :　ADC　* ((Reference voltage(3.3V)/ ADC resolution(256)) * Divided voltage ratio(2)
   temp_mv = ((double)((adcVal1 << 4) | (adcVal2 >> 4)) * 3300 * 2) / 256;
   dataBatt = (float)(temp_mv / 1000);
 
     //-------------------------
-    // シリアルモニタ表示
+    // Serial monitor display
     //-------------------------
 #ifdef SERIAL_MONITOR
     Serial.println("--- sensor data ---");    
@@ -402,7 +364,7 @@ void loopSensor(){
 
 //---------------------------------------
 //  Disp sensor data
-// センサーデータを文字列に変換してLCDに表示する
+// Convert sensor data into character string and display on LCD
 //---------------------------------------
 void dispSencerData(){
   float value;
@@ -410,9 +372,9 @@ void dispSencerData(){
   char sendData[40];
 
   //-----------------------------------
-  //センサーデータを文字列に変換
-  //dtostrf(変換する数字,変換される文字数,小数点以下の桁数,変換した文字の格納先);
-  //変換される文字数を-にすると変換される文字は左詰め、+なら右詰めとなる
+  // Convert sensor data to strings
+  // dtostrf(Number to be converted, number of characters to be converted, number of decimal places, where to store the converted characters);
+  // If the number of characters to be converted is set to -, the converted characters will be left-justified; if +, they will be right-justified.
   //-----------------------------------
   //-------------------------
   // Temperature (4Byte)
@@ -506,7 +468,7 @@ void dispSencerData(){
 
 //---------------------------------------
 // trim 
-// 文字列配列からSPを削除する
+// Removing SP from a string array
 //---------------------------------------
 void trim(char * data){
   int i = 0, j = 0;
@@ -522,10 +484,10 @@ void trim(char * data){
 }
 
 //=====================================================================
-// I2C　制御関数
+// I2C control function
 //=====================================================================
 //-----------------------------------------------
-//I2C スレーブデバイスに1バイト書き込む
+// I2C Write 1 byte to the slave device
 //-----------------------------------------------
 void i2c_write_byte(int device_address, int reg_address, int write_data){
   Wire.beginTransmission(device_address);
@@ -535,7 +497,7 @@ void i2c_write_byte(int device_address, int reg_address, int write_data){
 }
 
 //-----------------------------------------------
-//I2C スレーブデバイスから1バイト読み込む
+// I2C Read 1 byte from the slave device
 //-----------------------------------------------
 unsigned char i2c_read_byte(int device_address, int reg_address){
   int read_data = 0;

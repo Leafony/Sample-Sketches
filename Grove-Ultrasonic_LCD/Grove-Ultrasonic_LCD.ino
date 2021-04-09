@@ -17,8 +17,8 @@
 //
 //      Rev.00 2019/08/01 First release
 //=====================================================================
-//Grove - Ultrasonic Rangerを使用したデモ
-//LCDに超音波センサーから取得した対象物からの距離を表示
+// Grove - Demonstration using Ultrasonic Ranger
+// Displays the distance from the object obtained from the ultrasonic sensor on the LCD.
 //=====================================================================
 //use libraries
 //ST7032 - Arduino LiquidCrystal compatible library
@@ -26,7 +26,6 @@
 //Grove_Ultrasonic_Ranger
 //https://github.com/Seeed-Studio/Grove_Ultrasonic_Ranger/
 //=====================================================================
-
 
 #include <Wire.h>
 #include <ST7032.h>

@@ -32,16 +32,6 @@
 #include <SoftwareSerial.h>
 
 // --------------------------------------------
-// PD port
-//     digital 0: PD0 = PCRX    (HW UART)
-//     digital 1: PD1 = PCTX    (HW UART)
-//     digital 2: PD2 = INT0#
-//     digital 3: PD3 = INT1#
-//     digital 4: PD4 = SLEEP# 
-//     digital 5: PD5 = CN3_D5
-//     digital 6: PD6 = DISCN
-//     digital 7: PD7 = BLSLP#
-// --------------------------------------------
 #define PCTX   0
 #define PCRX   1
 #define INT0   2
@@ -52,17 +42,6 @@
 #define DISCN  6
 #define BLSLP  7
 
-// --------------------------------------------
-// PB port
-//     digital 8: PB0 = BLERX (software UART)
-//     digital 9: PB1 = BLETX (software UART)
-//     digital 10:PB2 = SS#
-//     digital 11:PB3 = MOSI
-//     digital 12:PB4 = MISO
-//     digital 13:PB5 = SCK
-//                PB6 = XTAL1
-//                PB7 = XTAL2
-//---------------------------------------------
 #define LORATX  8
 #define LORARX  9
 #define SS      10
@@ -70,16 +49,6 @@
 #define MISO    12
 #define SCK     13
 
-// --------------------------------------------
-// PC port
-//     digital 14/ Analog0: PC0 = CN2_D14
-//     digital 15/ Analog1: PC1 = CN2_D15
-//     digital 16/ Analog2: PC2 = WFTX  (software UART)
-//     digital 17/ Analog3: PC3 = WFRX  (software UART)
-//     digital 18/ SDA    : PC4 = SDA   (I2C)
-//     digital 19/ SCL    : PC5 = SCL   (I2C)
-//     RESET              : PC6 = RESET#
-//-----------------------------------------------
 #define CN2_D14 14
 #define CN2_D15 15
 #define WFTX    16
@@ -125,12 +94,6 @@ uint8_t receiveCheckCnt;
 //-----------------------------------------------
 void setupPort(){
 
-  //---------------------
-  // PD port
-  //---------------------
-                                // PD0 : digital 0 = RX
-                                // PD1 : digital 1 = TX
-
   pinMode(INT0,INPUT);          // PD2 : digital 2 = BLE interrupt
   pinMode(INT1,INPUT);          // PD3 : digital 3 = sensor interrupt
 
@@ -146,11 +109,6 @@ void setupPort(){
   pinMode(BLSLP, OUTPUT);       // PD7 : digital 7 = BLE sleep
   digitalWrite(BLSLP, HIGH);
 
-  //---------------------
-  // PB port
-  //---------------------
-                                // PB0 : digital 8 = BLETX
-                                // PB1 : digital 9 = BLETX
 
   pinMode(SS,OUTPUT);           // PB2 : digital 10 = not used
   digitalWrite(SS,LOW);
@@ -164,9 +122,6 @@ void setupPort(){
   pinMode(SCK,OUTPUT);          // PB5 : digital 13 =LED on 8bit-Dev. Leaf
   digitalWrite(SCK,LOW);
 
-  //---------------------
-  // PC port
-  //---------------------
   pinMode(CN2_D14,OUTPUT);       // PC0 : digital 14 = not used
   digitalWrite(CN2_D14,LOW);
 
@@ -179,8 +134,6 @@ void setupPort(){
   pinMode(WFRX,OUTPUT);          // PC3 : digital 17  = not used
   digitalWrite(WFRX,LOW);
 
-                                 // PC4 : digital 18 = I2C SDA
-                                 // PC5 : digital 19 = I2C SCL 
 
   pinMode(CPULED, OUTPUT);
   digitalWrite(CPULED, LOW);

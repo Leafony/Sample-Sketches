@@ -16,7 +16,7 @@
 //    https://opensource.org/licenses/MIT
 //
 //      Rev.00 2019/08/29 First release
-//      Rev.01 2020/07/29 不要部分削除等体裁修正
+//      Rev.01 2020/07/29 Modification of appearance such as deletion of unnecessary parts
 //=====================================================================
 //---------------------------------------------------------------------
 // difinition
@@ -34,34 +34,34 @@
 
 //===============================================
 // BLE Unique Name (Local device name)
-// 最大16文字（ASCIIコード）まで
+// Up to 16 characters (ASCII code)
 //===============================================
 //                     |1234567890123456|
 String strDeviceName = "Leafony_AC02";
 
 //===============================================
-// シリアルモニタへの出力
-//      #define SERIAL_MONITOR = 出力あり
-//    //#define SERIAL_MONITOR = 出力なし（コメントアウトする）
+// Output to serial monitor
+//      #define SERIAL_MONITOR = With output
+//    //#define SERIAL_MONITOR = Without output (Comment out)
 //===============================================
 #define SERIAL_MONITOR
 
 //===============================================
-// シリアルモニタへのデバック出力
-//      #define DEBUG = 出力あり
-//    //#define DEBUG = 出力なし（コメントアウトする）
+// Debug output to serial monitor
+//      #define DEBUG = With output
+//    //#define DEBUG = Without output (Comment out)
 //===============================================
 //#define DEBUG
 
 //-----------------------------------------------
-// 送信間隔の設定
-//  SEND_INTERVAL  :送信間隔（センサーデータを送る間隔  1秒単位
+// Setting the transmission interval
+//  SEND_INTERVAL  :transmission interval (Set the interval for sending sensor data in 1 second increments.)
 //-----------------------------------------------
 #define SEND_INTERVAL   (1)                 // 1s
 
 //-----------------------------------------------
-// IOピンの名前定義
-// 接続するリーフに合わせて定義する
+// IO pin name definition
+// Define it according to the leaf to be connected.
 //-----------------------------------------------
 #define D0              0                   // PD0  (RXD)
 #define D1              1                   // PD1  (TXD)
@@ -84,10 +84,10 @@ String strDeviceName = "Leafony_AC02";
 #define D17             17                  // [A3] PC3
 
 //-----------------------------------------------
-// プログラム内で使用する定数定義
+// Define constants to be used in the program
 //-----------------------------------------------
 //------------------------------
-// I2Cアドレス
+// I2C address
 //------------------------------
 #define LIS2DH_ADDRESS          0x19        // Accelerometer (SD0/SA0 pin = VCC)
 #define OPT3001_ADDRESS         0x45        // Ambient Light Sensor (ADDR pin = VCC)
@@ -96,7 +96,7 @@ String strDeviceName = "Leafony_AC02";
 
 //------------------------------
 // Loop interval
-// MsTimer2のタイマー割り込み発生間隔(ms)
+// Timer interrupt interval (ms)
 //------------------------------
 #define LOOP_INTERVAL 125                   // 125ms interval
 
@@ -131,12 +131,12 @@ SoftwareSerial Serialble(D16_BLE_RX, D15_BLE_TX);
 BGLib ble112((HardwareSerial *)&Serialble, 0, 0 );
 
 //---------------------------------------------------------------------
-// プログラムで使用する変数定義
+// Define variables to be used in the program
 //---------------------------------------------------------------------
 //------------------------------
 // LCD
 //------------------------------
-bool dispLCD = 0;                           // LCDに表示する場合1にする
+bool dispLCD = 0;                           // Set to 1 to display on LCD.
 int8_t lcdSendCount = 0;
 
 //------------------------------
@@ -169,21 +169,21 @@ float dataTemp = 0;
 float dataHumid = 0;
 
 //--------------------
-// 2点補正用データ
+// Data for two-point correction
 //--------------------
-// 温度補正用データ0
-float TL0 = 25.0;     // 4-Sensors温度測定値
-float TM0 = 25.0;     // 温度計等測定値
-// 温度補正用データ1
-float TL1 = 40.0;     // 4-Sensors温度測定値
-float TM1 = 40.0;     // 温度計等測定値
+// Temperature correction data 0
+float TL0 = 25.0;     // 4-Sensors Temperature measurement value
+float TM0 = 25.0;     // Thermometer and other measurements value
+// Temperature correction data 1
+float TL1 = 40.0;     // 4-Sensors Temperature measurement value
+float TM1 = 40.0;     // Thermometer and other measurements value
 
-// 湿度補正用データ0
-float HL0 = 60.0;     // 4-Sensors湿度測定値
-float HM0 = 60.0;     // 湿度計等測定値
-// 湿度補正用データ1
-float HL1 = 80.0;     // 4-Sensors湿度測定値
-float HM1 = 80.0;     // 湿度計等測定値
+// Humidity correction data 0
+float HL0 = 60.0;     // 4-Sensors Humidity measurement value
+float HM0 = 60.0;     // Hygrometer and other measurements value
+// Humidity correction data 1
+float HL1 = 80.0;     // 4-Sensors Humidity measurement value
+float HM1 = 80.0;     // Hygrometer and other measurements value
 
 //------------------------------
 // OPT3001 : Ambient Light Sensor
@@ -227,8 +227,8 @@ void setup() {
 
   if (dispLCD==1){
     i2c_write_byte(LCD_I2C_EXPANDER_ADDR, 0x03, 0xFE);
-    i2c_write_byte(LCD_I2C_EXPANDER_ADDR, 0x01, 0x01);      // LCD 電源ON
-    // LCD設定
+    i2c_write_byte(LCD_I2C_EXPANDER_ADDR, 0x01, 0x01);      //LCD power ON
+    // LCD settings
     lcd.begin(8, 2);
     lcd.setContrast(30);
     lcd.clear();
@@ -262,8 +262,8 @@ void setup() {
 }
 
 //-----------------------------------------------
-// IOピンの入出力設定
-// 接続するリーフに合わせて設定する
+// IO pin input/output settings
+// Configure the settings according to the leaf to be connected.
 //-----------------------------------------------
 void setupPort(){
   pinMode(D2, INPUT);                       // PD2 : digital 2 = PIR/LCD-SW interrupt
@@ -290,7 +290,7 @@ void setupPort(){
 }
 
 //---------------------------------------------------------------------
-// 各デバイスの初期設定
+// Initial settings for each device
 //---------------------------------------------------------------------
 //------------------------------
 // Sensor
@@ -331,12 +331,12 @@ void setupSensor(){
 }
 
 //=====================================================================
-// 割り込み処理
+// Interrupt
 //=====================================================================
 //----------------------------------------------
-// 割り込み処理初期設定
+// Interrupt initialization
 // Timer interrupt (interval=125ms, int=overflow)
-// メインループのタイマー割り込み設定
+// Timer interrupt setting for main loop
 //----------------------------------------------
 void setupTCInt(){
   MsTimer2::set(LOOP_INTERVAL, intTimer);
@@ -344,7 +344,7 @@ void setupTCInt(){
 
 //----------------------------------------------
 // Timer INT
-// タイマー割り込み関数
+// Timer interrupt function
 //----------------------------------------------
 void intTimer(){
   bInterval = true;
@@ -358,7 +358,7 @@ void intTimer(){
 //---------------------------------------------------------------------
 void loop(){
   //-----------------------------------------------------
-  // Timer interval 125ms で1回ループ
+  // Timer interval Loop once in 125ms
   //-----------------------------------------------------
   if (bInterval == true){
      bInterval = false;
@@ -379,7 +379,7 @@ void loop(){
     //--------------------------------------------
     loopCounter();                    // loop counter
     //--------------------------------------------
-    // 1sに1回実行する
+    // Run once in 1s
     //--------------------------------------------
     if(event1s == true){
       event1s = false;                // initialize parameter
@@ -392,8 +392,8 @@ void loop(){
 
 //---------------------------------------------------------------------
 // Counter
-// メインループのループ回数をカウントし
-// 1秒間隔でセンサーデータの取得とBLEの送信をONにする
+// Count the number of loops in the main loop and turn on sensor data acquisition
+// and BLE transmission at 1-second intervals
 //---------------------------------------------------------------------
 void loopCounter(){
   iLoop1s += 1;
@@ -413,19 +413,19 @@ void loopCounter(){
 
 //---------------------------------------------------------------------
 // Sensor
-// センサーデータ取得がONのとき、各センサーからデータを取得
-// コンソール出力がONのときシリアルに測定値と計算結果を出力する
+// When sensor data acquisition is ON, data is acquired from each sensor
+// Serial output of measured values and calculation results when console output is ON
 //---------------------------------------------------------------------
 void loopSensor(){
   double temp_mv;
     //-------------------------
     // LIS2DH
-    // 3軸センサーのデータ取得
+    // Data acquisition for 3-axis sensors
     //-------------------------
     accel.read();
-    dataX_g = accel.x_g;    //X軸
-    dataY_g = accel.y_g;    //Y軸
-    dataZ_g = accel.z_g;    //Z軸
+    dataX_g = accel.x_g;    // X-axis
+    dataY_g = accel.y_g;    // Y-axis
+    dataZ_g = accel.z_g;    // Z-axis
 
     if(dataZ_g >= 1.0){
       dataZ_g = 1.00;
@@ -435,15 +435,15 @@ void loopSensor(){
 
     dataTilt = acos(dataZ_g) / PI * 180;
 
-    //サイコロの目の位置を計算
-    //各目でセンサーは以下の値を取る
-    //    X Y Z
-    //  1 0 0 1
-    //  2 0 1 0
-    //  3 -1  0 0
-    //  4 1 0 0
-    //  5 0 -1  0
-    //  6 0 0 -1
+    // Calculate the position of the dice.
+    // For each eye, the sensor takes the following values
+    //     X  Y  Z
+    //  1  0  0  1
+    //  2  0  1  0
+    //  3 -1  0  0
+    //  4  1  0  0
+    //  5  0 -1  0
+    //  6  0  0 -1
     if ((-0.5 <= dataX_g && dataX_g < 0.5) && (-0.5 <= dataY_g && dataY_g < 0.5) && (0.5 <= dataZ_g)){
       dataPips = 1;
     }
@@ -468,20 +468,20 @@ void loopSensor(){
 
     //-------------------------
     // HTS221
-    // 温湿度センサーデータ取得
+    // Temperature and humidity sensor data acquisition
     //-------------------------
-    dataTemp = (float)smeHumidity.readTemperature();  //温度
-    dataHumid = (float)smeHumidity.readHumidity();    //湿度
+    dataTemp = (float)smeHumidity.readTemperature();  // Temperature
+    dataHumid = (float)smeHumidity.readHumidity();    // Humidity
 
     //-------------------------
-    // 温度と湿度の2点補正
+    // Two-point correction for temperature and humidity
     //-------------------------
-    dataTemp=TM0+(TM1-TM0)*(dataTemp-TL0)/(TL1-TL0);      // 温度補正
-    dataHumid=HM0+(HM1-HM0)*(dataHumid-HL0)/(HL1-HL0);    // 湿度補正
+    dataTemp=TM0+(TM1-TM0)*(dataTemp-TL0)/(TL1-TL0);      // Temperature correction
+    dataHumid=HM0+(HM1-HM0)*(dataHumid-HL0)/(HL1-HL0);    // Humidity correction
 
     //-------------------------
     // OPT3001
-    // 照度センサーデータ取得
+    // Illuminance sensor data acquisition
     //-------------------------
     OPT3001 result = light.readResult();
 
@@ -491,7 +491,7 @@ void loopSensor(){
 
   //-------------------------
   // ADC081C027（ADC)
-  // 電池リーフ電池電圧取得
+  // Battery leaf battery voltage acquisition
   //-------------------------
   uint8_t adcVal1 = 0;
   uint8_t adcVal2 = 0;
@@ -504,18 +504,18 @@ void loopSensor(){
   adcVal2 = Wire.read();
 
   if (adcVal1 == 0xff && adcVal2 == 0xff) {
-    //測定値がFFならバッテリリーフはつながっていない
+    // If the measured value is FF, the battery leaf is not connected.
     adcVal1 = adcVal2 = 0;
   }
 
-  //電圧計算　ADC　* （(リファレンス電圧(3.3V)/ ADCの分解能(256)) * 分圧比（２倍））
+  // Voltage calculation :　ADC　* ((Reference voltage(3.3V)/ ADC resolution(256)) * Divided voltage ratio(2)
   temp_mv = ((double)((adcVal1 << 4) | (adcVal2 >> 4)) * 3300 * 2) / 256;
   dataBatt = (float)(temp_mv / 1000);
 }
 
 //---------------------------------------------------------------------
 // Send sensor data
-// センサーデータをセントラルに送る文字列に変換してBLEリーフへデータを送る
+// Convert sensor data into a string to be sent to Central and send the data to BLE Leaf.
 //---------------------------------------------------------------------
 void bt_sendData(){
   float value;
@@ -524,9 +524,9 @@ void bt_sendData(){
   uint8 sendLen;
 
   //-------------------------
-  //センサーデータを文字列に変換
-  //dtostrf(変換する数字,変換される文字数,小数点以下の桁数,変換した文字の格納先);
-  //変換される文字数を-にすると変換される文字は左詰め、+なら右詰めとなる
+  // Convert sensor data to strings
+  // dtostrf(Number to be converted, number of characters to be converted, number of decimal places, where to store the converted characters);
+  // If the number of characters to be converted is set to -, the converted characters will be left-justified; if +, they will be right-justified.
   //-------------------------
   //-------------------------
   // Temperature (4Byte)
@@ -593,7 +593,7 @@ void bt_sendData(){
   lcd.clear();
   if (dispLCD==1){
     switch (lcdSendCount){
-      case 0:                 // BLE未接続
+      case 0:                 // BLE not connected
         lcd.print("Waiting");
         lcd.setCursor(0, 1);
         lcd.print("connect");
@@ -630,7 +630,7 @@ void bt_sendData(){
       lcdSendCount++;
     }
     else{
-        if( bBLEsendData == true ){     // BLE送信中は1から開始
+        if( bBLEsendData == true ){     // Start from 1 during BLE transmission.
           lcdSendCount = 1;
         }
         else{
@@ -642,19 +642,19 @@ void bt_sendData(){
   //-------------------------
   // BLE Send Data
   //-------------------------
-  if( bBLEsendData == true ){     // BLE送信
+  if( bBLEsendData == true ){     // BLE transmission
     // WebBluetoothアプリ用フォーマット
     sendLen = sprintf(sendData, "%04s,%04s,%04s,%04s,%04s,%01s\n", temp, humid, light, tilt, battVolt, pips);
-    // BLEデバイスへの送信
+    // Send to BLE device
     ble112.ble_cmd_gatt_server_send_characteristic_notification( 1, 0x000C, sendLen, (const uint8 *)sendData );
     while (ble112.checkActivity(1000));
   }
     //-------------------------
-    // シリアルモニタ表示
+    // Serial monitor display
     //-------------------------
 #ifdef SERIAL_MONITOR
 /*
-    // 複数行に表示する場合
+    // To display on multiple lines
     Serial.println("--- sensor data ---");    
     Serial.println("  Tmp[degC]     = " + String(dataTemp));
     Serial.println("  Hum[%]        = " + String(dataHumid));
@@ -670,7 +670,7 @@ void bt_sendData(){
 
 //---------------------------------------
 // trim
-// 文字列配列からSPを削除する
+// Removing SP from a string array
 //---------------------------------------
 void trim(char * data){
   int i = 0, j = 0;
@@ -686,10 +686,10 @@ void trim(char * data){
 }
 
 //=====================================================================
-// I2C　制御関数
+// I2C control function
 //=====================================================================
 //-----------------------------------------------
-//I2C スレーブデバイスに1バイト書き込む
+// I2C Write 1 byte to the slave device
 //-----------------------------------------------
 void i2c_write_byte(int device_address, int reg_address, int write_data){
   Wire.beginTransmission(device_address);
@@ -699,7 +699,7 @@ void i2c_write_byte(int device_address, int reg_address, int write_data){
 }
 
 //-----------------------------------------------
-//I2C スレーブデバイスから1バイト読み込む
+// I2C Read 1 byte from the slave device
 //-----------------------------------------------
 unsigned char i2c_read_byte(int device_address, int reg_address){
   int read_data = 0;
@@ -783,21 +783,21 @@ void setupBLE(){
 }
 
 //-----------------------------------------
-// BLEからデータが送信されていたらデータを取得し、取得データに従い
-// 処理を実施
+// If data is sent from the BLE, acquire the data
+// and perform processing according to the acquired data.
 //-----------------------------------------
 void loopBleRcv( void ){
     // keep polling for new data from BLE
-    ble112.checkActivity(0);                    /* 受信チェック */
+    ble112.checkActivity(0);                    /* Receive check */
 
     /*  */
     if (ble_state == BLE_STATE_STANDBY) {
-        bBLEconnect = false;                    /* [BLE] 接続状態 */
+        bBLEconnect = false;                    /* [BLE] connection state */
     } else if (ble_state == BLE_STATE_ADVERTISING) {
-        bBLEconnect = false;                    /* [BLE] 接続状態 */
+        bBLEconnect = false;                    /* [BLE] connection state */
     } else if (ble_state == BLE_STATE_CONNECTED_SLAVE) {
         /*  */
-        bBLEconnect = true;                     /* [BLE] 接続状態 */
+        bBLEconnect = true;                     /* [BLE] connection state */
         /*  */
     }
 }
@@ -829,7 +829,7 @@ void onTimeout() {
     ble_encrypted = 0;
     ble_bonding = 0xFF;
     /*  */
-    bBLEconnect = false;                    /* [BLE] 接続状態 */
+    bBLEconnect = false;                    /* [BLE] connection state */
     bBLEsendData = false;
 }
 
@@ -926,7 +926,7 @@ void my_evt_le_connection_closed( const struct ble_msg_le_connection_closed_evt_
     ble_encrypted = 0;
     ble_bonding = 0xFF;
     /*  */
-    bBLEconnect = false;                    /* [BLE] 接続状態 */
+    bBLEconnect = false;                    /* [BLE] connection state */
     bBLEsendData = false;
 }
 /*  */
