@@ -81,6 +81,18 @@ window.onload = function () {
 			buttonDisconnect.style.display = '';
 
 			textUniqueName.innerText = uniqueName;
+
+			buttonGetData.disabled = false;
+			buttonCheckVersion.disabled = false;
+			buttonCheckWake.disabled = false;
+			buttonCheckSleep.disabled = false;
+			buttonCheckSens.disabled = false;
+			buttonCheckSave.disabled = false;
+			buttonSubmitWake.disabled = false;
+			buttonSubmitSleep.disabled = false
+			buttonSubmitSens.disabled = false;
+			buttonSubmitSave.disabled = false;
+
 		}, 1500);
 	});
 
@@ -98,6 +110,17 @@ window.onload = function () {
 	leafony.onDisconnected( function ( state ) {
 		onDisconnected( state );
 	} );
+
+	buttonGetData.disabled    = true;
+	buttonCheckVersion.disabled = true;
+	buttonCheckWake.disabled  = true;
+	buttonCheckSleep.disabled = true;
+	buttonCheckSens.disabled  = true;
+	buttonCheckSave.disabled  = true;
+	buttonSubmitWake.disabled  = true;
+	buttonSubmitSleep.disabled = true;
+	buttonSubmitSens.disabled  = true;
+	buttonSubmitSave.disabled  = true;
 
 };
 
@@ -586,6 +609,17 @@ function onDisconnected( state ) {
 	buttonDisconnect.style.display = 'none';
 	buttonConnect.disabled = false;
 	buttonConnect.innerHTML = 'Connect';
+
+	buttonGetData.disabled    = true;
+	buttonCheckVersion.disabled = true;
+	buttonCheckWake.disabled  = true;
+	buttonCheckSleep.disabled = true;
+	buttonCheckSens.disabled  = true;
+	buttonCheckSave.disabled  = true;
+	buttonSubmitWake.disabled  = true;
+	buttonSubmitSleep.disabled = true;
+	buttonSubmitSens.disabled  = true;
+	buttonSubmitSave.disabled  = true;
 }
 
 
