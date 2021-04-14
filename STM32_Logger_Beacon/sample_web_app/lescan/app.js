@@ -73,11 +73,15 @@ window.onload = function () {
 		alertMessage.textContent = 'WebBluetooth API is not available on this device.'
 	}
 
-	leafony.onConnected( function (uniqueName) {
-		buttonConnect.style.display = 'none';
-		buttonDisconnect.style.display = '';
+	leafony.onConnected( async function (uniqueName) {
+		setTimeout(function () {
+			sendCommand('setTime ' + timeStamp());
 
-		textUniqueName.innerText = uniqueName;
+			buttonConnect.style.display = 'none';
+			buttonDisconnect.style.display = '';
+
+			textUniqueName.innerText = uniqueName;
+		}, 1500);
 	});
 
 	// Beacon event
@@ -110,7 +114,6 @@ buttonConnect.addEventListener( 'click', async function () {
 	// connect to leafony
 	leafony.disableSleep();
 	await leafony.connect();
-	setTimeout( sendCommand, 1500, 'setTime ' + timeStamp() );
 
 	// Spinner connect button
 	buttonConnect.disabled = true;
@@ -450,14 +453,15 @@ function updateChart( state ) {
 
 	// Append sensors values to array
 	let min_date = new Date(2021, 1, 1);
-	if (time.getTime() > min_date.getTime()){
+	let max_date = new Date();
+	if (time.getTime() > min_date.getTime() && time.getTime() <= max_date.getTime()){
 		array_time.push(str_time);
 		array_temp.push(temp);
 		array_humd.push(humd);
 		array_ilum.push(illm);
 		array_batt.push(batt);
 	} else {
-		console.log('too old');
+		console.log('invalid timestamp');
 	}
 
 }
