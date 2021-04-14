@@ -101,7 +101,7 @@ window.onload = function () {
 /**
  * Connect button
  */
-buttonConnect.addEventListener( 'click', function () {
+buttonConnect.addEventListener( 'click', async function () {
 
 	// initialize display
 	clearTable();
@@ -109,7 +109,8 @@ buttonConnect.addEventListener( 'click', function () {
 
 	// connect to leafony
 	leafony.disableSleep();
-	leafony.connect();
+	await leafony.connect();
+	setTimeout( sendCommand, 1500, 'setTime ' + timeStamp() );
 
 	// Spinner connect button
 	buttonConnect.disabled = true;
@@ -448,11 +449,16 @@ function updateChart( state ) {
 	textBatt.innerText = batt;
 
 	// Append sensors values to array
-	array_time.push(str_time);
-	array_temp.push(temp);
-	array_humd.push(humd);
-	array_ilum.push(illm);
-	array_batt.push(batt);
+	let min_date = new Date(2021, 1, 1);
+	if (time.getTime() > min_date.getTime()){
+		array_time.push(str_time);
+		array_temp.push(temp);
+		array_humd.push(humd);
+		array_ilum.push(illm);
+		array_batt.push(batt);
+	} else {
+		console.log('too old');
+	}
 
 }
 
@@ -571,9 +577,9 @@ function onDisconnected( state ) {
  * If leafony is not connected, show alert popups.
  * @param {string} command
  */
-function sendCommand( command ) {
+async function sendCommand( command ) {
 	if ( leafony.isConnected() ) {
-		leafony.sendCommand( command );
+		await leafony.sendCommand( command );
 	} else {
 		alertController.style.display = "";
 	}
@@ -610,7 +616,7 @@ buttonDownload.addEventListener( 'click', function () {
  * Get Hex Timestamp Value
  */
 function timeStamp() {
-	let timestamp = new Date().getTime();
-	timestamp = Math.floor(timestamp / 1000);
+	let now = new Date();
+	timestamp = Math.floor(now.getTime() / 1000);
 	return timestamp;
 }

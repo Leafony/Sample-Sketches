@@ -478,8 +478,8 @@ void wakeupBLE()
 //---------------------------------------
 void setupRingBuffer()
 {
-  // EEPROMの先頭2byteは次に読み出すレジスタのアドレスを指定
-  rb_addr = ((uint16_t)EEPROM.read(1) << 8) + (uint16_t)(EEPROM.read(0));
+  // read ring buffer start address from RTC backup register
+  rb_addr = getBackupRegister(RTC_BKP_DR3);
 
   // コントロールレジスタを読み出し
   // wake_intval = EEPROM.read(2);
@@ -541,10 +541,9 @@ void writeEEPROM()
   EEPROM.write(rb_addr + 10, (u_time >> 16) & 0xFF);
   EEPROM.write(rb_addr + 11, (u_time >> 24) & 0xFF);
 
-  // write next ring buffer address
+  // write next ring buffer address to RTC backup register
   rb_addr += PACKET_LENGTH;
-  EEPROM.write(0, rb_addr & 0xFF);
-  EEPROM.write(1, rb_addr >> 8);
+  setBackupRegister(RTC_BKP_DR3, rb_addr);
 
 #ifdef DEBUG
   Serial.print("temp = ");
@@ -586,13 +585,35 @@ uint32_t getTimestamp() {
   Serial.print(minutes);
   Serial.print(":");
   Serial.print(seconds);
-  Serial.print(" (GMT+0)");
+  Serial.println(" (GMT+0)");
 #endif
 
     DateTime date (year, month, day, hours, minutes, seconds);
     return date.unixtime();
   }
   return 0;
+}
+
+
+/**
+ * 
+ */
+uint32_t rtc_read_backup_reg(uint32_t BackupRegister) {
+    RTC_HandleTypeDef RtcHandle;
+    RtcHandle.Instance = RTC;
+    return HAL_RTCEx_BKUPRead(&RtcHandle, BackupRegister);
+}
+
+
+/**
+ * 
+ */
+void rtc_write_backup_reg(uint32_t BackupRegister, uint32_t data) {
+    RTC_HandleTypeDef RtcHandle;
+    RtcHandle.Instance = RTC;
+    HAL_PWR_EnableBkUpAccess();
+    HAL_RTCEx_BKUPWrite(&RtcHandle, BackupRegister, data);
+    HAL_PWR_DisableBkUpAccess();
 }
 
 
