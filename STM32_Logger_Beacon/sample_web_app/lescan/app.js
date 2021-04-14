@@ -107,6 +107,10 @@ window.onload = function () {
  */
 buttonConnect.addEventListener( 'click', async function () {
 
+	// Spinner connect button
+	buttonConnect.disabled = true;
+	buttonConnect.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Connecting...';
+
 	// initialize display
 	clearTable();
 	initChart();
@@ -115,9 +119,6 @@ buttonConnect.addEventListener( 'click', async function () {
 	leafony.disableSleep();
 	await leafony.connect();
 
-	// Spinner connect button
-	buttonConnect.disabled = true;
-	buttonConnect.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Connecting...';
 } );
 
 
@@ -217,7 +218,10 @@ buttonCheckSave.addEventListener( 'click', function () {
  * Wake time submit button
  */
 buttonSubmitWake.addEventListener( 'click', function () {
-	sendCommand( 'setWake ' + toString(inputWakeText.value));
+	if (!inputWakeText.value){
+		return;
+	}
+	sendCommand( 'setWake ' + inputWakeText.value);
 } );
 
 
@@ -225,7 +229,10 @@ buttonSubmitWake.addEventListener( 'click', function () {
  * Sleep time submit button
  */
 buttonSubmitSleep.addEventListener( 'click', function () {
-	sendCommand( 'setSleep ' + toString(inputSleepText.value));
+	if (!inputSleepText.value){
+		return;
+	}
+	sendCommand( 'setSleep ' + inputSleepText.value);
 } );
 
 
@@ -233,7 +240,10 @@ buttonSubmitSleep.addEventListener( 'click', function () {
  * Sens frequency submit button
  */
 buttonSubmitSens.addEventListener( 'click', function () {
-	sendCommand( 'setSensFreq ' + toString(inputSensText.value));
+	if (!inputSensText.value) {
+		return;
+	}
+	sendCommand( 'setSensFreq ' + inputSensText.value);
 } );
 
 
@@ -241,7 +251,10 @@ buttonSubmitSens.addEventListener( 'click', function () {
  * Save frequency submit button
  */
 buttonSubmitSave.addEventListener( 'click', function () {
-	sendCommand( 'setSaveFreq ' + toString(inputSaveText.value));
+	if (!inputSaveText.value) {
+		return;
+	}
+	sendCommand( 'setSaveFreq ' + inputSaveText.value);
 } );
 
 

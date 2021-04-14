@@ -47,7 +47,7 @@
 // BLE Local device name
 // 長さは必ず6文字
 //=====================================================================
-const String FIRMWARE_VERSION = "2021.03.001";
+const String FIRMWARE_VERSION = "2021.04.002";
 
 //=====================================================================
 // BLE Local device name
@@ -67,16 +67,16 @@ const String strDeviceName = "Leaf_Z";
 //  SLEEP_INTERVAL : スリープ時間 (秒)
 //  WAKE_INTERVAL　：パケット送信時間 (秒)
 //=====================================================================
-#define SLEEP_INTERVAL 5
-#define WAKE_INTERVAL 10
+#define DEFAULT_SLEEP_INTERVAL 4
+#define DEFAULT_WAKE_INTERVAL 2
 
 //=====================================================================
 // センサ測定間隔、データ保存間隔の設定
-//  SLEEP_INTERVAL : スリープ時間 (秒)
-//  WAKE_INTERVAL　：パケット送信時間 (秒)
+//  DEFAULT_SENS_FREQ : センサON頻度
+//  DEFAULT_SAVE_RREQ ：データ保存頻度
 //=====================================================================
-#define SENS_FREQ 1
-#define SAVE_FREQ 1
+#define DEFAULT_SENS_FREQ 1
+#define DEFAULT_SAVE_FREQ 1
 
 //=====================================================================
 // IOピンの名前定義
@@ -154,8 +154,13 @@ bool bBleSendWakeInterval = false;
 
 // EEPROM Ring Buffer
 uint16_t rb_addr = 0; // EEPROMリングバッファのTAILアドレス
-const uint8_t RINGBUFF_OFFSET_ADDR = 2;
+const uint8_t RINGBUFF_OFFSET_ADDR = 14;
 const uint8_t PACKET_LENGTH = 12;
+
+uint16_t wake_intval = DEFAULT_WAKE_INTERVAL;  // Wake Time
+uint16_t sleep_intval = DEFAULT_SLEEP_INTERVAL; // Sleep Time
+uint16_t sens_freq = DEFAULT_SENS_FREQ;    // Sensor ON Frequency
+uint16_t save_freq = DEFAULT_SAVE_FREQ;   // Data Save Frequency
 
 
 //=====================================================================
@@ -482,9 +487,15 @@ void setupRingBuffer()
   rb_addr = getBackupRegister(RTC_BKP_DR3);
 
   // コントロールレジスタを読み出し
-  // wake_intval = EEPROM.read(2);
-  // sleep_intval = EEPROM.read(3);
-  // store_freq = EEPROM.read(4);
+  if (rtc.isTimeSet()){
+    #ifdef DEBUG
+      Serial.println("isTimeSet");
+    #endif
+    wake_intval  = EEPROM.read(0);
+    sleep_intval = EEPROM.read(1);
+    sens_freq    = EEPROM.read(2);
+    save_freq    = EEPROM.read(3);
+  }
 
   // アドレスが不正な場合初期化
   if (rb_addr >= EEPROM.length() || (rb_addr - RINGBUFF_OFFSET_ADDR) % PACKET_LENGTH != 0)
@@ -497,6 +508,14 @@ void setupRingBuffer()
   Serial.println(EEPROM.length());
   Serial.print("rb_addr = ");
   Serial.println(rb_addr);
+  Serial.print("WAKE_INTERVAL = ");
+  Serial.println(wake_intval);
+  Serial.print("SLEEP_INTERVAL = ");
+  Serial.println(sleep_intval);
+  Serial.print("SENS_FREQ = ");
+  Serial.println(sens_freq);
+  Serial.print("SAVE_FREQ = ");
+  Serial.println(save_freq);
 #endif
 }
 
@@ -627,12 +646,12 @@ void sleepAllDevices()
 
 #ifdef DEBUG
   Serial.print("STM32 deepsleep (restart after ");
-  Serial.print(SLEEP_INTERVAL);
+  Serial.print(sleep_intval);
   Serial.println(" seconds)");
   Serial.flush();
 #endif
 
-  LowPower.deepSleep(SLEEP_INTERVAL * 1000);
+  LowPower.deepSleep(sleep_intval * 1000);
 
 }
 
@@ -690,12 +709,12 @@ void loop()
     StartAdvData();
     #ifdef DEBUG
       Serial.print("Start advertising (");
-      Serial.print(WAKE_INTERVAL);
+      Serial.print(wake_intval);
       Serial.println("s)");
     #endif
 
     // Continue Advertising; (check BLE status every 0.1 secound.)
-    for (int i = 0; i < WAKE_INTERVAL * 10; i++)
+    for (int i = 0; i < wake_intval * 10; i++)
     {
       delay(100);
       ble112.checkActivity();
@@ -822,34 +841,69 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
   {
     // send SLEEP_INTERVAL
     char sendData[8];
-    uint8_t len = sprintf(sendData, "%05d", (int)SLEEP_INTERVAL);
+    uint8_t len = sprintf(sendData, "%05d", (int)sleep_intval);
     ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
   }
   else if (rcv_data.startsWith("getWake"))
   {
     // send WAKE_INTERVAL
     char sendData[8];
-    uint8_t len = sprintf(sendData, "%05d", (int)WAKE_INTERVAL);
+    uint8_t len = sprintf(sendData, "%05d", (int)wake_intval);
     ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
   }
   else if (rcv_data.startsWith("getSensFreq"))
   {
     // send SENS_FREQ
     char sendData[8];
-    uint8_t len = sprintf(sendData, "%05d", (int)SENS_FREQ);
+    uint8_t len = sprintf(sendData, "%05d", (int)sens_freq);
     ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
   }
   else if (rcv_data.startsWith("getSaveFreq"))
   {
     // send SAVE_FREQ
     char sendData[8];
-    uint8_t len = sprintf(sendData, "%05d", (int)SAVE_FREQ);
+    uint8_t len = sprintf(sendData, "%05d", (int)save_freq);
     ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
   }
   else if (rcv_data.startsWith("setSleep"))
   {
-    // set SLEEP_INTERVAL
-    // Serial.println(rcv_data.replace("setSleep ", ""));
+    // setSleep <SLEEP_INTERVAL>
+    uint8_t num = rcv_data.substring(9).toInt();
+    EEPROM.write(1, num); // sleep_intval
+    #ifdef DEBUG
+    Serial.print("setSleep ");
+    Serial.println(num);
+    #endif
+  }
+  else if (rcv_data.startsWith("setWake"))
+  {
+    // setWake
+    uint8_t num = rcv_data.substring(8).toInt();
+    EEPROM.write(0, num);  // wake_intval
+    #ifdef DEBUG
+    Serial.print("setWake ");
+    Serial.println(num);
+    #endif
+  }
+  else if (rcv_data.startsWith("setSensFreq"))
+  {
+    // setWake
+    uint8_t num = rcv_data.substring(12).toInt();
+    EEPROM.write(2, num);  // sens_freq
+    #ifdef DEBUG
+    Serial.print("setSensFreq ");
+    Serial.println(num);
+    #endif
+  }
+  else if (rcv_data.startsWith("setSaveFreq"))
+  {
+    // setWake
+    uint8_t num = rcv_data.substring(12).toInt();
+    EEPROM.write(3, num);  // save_freq
+    #ifdef DEBUG
+    Serial.print("setSaveFreq ");
+    Serial.println(num);
+    #endif
   }
   else if (rcv_data.startsWith("setData"))
   {
@@ -872,6 +926,11 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
     rtc.setHours(timestamp.hour());
     rtc.setMinutes(timestamp.minute());
     rtc.setSeconds(timestamp.second());
+
+    EEPROM.write(0, wake_intval);
+    EEPROM.write(1, sleep_intval);
+    EEPROM.write(2, sens_freq);
+    EEPROM.write(3, save_freq);
 
 #ifdef DEBUG
     Serial.println(unixtime);
