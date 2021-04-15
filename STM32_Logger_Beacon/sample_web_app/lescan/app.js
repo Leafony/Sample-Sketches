@@ -59,8 +59,8 @@ let recv_state; // string
 
 // Check OS
 const os = navigator.platform;
-const isAndroid = os.match(/Android/);
-const isMac = os.match(/Mac/);
+const isAndroid = /Android/.test(os);
+const isMac = /Mac/.test(os);
 const isScanningSupported = isAndroid || isMac;
 
 /**
