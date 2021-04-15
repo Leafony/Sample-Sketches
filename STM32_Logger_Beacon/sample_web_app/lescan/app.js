@@ -58,9 +58,10 @@ let array_time;
 let recv_state; // string
 
 // Check OS
-const os = navigator.platform;
-const isAndroid = /Android/.test(os);
-const isMac = /Mac/.test(os);
+const platform = navigator.platform;
+const isMac = /Mac/.test(platform);
+const userAgent = navigator.userAgent;
+const isAndroid = /Android/.test(userAgent);
 const isScanningSupported = isAndroid || isMac;
 
 /**
