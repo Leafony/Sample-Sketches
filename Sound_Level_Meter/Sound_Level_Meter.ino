@@ -14,8 +14,8 @@
 #define LED5            10
 #define LED6            11
 
-#define MIC             16      // A2
-#define VR              17      // A3
+#define MIC             A2
+#define VR              A3
 
 unsigned int dataVR;
 unsigned int dataMic;
