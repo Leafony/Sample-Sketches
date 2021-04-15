@@ -40,58 +40,35 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-md-12 text-center">
-        <p>1.  Press <b>Scan Beacon</b> button to start scanning beacon. (Android or Mac only. Please see <a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">the documentation</a>.)</p>
-        <button type="button" class="btn btn-primary" id="ble-lescan-button">Scan Beacon</button>
-        <button type="button" class="btn btn-danger" id="ble-lestop-button" style="display:none;">Stop Scan</button>
-        <hr>
-      </div>
-      <div class="col-md-12 text-center">
-        <p>2. Display updated when beacon packet is received.</p>
-        <p class="display-4" id="textDevNameLe">Device Name</p>
-        <p class="display-4" id="textTempLe">00.0℃</p>
-        <p class="display-4" id="textHumidLe" style="display:none;">00%</p>
-        <p class="display-4" id="textBattLe">0.00V</p>
-        <p class="font-weight-light" id="textTimeLe">Last Update: 0000/00/00 00:00:00</p>
-        <hr>
-      </div>
-      <div class="col-md-12 text-center">
-        <p>3. Push <b>Success!</b> when it successfully works.</p>
-        <a type="button" class="btn btn-success" href="#section-ble-connect">Success!</a>
-      </div>
-    </div>
+    <div class="row justify-content-center">
 
-    <hr>
-
-    <div class="row">
-      <div class="col-md-12 text-center" id="section-ble-connect">
-        <p>4. Press <b>Connect button</b> to connect to Leafony.</p>
+      <h2>Initialization & Start Logging</h2>
+      <div class="col-12 text-center" id="section-ble-connect">
+        <p>1. Press <b>Connect button</b> to connect to Leafony. At the first time, the current timestamp will be set on Leafony, and it starts logging sensors after BLE disconnected. Please disconnect once.</p>
+        <p>2. After a while, press <b>Connect button again</b>, then logging data is ready to read.</p>
         <button type="button" class="btn btn-primary" id="ble-connect-button">Connect</button>
         <button type="button" class="btn btn-danger" id="ble-disconnect-button" style="display:none;">Disconnect</button>
       </div>
 
-      <div class="col-md-12 text-center" id="section-ble-connect">
+      <div class="col-12 text-center" id="section-ble-connect">
         <b>Device Name: </b>
         <p id="textUniqueName"></p>
         <hr>
       </div>
 
-      <div class="col-md-12 text-center" id="section-ble-connect" style="display:none;">
+      <div class="col-12 text-center" id="section-ble-connect" style="display:none;">
         <button type="button" class="btn btn-primary" id="set-time-button">Set Time</button>
         <hr>
       </div>
 
-      <div class="col-md-12 text-center" id="section-ble-connect">
-        <p>5. Press <b>Get Data button</b> to read out flash memory on Leafony.</p>
+      <div class="col-12 text-center" id="section-ble-connect">
+        <p>2. Press <b>Get Data button</b> to read out flash memory on Leafony.</p>
         <button type="button" class="btn btn-primary" id="ble-get-button">Get Data</button>
         <hr>
       </div>
-    </div>
 
-    <div class="row">
-      <div class="col-md-12">
-        <p class="text-center">6. After a while, logged data is transported and charts are updated.</p>
+      <div class="col-12">
+        <p class="text-center">3. After a while, logged data is transported and charts are updated.</p>
       </div>
       <div class="col-xl-4">
         <h2 class="text-center">Temp & Humid Sensor</h2>
@@ -104,20 +81,19 @@
       <div class="col-xl-4">
         <h2 class="text-center">Battery ADC</h2>
         <div id="chart_batt"></div>
-        <hr>
       </div>
 
-      <div class="col-md-12 text-center">
-        <p>7. You can download the plots as a csv file.</p>
-        <button type="button" class="btn btn-primary badge-pill btn-lg btn-block" id="button-download"
+      <div class="col-12 text-center">
+        <hr>
+        <p>4. You can download the plots as a csv file.</p>
+        <button type="button" class="btn btn-primary" id="button-download"
          download="data.csv" href="#">Download All Plots as CSV</button>
         <hr>
       </div>
-    </div>
 
-    <div class="row">
-      <div class="col-sm-8 mx-auto">
+      <div class="col-12 mx-auto">
         <h2>Settings</h2>
+        <p>5. You can change the parameters during connecting.</p>
         <div class="alert alert-warning" role="alert" style="display:none;" id="alert-controller">
           Error: Connect to Leafony First!
           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -172,14 +148,30 @@
           <button class="btn btn-outline-secondary" type="button" id="submit-all-button">Submit All</button>
         </div>
       </div>
-    </div>
 
-    <hr>
 
-    <div class="row">
-      <div class="col-md-12 text-center" id="section-ble-connect">
-        <p>8. Press <b>Disconnect button</b> to disconnect to Leafony.</p>
+      <div id="feature-beacon">
+        <div class="col-12 text-center">
+          <p>6.  Press <b>Scan Beacon</b> button to start scanning beacon. (Android or Mac only. Please see <a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">the documentation</a>.)</p>
+          <button type="button" class="btn btn-primary" id="ble-lescan-button">Scan Beacon</button>
+          <button type="button" class="btn btn-danger" id="ble-lestop-button" style="display:none;">Stop Scan</button>
+          <hr>
+        </div>
+        <div class="col-12 text-center">
+          <p>7. Display updated when beacon packet is received.</p>
+          <p class="display-4" id="textDevNameLe">Device Name</p>
+          <p class="display-4" id="textTempLe">00.0℃</p>
+          <p class="display-4" id="textHumidLe" style="display:none;">00%</p>
+          <p class="display-4" id="textBattLe">0.00V</p>
+          <p class="font-weight-light" id="textTimeLe">Last Update: 0000/00/00 00:00:00</p>
+          <hr>
+        </div>
+        <div class="col-12 text-center">
+          <p>8. Push <b>Success!</b> when it successfully works.</p>
+          <a type="button" class="btn btn-success" href="#section-ble-connect">Success!</a>
+        </div>
       </div>
+
     </div>
 
     <hr>

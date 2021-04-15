@@ -50,7 +50,6 @@ const buttonSetTime  = document.getElementById('set-time-button');
 
 const buttonDownload = document.getElementById("button-download");
 
-
 let leafony;
 let chart_temp, chart_ilum, chart_batt;
 let array_temp, array_humd, array_ilum, array_batt;
@@ -58,11 +57,20 @@ let array_time;
 
 let recv_state; // string
 
+// Check OS
+const os = navigator.platform;
+const isAndroid = os.match(/Android/);
+const isMac = os.match(/Mac/);
+const isScanningSupported = isAndroid || isMac;
 
 /**
  * 
  */
 window.onload = function () {
+
+	if (!isScanningSupported) {
+		document.getElementById("feature-beacon").style.display = "none";
+	}
 
 	initChart();
 
@@ -644,6 +652,7 @@ buttonDownload.addEventListener( 'click', function () {
 	let bom_utf_8 = new Uint8Array( [ 0xEF, 0xBB, 0xBF ] );
 	let csvText = "";
 
+	// TODO: timestamp
 	for (var i = 0; i < array_temp.length; i++ ) {
 		csvText += String(i) + "," + array_temp[i] + "," +
 				   array_humd[i] + "," + array_ilum[i] + "," + array_batt[i] + '\n';
