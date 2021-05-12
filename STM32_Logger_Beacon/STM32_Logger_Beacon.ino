@@ -47,13 +47,13 @@
 // BLE Local device name
 // 長さは必ず6文字
 //=====================================================================
-const String FIRMWARE_VERSION = "2021.04.002";
+const String FIRMWARE_VERSION = "2021.05.012";
 
 //=====================================================================
 // BLE Local device name
 // 長さは必ず6文字
 //=====================================================================
-const String strDeviceName = "Leaf_Z";
+const String strDeviceName = "Leaf_A";
 
 //=====================================================================
 // シリアルコンソールへのデバック出力
@@ -67,8 +67,8 @@ const String strDeviceName = "Leaf_Z";
 //  SLEEP_INTERVAL : スリープ時間 (秒)
 //  WAKE_INTERVAL　：パケット送信時間 (秒)
 //=====================================================================
-#define DEFAULT_SLEEP_INTERVAL 4
-#define DEFAULT_WAKE_INTERVAL 2
+#define DEFAULT_SLEEP_INTERVAL 60
+#define DEFAULT_WAKE_INTERVAL 1
 
 //=====================================================================
 // センサ測定間隔、データ保存間隔の設定
@@ -96,6 +96,9 @@ const String strDeviceName = "Leaf_Z";
 // #define BLE_TX PC5
 // #define BLE_RX PC4
 
+#define INT_0 PC7
+#define INT_1 PB3
+
 //=====================================================================
 // プログラム内で使用する定数定義
 //
@@ -106,6 +109,14 @@ const String strDeviceName = "Leaf_Z";
 #define LCD_I2C_EXPANDER_ADDR 0x1A // LCD I2C Expander
 #define BATT_ADC_ADDR         0x50 // Battery ADC
 
+// Adjust this number for the sensitivity of the 'click' force
+// this strongly depend on the range! for 16G, try 5-10
+// for 8G, try 10-20. for 4G try 20-40. for 2G try 40-80
+#define CLICKTHRESHHOLD 80
+
+#define SINGLETAP 1
+#define DOUBLETAP 2
+
 // BLE states
 #define BLE_STATE_STANDBY          (0)
 #define BLE_STATE_SCANNING         (1)
@@ -113,6 +124,9 @@ const String strDeviceName = "Leaf_Z";
 #define BLE_STATE_CONNECTING       (3)
 #define BLE_STATE_CONNECTED_MASTER (4)
 #define BLE_STATE_CONNECTED_SLAVE  (5)
+
+// Baudrate
+#define SERIAL_BAUD 115200
 
 //=====================================================================
 // objects
@@ -162,11 +176,35 @@ uint16_t sleep_intval = DEFAULT_SLEEP_INTERVAL; // Sleep Time
 uint16_t sens_freq = DEFAULT_SENS_FREQ;    // Sensor ON Frequency
 uint16_t save_freq = DEFAULT_SAVE_FREQ;   // Data Save Frequency
 
+//----------------------------------------------
+// 加速度センサクリック割り込み
+//----------------------------------------------
+void onClicked() {
+  accel.setClick(0, 0); // INT disabled
 
-//=====================================================================
+  wakeupBLE();
+  StartAdvData();
+
+#ifdef DEBUG
+  Serial.println('STM32 on Clicked!');
+  Serial.print("Start advertising ");
+  Serial.print(5);
+  Serial.println(" seconds.");
+  Serial.flush();
+#endif
+
+  // Continue Advertising; (check BLE status every 0.1 secound.)
+  for (int i = 0; i < 5 * 10; i++)
+  {
+    delay(100);
+    ble112.checkActivity();
+  }
+}
+
+//----------------------------------------------
 // IOピンの入出力設定
 // 接続するリーフに合わせて設定する
-//=====================================================================
+//----------------------------------------------
 void setupPort()
 {
   pinMode(BLE_WAKEUP, OUTPUT);    // BLE Wakeup/Sleep
@@ -185,9 +223,17 @@ void setupSensor()
 
   // LIS2DH (accelerometer)
   accel.begin(LIS2DH_ADDRESS);
-  accel.setClick(0, 0);                    // Disable Interrupt
   accel.setRange(LIS3DH_RANGE_2_G);        // Full scale +/- 2G
-  accel.setDataRate(LIS3DH_DATARATE_1_HZ); // Data rate = 1Hz
+  // accel.setDataRate(LIS3DH_DATARATE_1_HZ); // Data rate = 1Hz
+  // accel.setClick(0, 0);                    // Disable Interrupt
+  accel.setClick(DOUBLETAP, CLICKTHRESHHOLD);
+
+  // enable interrupt from accelerometer click event
+  // attachInterrupt(INT_1, onClicked, RISING);
+  LowPower.attachInterruptWakeup(INT_1, onClicked, RISING, DEEP_SLEEP_MODE);
+
+  // start click interrupt
+  // accel.getClick();
 
   // HTS221 (temperature /humidity)
   smeHumidity.begin();
@@ -310,21 +356,21 @@ void StartAdvData()
 void getSensors()
 {
   // LIS2DH 3軸センサーのデータ取得
-  accel.read();
-  dataX_g = accel.x_g;
-  dataY_g = accel.y_g;
-  dataZ_g = accel.z_g;
+  // accel.read();
+  // dataX_g = accel.x_g;
+  // dataY_g = accel.y_g;
+  // dataZ_g = accel.z_g;
 
-  if (dataZ_g >= 1.0)
-  {
-    dataZ_g = 1.00;
-  }
-  else if (dataZ_g <= -1.0)
-  {
-    dataZ_g = -1.00;
-  }
+  // if (dataZ_g >= 1.0)
+  // {
+  //   dataZ_g = 1.00;
+  // }
+  // else if (dataZ_g <= -1.0)
+  // {
+  //   dataZ_g = -1.00;
+  // }
 
-  dataTilt = acos(dataZ_g) / PI * 180;
+  // dataTilt = acos(dataZ_g) / PI * 180;
 
   // HTS221 温湿度センサーデータ取得
   dataTemp = (float)smeHumidity.readTemperature();
@@ -365,8 +411,8 @@ void getSensors()
   Serial.println("  Tmp[degC]     = " + String(dataTemp));
   Serial.println("  Hum[%]        = " + String(dataHumid));
   Serial.println("  Lum[lx]       = " + String(dataLight));
-  Serial.println("  Accel X,Y,Z   = " + String(dataX_g) + " " + String(dataY_g) + " " + String(dataZ_g));
-  Serial.println("  Ang[arc deg]  = " + String(dataTilt));
+  // Serial.println("  Accel X,Y,Z   = " + String(dataX_g) + " " + String(dataY_g) + " " + String(dataZ_g));
+  // Serial.println("  Ang[arc deg]  = " + String(dataTilt));
   Serial.println("  Bat[V]        = " + String(dataBatt));
   Serial.println("");
 #endif
@@ -380,7 +426,7 @@ void getSensors()
 void sleepSensors()
 {
   // LIS2DH sleep
-  accel.setDataRate(LIS3DH_DATARATE_POWERDOWN);
+  // accel.setDataRate(LIS3DH_DATARATE_POWERDOWN);
 
   // HTS221 sleep
   smeHumidity.deactivate();
@@ -409,7 +455,7 @@ void wakeupSensors()
 #endif
 
   // LIS2DH wakeup
-  accel.setDataRate(LIS3DH_DATARATE_1_HZ);
+  // accel.setDataRate(LIS3DH_DATARATE_1_HZ);
 
   // HTS221 wakeup
   smeHumidity.activate();
@@ -661,7 +707,7 @@ void sleepAllDevices()
  */
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(SERIAL_BAUD);
   LowPower.begin(); // Configure low power
 
   Wire.begin(); // I2C 100KHz
@@ -724,6 +770,8 @@ void loop()
     // when the connection is not requested, shutdown all devices during SLEEP_INTERVAL seconds;
     if (!bBleConnected)
     {
+      // accel.setClick(DOUBLETAP, CLICKTHRESHHOLD); // Enable Interrupt
+      accel.getClick();  // Enable Interrupt
       sleepAllDevices();
     }
   } else
