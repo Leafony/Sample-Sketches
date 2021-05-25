@@ -67,8 +67,8 @@ const String strDeviceName = "Leaf_A";
 //  SLEEP_INTERVAL : スリープ時間 (秒)
 //  WAKE_INTERVAL　：パケット送信時間 (秒)
 //=====================================================================
-#define DEFAULT_SLEEP_INTERVAL 60
-#define DEFAULT_WAKE_INTERVAL 1
+#define DEFAULT_SLEEP_INTERVAL 10
+#define DEFAULT_WAKE_INTERVAL 0
 
 //=====================================================================
 // センサ測定間隔、データ保存間隔の設定
@@ -760,7 +760,7 @@ void loop()
     #endif
 
     // Continue Advertising; (check BLE status every 0.1 secound.)
-    for (int i = 0; i < wake_intval * 10; i++)
+    for (int i = 0; i <= wake_intval * 10; i++)
     {
       delay(100);
       ble112.checkActivity();
@@ -918,6 +918,7 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
     // setSleep <SLEEP_INTERVAL>
     uint8_t num = rcv_data.substring(9).toInt();
     EEPROM.write(1, num); // sleep_intval
+    sleep_intval = num;
     #ifdef DEBUG
     Serial.print("setSleep ");
     Serial.println(num);
@@ -928,6 +929,7 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
     // setWake
     uint8_t num = rcv_data.substring(8).toInt();
     EEPROM.write(0, num);  // wake_intval
+    wake_intval = num;
     #ifdef DEBUG
     Serial.print("setWake ");
     Serial.println(num);
