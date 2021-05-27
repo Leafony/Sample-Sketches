@@ -213,51 +213,6 @@ void setupPort()
 
 
 //-----------------------------------------------
-// sensor
-//-----------------------------------------------
-void setupSensor()
-{
-#ifdef DEBUG
-  Serial.println("setupSensor()");
-#endif
-
-  // LIS2DH (accelerometer)
-  accel.begin(LIS2DH_ADDRESS);
-  accel.setRange(LIS3DH_RANGE_2_G);        // Full scale +/- 2G
-  // accel.setDataRate(LIS3DH_DATARATE_1_HZ); // Data rate = 1Hz
-  // accel.setClick(0, 0);                    // Disable Interrupt
-  accel.setClick(DOUBLETAP, CLICKTHRESHHOLD);
-
-  // enable interrupt from accelerometer click event
-  // attachInterrupt(INT_1, onClicked, RISING);
-  LowPower.attachInterruptWakeup(INT_1, onClicked, RISING, DEEP_SLEEP_MODE);
-
-  // start click interrupt
-  // accel.getClick();
-
-  // HTS221 (temperature /humidity)
-  smeHumidity.begin();
-
-  // OPT3001 (light)
-  OPT3001_Config newConfig;
-  OPT3001_ErrorCode errorConfig;
-  light.begin(OPT3001_ADDRESS);
-
-  newConfig.RangeNumber = B1100;             // automatic full scale
-  newConfig.ConvertionTime = B1;             // convertion time = 800ms
-  newConfig.ModeOfConversionOperation = B11; // continous conversion
-  newConfig.Latch = B0;                      // hysteresis-style
-
-  errorConfig = light.writeConfig(newConfig);
-
-  if (errorConfig != NO_ERROR)
-  {
-    errorConfig = light.writeConfig(newConfig); //retry
-  }
-}
-
-
-//-----------------------------------------------
 // BLE
 //-----------------------------------------------
 void setupBLE()
@@ -350,39 +305,57 @@ void StartAdvData()
 }
 
 
+//-----------------------------------------------
+// sensor
+//-----------------------------------------------
+void setupSensor()
+{
+#ifdef DEBUG
+  Serial.println("setupSensor()");
+#endif
+
+  // LIS2DH (accelerometer)
+  accel.begin(LIS2DH_ADDRESS);
+  accel.setRange(LIS3DH_RANGE_2_G);        // Full scale +/- 2G
+  accel.setClick(DOUBLETAP, CLICKTHRESHHOLD);
+
+  // enable interrupt from accelerometer click event
+  LowPower.attachInterruptWakeup(INT_1, onClicked, RISING, DEEP_SLEEP_MODE);
+
+  // HTS221 (temperature /humidity)
+  smeHumidity.begin();
+
+  // OPT3001 (light)
+  OPT3001_Config newConfig;
+  OPT3001_ErrorCode errorConfig;
+  light.begin(OPT3001_ADDRESS);
+
+  newConfig.RangeNumber = B1100;             // automatic full scale
+  newConfig.ConvertionTime = B0;             // convertion time = 100ms
+  newConfig.ModeOfConversionOperation = B01; // single-shot conversion
+  newConfig.Latch = B0;                      // hysteresis-style
+
+  errorConfig = light.writeConfig(newConfig);
+
+  if (errorConfig != NO_ERROR)
+  {
+    Serial.println("error");
+  }
+}
+
+
 //--------------------------------------------------------------------
 // センサの値を取得
 //--------------------------------------------------------------------
 void getSensors()
 {
-  // LIS2DH 3軸センサーのデータ取得
-  // accel.read();
-  // dataX_g = accel.x_g;
-  // dataY_g = accel.y_g;
-  // dataZ_g = accel.z_g;
-
-  // if (dataZ_g >= 1.0)
-  // {
-  //   dataZ_g = 1.00;
-  // }
-  // else if (dataZ_g <= -1.0)
-  // {
-  //   dataZ_g = -1.00;
-  // }
-
-  // dataTilt = acos(dataZ_g) / PI * 180;
-
   // HTS221 温湿度センサーデータ取得
   dataTemp = (float)smeHumidity.readTemperature();
   dataHumid = (float)smeHumidity.readHumidity();
 
   // OPT3001 照度センサーデータ取得
   OPT3001 result = light.readResult();
-
-  if (result.error == NO_ERROR)
-  {
-    dataLight = result.lux;
-  }
+  dataLight = result.lux;
 
   // ADC081C027（ADC) 電池リーフ電池電圧取得
   uint8_t adcVal1 = 0;
@@ -425,9 +398,6 @@ void getSensors()
 //-----------------------------------------
 void sleepSensors()
 {
-  // LIS2DH sleep
-  // accel.setDataRate(LIS3DH_DATARATE_POWERDOWN);
-
   // HTS221 sleep
   smeHumidity.deactivate();
 
@@ -439,7 +409,7 @@ void sleepSensors()
   errorConfig = light.writeConfig(newConfig);
   if (errorConfig != NO_ERROR)
   {
-    errorConfig = light.writeConfig(newConfig);
+    Serial.println("error");
   }
 }
 
@@ -454,25 +424,17 @@ void wakeupSensors()
   Serial.println(F("Wakeup Senser"));
 #endif
 
-  // LIS2DH wakeup
-  // accel.setDataRate(LIS3DH_DATARATE_1_HZ);
-
   // HTS221 wakeup
   smeHumidity.activate();
 
   // OPT3001 wakeup
   OPT3001_Config newConfig;
   OPT3001_ErrorCode errorConfig;
-
-  newConfig.RangeNumber = B1100;             //automatic full scale
-  newConfig.ConvertionTime = B1;             //convertion time = 800ms
-  newConfig.ModeOfConversionOperation = B11; //continous conversion
-  newConfig.Latch = B1;                      //latch window style
-
+  newConfig.ModeOfConversionOperation = B01; //single-shot conversion
   errorConfig = light.writeConfig(newConfig);
   if (errorConfig != NO_ERROR)
   {
-    errorConfig = light.writeConfig(newConfig); //retry
+    Serial.println("error");
   }
 }
 
@@ -1083,6 +1045,9 @@ void my_rsp_system_get_bt_address(const struct ble_msg_system_get_bt_address_rsp
   unsigned short addr = 0;
   char cAddr[30];
   addr = msg->address.addr[0] + (msg->address.addr[1] * 0x100);
-  sprintf(cAddr, "Device name is Leaf_A_#%05d ", addr);
+  sprintf(cAddr, "#%05d", addr);
+  Serial.print("Device name is ");
+  Serial.print(strDeviceName);
+  Serial.print("_");
   Serial.println(cAddr);
 }
