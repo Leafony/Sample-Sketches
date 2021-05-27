@@ -548,7 +548,7 @@ function onStateChange(state) {
 			buttonGetData.innerHTML = 'Get Data';
 			buttonGetData.disabled = false;
 
-			array_time.pop(); // TODO: [bugfix] "finish"が保存されてしまうのを解決する
+			array_time.pop();
 			array_temp.pop();
 			array_humd.pop();
 			array_ilum.pop();
@@ -651,7 +651,8 @@ async function sendCommand( command ) {
 buttonDownload.addEventListener( 'click', function () {
 
 	let bom_utf_8 = new Uint8Array( [ 0xEF, 0xBB, 0xBF ] );
-	let csvText = "timestamp,temperature,humidity,illuminance,battery_voltage\n";
+	let csvText = "";
+	// let csvText = "timestamp,temperature,humidity,illuminance,battery_voltage\n";
 
 	for (var i = 0; i < array_temp.length; i++ ) {
 		csvText += array_time[i] + "," + array_temp[i] + "," +
