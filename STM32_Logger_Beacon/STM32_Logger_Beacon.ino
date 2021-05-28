@@ -176,10 +176,15 @@ uint16_t sleep_intval = DEFAULT_SLEEP_INTERVAL; // Sleep Time
 uint16_t sens_freq = DEFAULT_SENS_FREQ;    // Sensor ON Frequency
 uint16_t save_freq = DEFAULT_SAVE_FREQ;   // Data Save Frequency
 
+// On-Click Interrupt
+bool onClickedFlag = false;
+
 //----------------------------------------------
 // 加速度センサクリック割り込み
 //----------------------------------------------
 void onClicked() {
+  onClickedFlag = true;
+  /*
   accel.setClick(0, 0); // INT disabled
 
   wakeupBLE();
@@ -199,6 +204,7 @@ void onClicked() {
     delay(100);
     ble112.checkActivity();
   }
+  */
 }
 
 //----------------------------------------------
@@ -311,7 +317,7 @@ void StartAdvData()
 void setupSensor()
 {
 #ifdef DEBUG
-  Serial.println("setupSensor()");
+  Serial.println("Initializing sensors...");
 #endif
 
   // LIS2DH (accelerometer)
@@ -329,18 +335,15 @@ void setupSensor()
   OPT3001_Config newConfig;
   OPT3001_ErrorCode errorConfig;
   light.begin(OPT3001_ADDRESS);
-
   newConfig.RangeNumber = B1100;             // automatic full scale
   newConfig.ConvertionTime = B0;             // convertion time = 100ms
   newConfig.ModeOfConversionOperation = B01; // single-shot conversion
   newConfig.Latch = B0;                      // hysteresis-style
-
   errorConfig = light.writeConfig(newConfig);
 
-  if (errorConfig != NO_ERROR)
-  {
-    Serial.println("error");
-  }
+#ifdef DEBUG
+  Serial.println("Sensors initialized.");
+#endif
 }
 
 
@@ -349,7 +352,8 @@ void setupSensor()
 //--------------------------------------------------------------------
 void getSensors()
 {
-  // HTS221 温湿度センサーデータ取得
+  // HTS221 (temperature /humidity)
+  smeHumidity.begin();
   dataTemp = (float)smeHumidity.readTemperature();
   dataHumid = (float)smeHumidity.readHumidity();
 
@@ -407,10 +411,6 @@ void sleepSensors()
 
   newConfig.ModeOfConversionOperation = B00;
   errorConfig = light.writeConfig(newConfig);
-  if (errorConfig != NO_ERROR)
-  {
-    Serial.println("error");
-  }
 }
 
 
@@ -421,7 +421,7 @@ void sleepSensors()
 void wakeupSensors()
 {
 #ifdef DEBUG
-  Serial.println(F("Wakeup Senser"));
+  Serial.println(F("Wakeup Sensors."));
 #endif
 
   // HTS221 wakeup
@@ -432,10 +432,6 @@ void wakeupSensors()
   OPT3001_ErrorCode errorConfig;
   newConfig.ModeOfConversionOperation = B01; //single-shot conversion
   errorConfig = light.writeConfig(newConfig);
-  if (errorConfig != NO_ERROR)
-  {
-    Serial.println("error");
-  }
 }
 
 
@@ -496,9 +492,6 @@ void setupRingBuffer()
 
   // コントロールレジスタを読み出し
   if (rtc.isTimeSet()){
-    #ifdef DEBUG
-      Serial.println("isTimeSet");
-    #endif
     wake_intval  = EEPROM.read(0);
     sleep_intval = EEPROM.read(1);
     sens_freq    = EEPROM.read(2);
@@ -512,18 +505,20 @@ void setupRingBuffer()
   }
 
 #ifdef DEBUG
-  Serial.print("EEPROM length = ");
+  Serial.print("EEPROM length: ");
   Serial.println(EEPROM.length());
-  Serial.print("rb_addr = ");
+  Serial.print("Ring buffer read address: ");
   Serial.println(rb_addr);
-  Serial.print("WAKE_INTERVAL = ");
-  Serial.println(wake_intval);
-  Serial.print("SLEEP_INTERVAL = ");
-  Serial.println(sleep_intval);
-  Serial.print("SENS_FREQ = ");
-  Serial.println(sens_freq);
-  Serial.print("SAVE_FREQ = ");
-  Serial.println(save_freq);
+  Serial.print("WAKE_INTERVAL: ");
+  Serial.print(wake_intval);
+  Serial.println(" seconds");
+  Serial.print("SLEEP_INTERVAL: ");
+  Serial.print(sleep_intval);
+  Serial.println(" seconds");
+  // Serial.print("SENS_FREQ = ");
+  // Serial.println(sens_freq);
+  // Serial.print("SAVE_FREQ = ");
+  // Serial.println(save_freq);
 #endif
 }
 
@@ -543,9 +538,10 @@ void writeEEPROM()
   }
 
 #ifdef DEBUG
+  Serial.println("");
   Serial.print("writeEEPROM(): ADDR=");
   Serial.print(rb_addr);
-  Serial.print(" timestamp=");
+  Serial.print(", timestamp=");
   Serial.println(u_time);
 #endif
 
@@ -573,7 +569,7 @@ void writeEEPROM()
   setBackupRegister(RTC_BKP_DR3, rb_addr);
 
 #ifdef DEBUG
-  Serial.print("temp = ");
+  Serial.print("{ temp = ");
   Serial.print(temp);
   Serial.print(", humid = ");
   Serial.print(humid);
@@ -581,8 +577,10 @@ void writeEEPROM()
   Serial.print(illum);
   Serial.print(", batt = ");
   Serial.println(battVolt);
-  Serial.print("next addr = ");
+  Serial.println(" }");
+  Serial.print("Next ringbuffer address: ");
   Serial.println(rb_addr);
+  Serial.println("");
 #endif
 }
 
@@ -600,7 +598,7 @@ uint32_t getTimestamp() {
     uint8_t seconds = rtc.getSeconds();
 
 #ifdef DEBUG
-  Serial.print("getTimestamp(): Now ");
+  Serial.print("RTC Timestamp: ");
   Serial.print(year + 2000);
   Serial.print("/");
   Serial.print(month);
@@ -675,14 +673,20 @@ void setup()
   Wire.begin(); // I2C 100KHz
   rtc.begin(); // initialize RTC 24H format
 
-#ifdef DEBUG
-  Serial.println("<<< Wake up <<<");
-  Serial.println("=========================================");
-  Serial.println("setup start");
-#endif
+  #ifdef DEBUG
+    Serial.println("=========================================");
+    Serial.println("Setup start.");
+  #endif
 
   setupPort();
+  setupRingBuffer();
+  setupSensor();
+  setupBLE();
 
+  #ifdef DEBUG
+    Serial.println("Setup finished.");
+    Serial.println("=========================================");
+  #endif
 }
 
 
@@ -693,14 +697,8 @@ void loop()
 {
   if (!bBleConnected)
   { // when BLE is not connected.
-    setupRingBuffer();
-
-    setupSensor();
-    setupBLE();
-
     #ifdef DEBUG
-      Serial.println("setup end");
-      Serial.println("=========================================");
+      Serial.println("<<< Wake up <<<");
     #endif
 
     wakeupBLE();
@@ -715,19 +713,39 @@ void loop()
     }
 
     StartAdvData();
-    #ifdef DEBUG
-      Serial.print("Start advertising (");
-      Serial.print(wake_intval);
-      Serial.println("s)");
-    #endif
 
-    // Continue Advertising; (check BLE status every 0.1 secound.)
-    for (int i = 0; i <= wake_intval * 10; i++)
-    {
-      delay(100);
-      ble112.checkActivity();
+    if (onClickedFlag) {
+      // onClicked Interrupt
+      onClickedFlag = false;
+      #ifdef DEBUG
+        Serial.println('STM32 on Clicked!');
+        Serial.print("Start advertising ");
+        Serial.print(5);
+        Serial.println(" seconds.");
+        Serial.flush();
+      #endif
+
+      // Continue Advertising; (check BLE status every 0.1 secound.)
+      for (int i = 0; i < 5 * 10; i++)
+      {
+        delay(100);
+        ble112.checkActivity();
+      }
+    } else {  // Normal operation
+      #ifdef DEBUG
+        Serial.print("Start advertising (");
+        Serial.print(wake_intval);
+        Serial.println("s)");
+      #endif
+
+      // Continue Advertising; (check BLE status every 0.1 secound.)
+      for (int i = 0; i <= wake_intval * 10; i++)
+      {
+        delay(100);
+        ble112.checkActivity();
+      }
+      // bBleConnected turns true at this time, when the connection is requested;
     }
-    // bBleConnected turns true at this time, when the connection is requested;
 
     // when the connection is not requested, shutdown all devices during SLEEP_INTERVAL seconds;
     if (!bBleConnected)
@@ -773,7 +791,6 @@ void loop()
       ble112.checkActivity(100);
     }
   }
-
 }
 
 
