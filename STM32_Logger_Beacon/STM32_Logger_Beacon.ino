@@ -44,16 +44,14 @@
 #include "TBGLib.h"
 
 //=====================================================================
-// BLE Local device name
-// 長さは必ず6文字
+// Sketch firmware version
 //=====================================================================
-const String FIRMWARE_VERSION = "2021.05.012";
+const String FIRMWARE_VERSION = "2021.05.280";
 
 //=====================================================================
 // BLE Local device name
-// 長さは必ず6文字
 //=====================================================================
-const String strDeviceName = "Leaf_A";
+const String strDeviceName = "Leaf_AB";
 
 //=====================================================================
 // シリアルコンソールへのデバック出力
@@ -75,27 +73,28 @@ const String strDeviceName = "Leaf_A";
 //  DEFAULT_SENS_FREQ : センサON頻度
 //  DEFAULT_SAVE_RREQ ：データ保存頻度
 //=====================================================================
-#define DEFAULT_SENS_FREQ 1
-#define DEFAULT_SAVE_FREQ 1
+#define DEFAULT_SENS_FREQ 1 // TODO: implement dynamic sens frequency
+#define DEFAULT_SAVE_FREQ 1 // TODO: implement dynamic save frequency
 
 //=====================================================================
-// IOピンの名前定義
+// IO pins definition
 //=====================================================================
-// 29-pinの場合
+// for STM32 29-pin leaf
 #define BLE_WAKEUP PB12 // D7   PB12
 #define BLE_RX PA0      // [A2] PA1
 #define BLE_TX PA1      // [A1] PA0
 
-// // 58-pin Bus-Aに接続する場合
+// for STM32 58-pin leaf Bus-A
 // #define BLE_WAKEUP PA8
 // #define BLE_TX PA1
 // #define BLE_RX PA0
 
-// // 58-pin Bus-Bに接続する場合
+// for STM32 58-pin leaf Bus-B
 // #define BLE_WAKEUP PB11
 // #define BLE_TX PC5
 // #define BLE_RX PC4
 
+// Interrupt pins
 #define INT_0 PC7
 #define INT_1 PB3
 
@@ -166,50 +165,28 @@ bool bBleSendData = false;
 bool bBleSendSleepInterval = false;
 bool bBleSendWakeInterval = false;
 
-// EEPROM Ring Buffer
-uint16_t rb_addr = 0; // EEPROMリングバッファのTAILアドレス
+// EEPROM ringbuffer
+uint16_t rb_addr = 0;  // ringbuffer read address
 const uint8_t RINGBUFF_OFFSET_ADDR = 14;
 const uint8_t PACKET_LENGTH = 12;
 
-uint16_t wake_intval = DEFAULT_WAKE_INTERVAL;  // Wake Time
+uint16_t wake_intval = DEFAULT_WAKE_INTERVAL;   // Wake Time
 uint16_t sleep_intval = DEFAULT_SLEEP_INTERVAL; // Sleep Time
-uint16_t sens_freq = DEFAULT_SENS_FREQ;    // Sensor ON Frequency
-uint16_t save_freq = DEFAULT_SAVE_FREQ;   // Data Save Frequency
+uint16_t sens_freq = DEFAULT_SENS_FREQ;         // Sensor ON Frequency
+uint16_t save_freq = DEFAULT_SAVE_FREQ;         // Data Save Frequency
 
 // On-Click Interrupt
 bool onClickedFlag = false;
 
 //----------------------------------------------
-// 加速度センサクリック割り込み
+// Accelerometer double-tap interrupt
 //----------------------------------------------
 void onClicked() {
   onClickedFlag = true;
-  /*
-  accel.setClick(0, 0); // INT disabled
-
-  wakeupBLE();
-  StartAdvData();
-
-#ifdef DEBUG
-  Serial.println('STM32 on Clicked!');
-  Serial.print("Start advertising ");
-  Serial.print(5);
-  Serial.println(" seconds.");
-  Serial.flush();
-#endif
-
-  // Continue Advertising; (check BLE status every 0.1 secound.)
-  for (int i = 0; i < 5 * 10; i++)
-  {
-    delay(100);
-    ble112.checkActivity();
-  }
-  */
 }
 
 //----------------------------------------------
-// IOピンの入出力設定
-// 接続するリーフに合わせて設定する
+// IO ports initialization
 //----------------------------------------------
 void setupPort()
 {
@@ -219,7 +196,7 @@ void setupPort()
 
 
 //-----------------------------------------------
-// BLE
+// BLE initialization
 //-----------------------------------------------
 void setupBLE()
 {
@@ -261,7 +238,7 @@ void setupBLE()
 
 
 //-----------------------------------------------
-// アドバタイズするデータの設定
+// BLE Advertising data configuration
 //-----------------------------------------------
 void StartAdvData()
 {
@@ -312,7 +289,7 @@ void StartAdvData()
 
 
 //-----------------------------------------------
-// sensor
+// Sensors initialization
 //-----------------------------------------------
 void setupSensor()
 {
@@ -348,7 +325,7 @@ void setupSensor()
 
 
 //--------------------------------------------------------------------
-// センサの値を取得
+// Get sensors values
 //--------------------------------------------------------------------
 void getSensors()
 {
@@ -388,8 +365,6 @@ void getSensors()
   Serial.println("  Tmp[degC]     = " + String(dataTemp));
   Serial.println("  Hum[%]        = " + String(dataHumid));
   Serial.println("  Lum[lx]       = " + String(dataLight));
-  // Serial.println("  Accel X,Y,Z   = " + String(dataX_g) + " " + String(dataY_g) + " " + String(dataZ_g));
-  // Serial.println("  Ang[arc deg]  = " + String(dataTilt));
   Serial.println("  Bat[V]        = " + String(dataBatt));
   Serial.println("");
 #endif
@@ -452,9 +427,6 @@ void sleepBLE()
   ble112.ble_cmd_system_halt(1);
   while (ble112.checkActivity())
     ;
-
-  // digitalWrite(BLE_WAKEUP, LOW);
-  // delay(500);
 }
 
 
