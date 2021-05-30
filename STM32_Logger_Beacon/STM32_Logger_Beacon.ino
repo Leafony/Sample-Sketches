@@ -548,7 +548,7 @@ void writeEEPROM()
   Serial.print(", illum = ");
   Serial.print(illum);
   Serial.print(", batt = ");
-  Serial.println(battVolt);
+  Serial.print(battVolt);
   Serial.println(" }");
   Serial.print("Next ringbuffer address: ");
   Serial.println(rb_addr);
@@ -686,8 +686,7 @@ void loop()
 
     StartAdvData();
 
-    if (onClickedFlag) {
-      // onClicked Interrupt
+    if (onClickedFlag) {  // onClicked Interrupt
       onClickedFlag = false;
       #ifdef DEBUG
         Serial.println('STM32 on Clicked!');
