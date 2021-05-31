@@ -66,6 +66,7 @@ const String strDeviceName = "Leaf_AB";
 //  WAKE_INTERVAL　：パケット送信時間 (秒)
 //=====================================================================
 #define DEFAULT_SLEEP_INTERVAL 10
+#define DEFAULT_CLICK_WAKE_INTERVAL 20
 #define DEFAULT_WAKE_INTERVAL 0
 
 //=====================================================================
@@ -83,20 +84,22 @@ const String strDeviceName = "Leaf_AB";
 #define BLE_WAKEUP PB12 // D7   PB12
 #define BLE_RX PA0      // [A2] PA1
 #define BLE_TX PA1      // [A1] PA0
+#define INT_0 PC7       // INT0
+#define INT_1 PB3       // INT1
 
 // for STM32 58-pin leaf Bus-A
 // #define BLE_WAKEUP PA8
 // #define BLE_TX PA1
 // #define BLE_RX PA0
+// #define INT_0 PC7
+// #define INT_1 PB3
 
 // for STM32 58-pin leaf Bus-B
 // #define BLE_WAKEUP PB11
 // #define BLE_TX PC5
 // #define BLE_RX PC4
-
-// Interrupt pins
-#define INT_0 PC7
-#define INT_1 PB3
+// #define INT_0 PC7
+// #define INT_1 PB3
 
 //=====================================================================
 // プログラム内で使用する定数定義
@@ -112,7 +115,6 @@ const String strDeviceName = "Leaf_AB";
 // this strongly depend on the range! for 16G, try 5-10
 // for 8G, try 10-20. for 4G try 20-40. for 2G try 40-80
 #define CLICKTHRESHHOLD 80
-
 #define SINGLETAP 1
 #define DOUBLETAP 2
 
@@ -140,6 +142,7 @@ BGLib ble112((HardwareSerial *)&Serialble, 0, 0);
 
 // RTC
 STM32RTC& rtc = STM32RTC::getInstance();
+
 //=====================================================================
 // Variables
 //=====================================================================
@@ -170,10 +173,11 @@ uint16_t rb_addr = 0;  // ringbuffer read address
 const uint8_t RINGBUFF_OFFSET_ADDR = 14;
 const uint8_t PACKET_LENGTH = 12;
 
-uint16_t wake_intval = DEFAULT_WAKE_INTERVAL;   // Wake Time
-uint16_t sleep_intval = DEFAULT_SLEEP_INTERVAL; // Sleep Time
-uint16_t sens_freq = DEFAULT_SENS_FREQ;         // Sensor ON Frequency
-uint16_t save_freq = DEFAULT_SAVE_FREQ;         // Data Save Frequency
+uint16_t wake_intval = DEFAULT_WAKE_INTERVAL;   // Wake time
+uint16_t click_wake_intval = DEFAULT_CLICK_WAKE_INTERVAL;  // Click interrupt wake time
+uint16_t sleep_intval = DEFAULT_SLEEP_INTERVAL; // Sleep time
+uint16_t sens_freq = DEFAULT_SENS_FREQ;         // Sensor ON frequency
+uint16_t save_freq = DEFAULT_SAVE_FREQ;         // Data save frequency
 
 // On-Click Interrupt
 bool onClickedFlag = false;
@@ -188,8 +192,7 @@ void onClicked() {
 //----------------------------------------------
 // IO ports initialization
 //----------------------------------------------
-void setupPort()
-{
+void setupPort() {
   pinMode(BLE_WAKEUP, OUTPUT);    // BLE Wakeup/Sleep
   digitalWrite(BLE_WAKEUP, HIGH); // BLE Wakeup
 }
@@ -198,8 +201,7 @@ void setupPort()
 //-----------------------------------------------
 // BLE initialization
 //-----------------------------------------------
-void setupBLE()
-{
+void setupBLE() {
 #ifdef DEBUG
   Serial.println("setupBLE()");
 #endif
@@ -218,30 +220,26 @@ void setupBLE()
 
   Serialble.begin(9600);
 
-  while (!bSystemBootBle)
-  {
+  while (!bSystemBootBle) {
     ble112.checkActivity(100);
   }
 
-  // ble_rsp_system_get_bt_addressハンドラが呼び出される
+  // ble_rsp_system_get_bt_address handler is called.
   ble112.ble_cmd_system_get_bt_address();
-  while (ble112.checkActivity(100))
-    ;
+  while (ble112.checkActivity(100));
 
-  // advertising parametersを設定
+  // set advertising parameters
   //  interval_min : 250ms( = 400 x 0.625ms )
   //  interval_max : 500ms( = 800 x 0.625ms )
   ble112.ble_cmd_le_gap_set_adv_parameters(400, 800, 7); /* [BGLIB] <interval_min> <interval_max> <channel_map> */
-  while (ble112.checkActivity(100))
-    ;
+  while (ble112.checkActivity(100));
 }
 
 
 //-----------------------------------------------
 // BLE Advertising data configuration
 //-----------------------------------------------
-void StartAdvData()
-{
+void StartAdvData() {
   char charTemp[7], charHumid[7], charBatt[7];
   char userData[15];
   uint8_t dataLen;
@@ -257,8 +255,7 @@ void StartAdvData()
   // AD Structure 2 (Complete Local Name)
   adv_data[index++] = strDeviceName.length() + 1;           // field length
   adv_data[index++] = BGLIB_GAP_AD_TYPE_LOCALNAME_COMPLETE; // AD Type (Complete Local Name)
-  for (uint8_t i = 0; i < strDeviceName.length(); i++)
-  {
+  for (uint8_t i = 0; i < strDeviceName.length(); i++) {
     adv_data[index++] = strDeviceName.charAt(i); // Local Name
   }
 
@@ -270,37 +267,33 @@ void StartAdvData()
   adv_data[index++] = dataLen + 1; // field lengh
   adv_data[index++] = 0xff;        // AD Type (Manufacturer Specific Data)
 
-  for (uint8_t i = 0; i < dataLen; i++)
-  {
+  for (uint8_t i = 0; i < dataLen; i++) {
     adv_data[index++] = userData[i]; // User Data
   }
 
   // register advertising packet
   stLen = index;
   ble112.ble_cmd_le_gap_set_adv_data(SCAN_RSP_ADVERTISING_PACKETS, stLen, adv_data);
-  while (ble112.checkActivity(1000))
-    ;
+  while (ble112.checkActivity(1000));
 
   // index = 0  LE_GAP_SCANNABLE_NON_CONNECTABLE / LE_GAP_UNDIRECTED_CONNECTABLE
   ble112.ble_cmd_le_gap_start_advertising(0, LE_GAP_USER_DATA, LE_GAP_UNDIRECTED_CONNECTABLE);
-  while (ble112.checkActivity(1000))
-    ;
+  while (ble112.checkActivity(1000));
 }
 
 
 //-----------------------------------------------
 // Sensors initialization
 //-----------------------------------------------
-void setupSensor()
-{
+void setupSensors() {
 #ifdef DEBUG
   Serial.println("Initializing sensors...");
 #endif
 
   // LIS2DH (accelerometer)
   accel.begin(LIS2DH_ADDRESS);
-  accel.setRange(LIS3DH_RANGE_2_G);        // Full scale +/- 2G
-  accel.setClick(DOUBLETAP, CLICKTHRESHHOLD);
+  accel.setRange(LIS3DH_RANGE_2_G);  // Full scale +/- 2G
+  accel.setClick(DOUBLETAP, CLICKTHRESHHOLD);  // enable click interrupt
 
   // enable interrupt from accelerometer click event
   LowPower.attachInterruptWakeup(INT_1, onClicked, RISING, DEEP_SLEEP_MODE);
@@ -318,6 +311,8 @@ void setupSensor()
   newConfig.Latch = B0;                      // hysteresis-style
   errorConfig = light.writeConfig(newConfig);
 
+  delay(100); // wait until all sensors are ready
+
 #ifdef DEBUG
   Serial.println("Sensors initialized.");
 #endif
@@ -327,18 +322,17 @@ void setupSensor()
 //--------------------------------------------------------------------
 // Get sensors values
 //--------------------------------------------------------------------
-void getSensors()
-{
-  // HTS221 (temperature /humidity)
+void getSensors() {
+  // HTS221 (temperature & humidity)
   smeHumidity.begin();
   dataTemp = (float)smeHumidity.readTemperature();
   dataHumid = (float)smeHumidity.readHumidity();
 
-  // OPT3001 照度センサーデータ取得
+  // OPT3001 (illuminance)
   OPT3001 result = light.readResult();
   dataLight = result.lux;
 
-  // ADC081C027（ADC) 電池リーフ電池電圧取得
+  // ADC081C027（ADC) battery voltage
   uint8_t adcVal1 = 0;
   uint8_t adcVal2 = 0;
 
@@ -350,8 +344,7 @@ void getSensors()
   adcVal2 = Wire.read();
 
   //測定値がFFならバッテリリーフはつながっていない
-  if (adcVal1 == 0xff && adcVal2 == 0xff)
-  {
+  if (adcVal1 == 0xff && adcVal2 == 0xff) {
     adcVal1 = adcVal2 = 0;
   }
 
@@ -361,7 +354,7 @@ void getSensors()
 
 #ifdef DEBUG
   Serial.println("");
-  Serial.println("--- sensor data ---");
+  Serial.println("--- sensors data ---");
   Serial.println("  Tmp[degC]     = " + String(dataTemp));
   Serial.println("  Hum[%]        = " + String(dataHumid));
   Serial.println("  Lum[lx]       = " + String(dataLight));
@@ -375,15 +368,13 @@ void getSensors()
 // sleep sensors
 // センサーリーフをスリープさせる
 //-----------------------------------------
-void sleepSensors()
-{
+void sleepSensors() {
   // HTS221 sleep
   smeHumidity.deactivate();
 
   // OPT3001 sleep
   OPT3001_Config newConfig;
   OPT3001_ErrorCode errorConfig;
-
   newConfig.ModeOfConversionOperation = B00;
   errorConfig = light.writeConfig(newConfig);
 }
@@ -393,8 +384,7 @@ void sleepSensors()
 // wakeup sensors
 // センサーリーフをスリープから復帰させる
 //-----------------------------------------
-void wakeupSensors()
-{
+void wakeupSensors() {
 #ifdef DEBUG
   Serial.println(F("Wakeup Sensors."));
 #endif
@@ -407,6 +397,7 @@ void wakeupSensors()
   OPT3001_ErrorCode errorConfig;
   newConfig.ModeOfConversionOperation = B01; //single-shot conversion
   errorConfig = light.writeConfig(newConfig);
+  delay(300);
 }
 
 
@@ -414,19 +405,16 @@ void wakeupSensors()
 // sleep BLE
 // BLE リーフをスリープさせる
 //---------------------------------------
-void sleepBLE()
-{
+void sleepBLE() {
 #ifdef DEBUG
   Serial.println("Sleep BLE");
 #endif
 
   ble112.ble_cmd_le_gap_stop_advertising(0);
-  while (ble112.checkActivity())
-    ;
+  while (ble112.checkActivity());
 
   ble112.ble_cmd_system_halt(1);
-  while (ble112.checkActivity())
-    ;
+  while (ble112.checkActivity());
 }
 
 
@@ -434,8 +422,7 @@ void sleepBLE()
 // wakeup BLE
 // BLEリーフをスリープから復帰させる
 //---------------------------------------
-void wakeupBLE()
-{
+void wakeupBLE() {
 #ifdef DEBUG
   Serial.println("Wakeup BLE");
 #endif
@@ -445,34 +432,30 @@ void wakeupBLE()
   delay(10);
 
   ble112.ble_cmd_system_halt(0);
-  while (ble112.checkActivity())
-    ;
+  while (ble112.checkActivity());
 
   ble112.ble_cmd_le_gap_set_adv_parameters(400, 800, 7); /* [BGLIB] <interval_min> <interval_max> <channel_map> */
-  while (ble112.checkActivity())
-    ;
+  while (ble112.checkActivity());
 }
 
 
 //---------------------------------------
 // EEPROM
 //---------------------------------------
-void setupRingBuffer()
-{
-  // read ring buffer start address from RTC backup register
+void setupRingBuffer() {
+  // read ring buffer start address from RTC backup register.
   rb_addr = getBackupRegister(RTC_BKP_DR3);
 
-  // コントロールレジスタを読み出し
-  if (rtc.isTimeSet()){
+  // read control registers.
+  if (rtc.isTimeSet()) {
     wake_intval  = EEPROM.read(0);
     sleep_intval = EEPROM.read(1);
     sens_freq    = EEPROM.read(2);
     save_freq    = EEPROM.read(3);
   }
 
-  // アドレスが不正な場合初期化
-  if (rb_addr >= EEPROM.length() || (rb_addr - RINGBUFF_OFFSET_ADDR) % PACKET_LENGTH != 0)
-  {
+  // when address is invalid;
+  if (rb_addr >= EEPROM.length() || (rb_addr - RINGBUFF_OFFSET_ADDR) % PACKET_LENGTH != 0) {
     rb_addr = RINGBUFF_OFFSET_ADDR;
   }
 
@@ -498,14 +481,12 @@ void setupRingBuffer()
 /**
  * 
  */
-void writeEEPROM()
-{
+void writeEEPROM() {
   uint16_t temp, humid, illum, battVolt;
   uint32_t u_time = getTimestamp();
 
   // Reset the ring buffer address when the size is not enough;
-  if (rb_addr + PACKET_LENGTH >= EEPROM.length())
-  {
+  if (rb_addr + PACKET_LENGTH >= EEPROM.length()) {
     rb_addr = RINGBUFF_OFFSET_ADDR;
   }
 
@@ -517,7 +498,7 @@ void writeEEPROM()
   Serial.println(u_time);
 #endif
 
-  // Write the sensors data to EEPROM
+  // Write the sensors data to EEPROM.
   temp = (uint16_t)(dataTemp * 256.0);
   humid = (uint16_t)(dataHumid * 256.0);
   illum = (uint16_t)dataLight;
@@ -536,7 +517,7 @@ void writeEEPROM()
   EEPROM.write(rb_addr + 10, (u_time >> 16) & 0xFF);
   EEPROM.write(rb_addr + 11, (u_time >> 24) & 0xFF);
 
-  // write next ring buffer address to RTC backup register
+  // write next ring buffer address to RTC backup register.
   rb_addr += PACKET_LENGTH;
   setBackupRegister(RTC_BKP_DR3, rb_addr);
 
@@ -558,10 +539,10 @@ void writeEEPROM()
 
 
 /**
- * 
+ * decode RTC to timestamp.
  */
 uint32_t getTimestamp() {
-  if (rtc.isTimeSet()){
+  if (rtc.isTimeSet()) {
     uint8_t year = rtc.getYear();
     uint8_t month = rtc.getMonth();
     uint8_t day = rtc.getDay();
@@ -593,7 +574,7 @@ uint32_t getTimestamp() {
 
 
 /**
- * 
+ * read RTC backup register
  */
 uint32_t rtc_read_backup_reg(uint32_t BackupRegister) {
     RTC_HandleTypeDef RtcHandle;
@@ -603,7 +584,7 @@ uint32_t rtc_read_backup_reg(uint32_t BackupRegister) {
 
 
 /**
- * 
+ * write RTC backup register
  */
 void rtc_write_backup_reg(uint32_t BackupRegister, uint32_t data) {
     RTC_HandleTypeDef RtcHandle;
@@ -617,28 +598,25 @@ void rtc_write_backup_reg(uint32_t BackupRegister, uint32_t data) {
 /**
  * 
  */
-void sleepAllDevices()
-{
+void sleepAllDevices() {
   sleepBLE();
   sleepSensors();
 
 #ifdef DEBUG
-  Serial.print("STM32 deepsleep (restart after ");
+  Serial.print(">>> STM32 deepsleep (restart after ");
   Serial.print(sleep_intval);
-  Serial.println(" seconds)");
+  Serial.println(" seconds) >>>");
   Serial.flush();
 #endif
 
   LowPower.deepSleep(sleep_intval * 1000);
-
 }
 
 
 /**
  * 
  */
-void setup()
-{
+void setup() {
   Serial.begin(SERIAL_BAUD);
   LowPower.begin(); // Configure low power
 
@@ -652,7 +630,7 @@ void setup()
 
   setupPort();
   setupRingBuffer();
-  setupSensor();
+  setupSensors();
   setupBLE();
 
   #ifdef DEBUG
@@ -665,17 +643,15 @@ void setup()
 /**
  * 
  */
-void loop()
-{
-  if (!bBleConnected)
-  { // when BLE is not connected.
+void loop() {
+  if (!bBleConnected) { // when BLE is not connected.
     #ifdef DEBUG
       Serial.println("<<< Wake up <<<");
     #endif
 
+    wakeupSensors();
     wakeupBLE();
 
-    wakeupSensors();
     getSensors();
     sleepSensors();
 
@@ -689,16 +665,15 @@ void loop()
     if (onClickedFlag) {  // onClicked Interrupt
       onClickedFlag = false;
       #ifdef DEBUG
-        Serial.println('STM32 on Clicked!');
+        Serial.println("STM32 on Clicked!");
         Serial.print("Start advertising ");
-        Serial.print(5);
+        Serial.print(click_wake_intval);
         Serial.println(" seconds.");
         Serial.flush();
       #endif
 
       // Continue Advertising; (check BLE status every 0.1 secound.)
-      for (int i = 0; i < 5 * 10; i++)
-      {
+      for (int i = 0; i < click_wake_intval * 10; i++) {
         delay(100);
         ble112.checkActivity();
       }
@@ -710,8 +685,7 @@ void loop()
       #endif
 
       // Continue Advertising; (check BLE status every 0.1 secound.)
-      for (int i = 0; i <= wake_intval * 10; i++)
-      {
+      for (int i = 0; i <= wake_intval * 10; i++) {
         delay(100);
         ble112.checkActivity();
       }
@@ -719,30 +693,25 @@ void loop()
     }
 
     // when the connection is not requested, shutdown all devices during SLEEP_INTERVAL seconds;
-    if (!bBleConnected)
-    {
+    if (!bBleConnected) {
       // accel.setClick(DOUBLETAP, CLICKTHRESHHOLD); // Enable Interrupt
       accel.getClick();  // Enable Interrupt
       sleepAllDevices();
     }
-  } else
-  { // when ble is connected, this scope will run continuously.
-    if (bBleSendData)
-    {
+  } else { // when ble is connected, this scope will run continuously.
+    if (bBleSendData) {
 #ifdef DEBUG
       Serial.println("Start to send data.");
 #endif
 
-      for (int i = RINGBUFF_OFFSET_ADDR; i < EEPROM.length(); i += PACKET_LENGTH)
-      {
+      for (int i = RINGBUFF_OFFSET_ADDR; i < EEPROM.length(); i += PACKET_LENGTH) {
         char sendData[PACKET_LENGTH];
 
-        for (int j=0; j<PACKET_LENGTH; j++){
+        for (int j=0; j<PACKET_LENGTH; j++) {
           sendData[j] = EEPROM.read(i + j);
         }
         ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, PACKET_LENGTH, (const uint8_t *)sendData);
-        while (ble112.checkActivity(1000))
-          ;
+        while (ble112.checkActivity(1000));
       }
 
 #ifdef DEBUG
@@ -752,13 +721,7 @@ void loop()
       // after all the data trasnported,
       ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, 6, (const uint8_t *)"finish");
       bBleSendData = false;
-    }
-    else if (false)
-    {
-      // TBD
-    }
-    else
-    {
+    } else {
       ble112.checkActivity(100);
     }
   }
@@ -933,7 +896,7 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
     EEPROM.write(3, save_freq);
 
 #ifdef DEBUG
-    Serial.println(unixtime);
+    Serial.print("STM32 received timestamp: ");
     Serial.print(timestamp.year());
     Serial.print("/");
     Serial.print(timestamp.month());
@@ -944,7 +907,10 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
     Serial.print(":");
     Serial.print(timestamp.minute());
     Serial.print(":");
-    Serial.println(timestamp.second());
+    Serial.print(timestamp.second());
+    Serial.print(" (Unixtime: ");
+    Serial.print(unixtime);
+    Serial.println(")");
 #endif
   }
 }
