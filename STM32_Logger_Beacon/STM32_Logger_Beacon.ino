@@ -329,6 +329,7 @@ void getSensors() {
   dataHumid = (float)smeHumidity.readHumidity();
 
   // OPT3001 (illuminance)
+  delay(100);
   OPT3001 result = light.readResult();
   dataLight = result.lux;
 
@@ -395,6 +396,7 @@ void wakeupSensors() {
   // OPT3001 wakeup
   OPT3001_Config newConfig;
   OPT3001_ErrorCode errorConfig;
+  newConfig.RangeNumber = B1100;  // automatic full scale
   newConfig.ModeOfConversionOperation = B01; //single-shot conversion
   errorConfig = light.writeConfig(newConfig);
   delay(300);
