@@ -46,12 +46,12 @@
 //=====================================================================
 // Sketch firmware version
 //=====================================================================
-const String FIRMWARE_VERSION = "2021.05.280";
+const String FIRMWARE_VERSION = "2021.06.020";
 
 //=====================================================================
 // BLE Local device name
 //=====================================================================
-const String strDeviceName = "Leaf_AB";
+const String strDeviceName = "Leaf_ABCDEFG";
 
 //=====================================================================
 // シリアルコンソールへのデバック出力
@@ -170,7 +170,7 @@ bool bBleSendWakeInterval = false;
 
 // EEPROM ringbuffer
 uint16_t rb_addr = 0;  // ringbuffer read address
-const uint8_t RINGBUFF_OFFSET_ADDR = 14;
+const uint8_t RINGBUFF_OFFSET_ADDR = 8;
 const uint8_t PACKET_LENGTH = 12;
 
 uint16_t wake_intval = DEFAULT_WAKE_INTERVAL;   // Wake time
@@ -179,7 +179,7 @@ uint16_t sleep_intval = DEFAULT_SLEEP_INTERVAL; // Sleep time
 uint16_t sens_freq = DEFAULT_SENS_FREQ;         // Sensor ON frequency
 uint16_t save_freq = DEFAULT_SAVE_FREQ;         // Data save frequency
 
-// On-Click Interrupt
+// On-Clicked Interrupt
 bool onClickedFlag = false;
 
 //----------------------------------------------
@@ -450,10 +450,10 @@ void setupRingBuffer() {
 
   // read control registers.
   if (rtc.isTimeSet()) {
-    wake_intval  = EEPROM.read(0);
-    sleep_intval = EEPROM.read(1);
-    sens_freq    = EEPROM.read(2);
-    save_freq    = EEPROM.read(3);
+    wake_intval  = (EEPROM.read(0) << 8) + EEPROM.read(1);
+    sleep_intval = (EEPROM.read(2) << 8) + EEPROM.read(3);
+    sens_freq    = (EEPROM.read(4) << 8) + EEPROM.read(5);
+    save_freq    = (EEPROM.read(6) << 8) + EEPROM.read(7);
   }
 
   // when address is invalid;
@@ -830,44 +830,52 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
   }
   else if (rcv_data.startsWith("setSleep"))
   {
-    // setSleep <SLEEP_INTERVAL>
-    uint8_t num = rcv_data.substring(9).toInt();
-    EEPROM.write(1, num); // sleep_intval
+    // rcv_data = "setSleep <SLEEP_INTERVAL>"
+    uint16_t num = rcv_data.substring(9).toInt();
+    EEPROM.write(2, (num >> 8) & 0xFF); // sleep_intval
+    EEPROM.write(3, (num & 0xFF));      // sleep_intval
     sleep_intval = num;
     #ifdef DEBUG
-    Serial.print("setSleep ");
-    Serial.println(num);
+    Serial.print("Sleep interval is changed. (");
+    Serial.print(num);
+    Serial.println("s)");
     #endif
   }
   else if (rcv_data.startsWith("setWake"))
   {
-    // setWake
-    uint8_t num = rcv_data.substring(8).toInt();
-    EEPROM.write(0, num);  // wake_intval
+    // rcv_data = "setWake <WAKE_INTERVAL>"
+    uint16_t num = rcv_data.substring(8).toInt();
+    EEPROM.write(0, (num >> 8) & 0xFF);  // wake_intval
+    EEPROM.write(1, (num & 0xFF));       // wake_intval
     wake_intval = num;
     #ifdef DEBUG
-    Serial.print("setWake ");
-    Serial.println(num);
+    Serial.print("Wake interval is changed. (");
+    Serial.print(num);
+    Serial.println("s)");
     #endif
   }
   else if (rcv_data.startsWith("setSensFreq"))
   {
-    // setWake
-    uint8_t num = rcv_data.substring(12).toInt();
-    EEPROM.write(2, num);  // sens_freq
+    // rcv_data = "setSensFreq <SENS_FREQUENCY>"
+    uint16_t num = rcv_data.substring(12).toInt();
+    EEPROM.write(4, (num >> 8) & 0xFF);  // sens_freq
+    EEPROM.write(5, (num & 0xFF));       // sens_freq
     #ifdef DEBUG
-    Serial.print("setSensFreq ");
-    Serial.println(num);
+    Serial.print("Sens frequency is changed. (");
+    Serial.print(num);
+    Serial.println("s)");
     #endif
   }
   else if (rcv_data.startsWith("setSaveFreq"))
   {
-    // setWake
-    uint8_t num = rcv_data.substring(12).toInt();
-    EEPROM.write(3, num);  // save_freq
+    // rcv_data = "setSaveFreq <SAVE_FREQUENCY>"
+    uint16_t num = rcv_data.substring(12).toInt();
+    EEPROM.write(6, (num >> 8) & 0xFF);  // save_freq
+    EEPROM.write(7, (num & 0xFF));  // save_freq
     #ifdef DEBUG
-    Serial.print("setSaveFreq ");
-    Serial.println(num);
+    Serial.print("Save frequency is changed. (");
+    Serial.print(num);
+    Serial.println("s)");
     #endif
   }
   else if (rcv_data.startsWith("setData"))
@@ -892,10 +900,14 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
     rtc.setMinutes(timestamp.minute());
     rtc.setSeconds(timestamp.second());
 
-    EEPROM.write(0, wake_intval);
-    EEPROM.write(1, sleep_intval);
-    EEPROM.write(2, sens_freq);
-    EEPROM.write(3, save_freq);
+    EEPROM.write(0, (wake_intval >> 8) & 0xFF);
+    EEPROM.write(1, (wake_intval & 0xFF));
+    EEPROM.write(2, (sleep_intval >> 8) & 0xFF);
+    EEPROM.write(3, (sleep_intval & 0xFF));
+    EEPROM.write(4, (sens_freq >> 8) & 0xFF);
+    EEPROM.write(5, (sens_freq & 0xFF));
+    EEPROM.write(6, (save_freq >> 8) & 0xFF);
+    EEPROM.write(7, (save_freq & 0xFF));
 
 #ifdef DEBUG
     Serial.print("STM32 received timestamp: ");
