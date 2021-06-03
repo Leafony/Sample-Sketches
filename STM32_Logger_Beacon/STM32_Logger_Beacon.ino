@@ -553,19 +553,19 @@ uint32_t getTimestamp() {
     uint8_t seconds = rtc.getSeconds();
 
 #ifdef DEBUG
-  Serial.print("RTC Timestamp: ");
-  Serial.print(year + 2000);
-  Serial.print("/");
-  Serial.print(month);
-  Serial.print("/");
-  Serial.print(day);
-  Serial.print(" ");
-  Serial.print(hours);
-  Serial.print(":");
-  Serial.print(minutes);
-  Serial.print(":");
-  Serial.print(seconds);
-  Serial.println(" (GMT+0)");
+    Serial.print("RTC Timestamp: ");
+    Serial.print(year + 2000);
+    Serial.print("/");
+    Serial.print(month);
+    Serial.print("/");
+    Serial.print(day);
+    Serial.print(" ");
+    Serial.print(hours);
+    Serial.print(":");
+    Serial.print(minutes);
+    Serial.print(":");
+    Serial.print(seconds);
+    Serial.println(" (GMT+0)");
 #endif
 
     DateTime date (year, month, day, hours, minutes, seconds);
@@ -625,20 +625,20 @@ void setup() {
   Wire.begin(); // I2C 100KHz
   rtc.begin(); // initialize RTC 24H format
 
-  #ifdef DEBUG
-    Serial.println("=========================================");
-    Serial.println("Setup start.");
-  #endif
+#ifdef DEBUG
+  Serial.println("=========================================");
+  Serial.println("Setup start.");
+#endif
 
   setupPort();
   setupRingBuffer();
   setupSensors();
   setupBLE();
 
-  #ifdef DEBUG
-    Serial.println("Setup finished.");
-    Serial.println("=========================================");
-  #endif
+#ifdef DEBUG
+  Serial.println("Setup finished.");
+  Serial.println("=========================================");
+#endif
 }
 
 
@@ -647,9 +647,9 @@ void setup() {
  */
 void loop() {
   if (!bBleConnected) { // when BLE is not connected.
-    #ifdef DEBUG
-      Serial.println("<<< Wake up <<<");
-    #endif
+#ifdef DEBUG
+    Serial.println("<<< Wake up <<<");
+#endif
 
     wakeupSensors();
     wakeupBLE();
@@ -666,13 +666,13 @@ void loop() {
 
     if (onClickedFlag) {  // onClicked Interrupt
       onClickedFlag = false;
-      #ifdef DEBUG
-        Serial.println("STM32 on Clicked!");
-        Serial.print("Start advertising ");
-        Serial.print(click_wake_intval);
-        Serial.println(" seconds.");
-        Serial.flush();
-      #endif
+#ifdef DEBUG
+      Serial.println("STM32 on Clicked!");
+      Serial.print("Start advertising ");
+      Serial.print(click_wake_intval);
+      Serial.println(" seconds.");
+      Serial.flush();
+#endif
 
       // Continue Advertising; (check BLE status every 0.1 secound.)
       for (int i = 0; i < click_wake_intval * 10; i++) {
@@ -680,11 +680,11 @@ void loop() {
         ble112.checkActivity();
       }
     } else {  // Normal operation
-      #ifdef DEBUG
-        Serial.print("Start advertising (");
-        Serial.print(wake_intval);
-        Serial.println("s)");
-      #endif
+#ifdef DEBUG
+      Serial.print("Start advertising (");
+      Serial.print(wake_intval);
+      Serial.println("s)");
+#endif
 
       // Continue Advertising; (check BLE status every 0.1 secound.)
       for (int i = 0; i <= wake_intval * 10; i++) {

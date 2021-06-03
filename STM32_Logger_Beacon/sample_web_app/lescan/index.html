@@ -9,6 +9,12 @@
   <!-- <link rel="stylesheet" href="styles.css"> -->
 
   <title>Leafony Logger Beacon</title>
+
+  <style type="text/css">
+  body {
+    font-family: "Noto Sans Japanese", sans-serif;
+  }
+  </style>
 </head>
 
 <body class="bg-light">
@@ -27,7 +33,7 @@
 
   <!-- Main Content -->
   <div class="py-5 bg-dark">
-    <div class="text-center text-light col-sm-12">
+    <div class="text-center text-light">
       <h1>Leafony Logger Beacon</h1>
     </div>
   </div>
@@ -42,113 +48,152 @@
 
     <div class="row justify-content-center">
 
-      <h2>Initialization & Start Logging</h2>
-      <div class="col-12 text-center" id="section-ble-connect">
-        <p>1. Press <b>Connect button</b> to connect to Leafony. At the first time, the current timestamp will be set on Leafony, and it starts logging sensors after BLE disconnected. Please disconnect once.</p>
-        <p>2. After a while, press <b>Connect button again</b>, then logging data is ready to read.</p>
-        <button type="button" class="btn btn-primary" id="ble-connect-button">Connect</button>
-        <button type="button" class="btn btn-danger" id="ble-disconnect-button" style="display:none;">Disconnect</button>
+      <div class="col-12 mb-3 p-3 bg-white rounded shadow-sm">
+        <h2 class="border-bottom"><i class="fas fa-globe-americas"></i> Language</h2>
+        <select class="form-control form-control-lg" id="languageSelect">
+          <option value="en">English</option>
+          <option value="ja">Japanese</option>
+        </select>
       </div>
 
-      <div class="col-12 text-center" id="section-ble-connect">
-        <b>Device Name: </b>
-        <p id="textUniqueName"></p>
-        <hr>
-      </div>
+      <div class="col-12 mb-3 p-3 bg-white rounded shadow-sm">
+        <h2 class="langCng border-bottom" lang="en">Initialize</h2>
+        <h2 class="langCng border-bottom" lang="ja">初期化</h2>
 
-      <div class="col-12 text-center" id="section-ble-connect" style="display:none;">
-        <button type="button" class="btn btn-primary" id="set-time-button">Set Time</button>
-        <hr>
-      </div>
+        <p class="langCng" lang="en">First, let's connect with Leafony via Bluetooth once to set the time in Leafony.</p>
+        <p class="langCng" lang="ja">はじめに、Leafonyに時刻を設定するために、一度BluetoothでLeafonyと接続しましょう。</p>
 
-      <div class="col-12 text-center" id="section-ble-connect">
-        <p>2. Press <b>Get Data button</b> to read out flash memory on Leafony.</p>
-        <button type="button" class="btn btn-primary" id="ble-get-button">Get Data</button>
-        <hr>
-      </div>
+        <p class="langCng" lang="en">1. Press the Connect button to search for nearby Bluetooth.</p>
+        <p class="langCng" lang="ja">1. Connectボタンを押すと周辺のBluetoothを検索します。</p>
 
-      <div class="col-12">
-        <p class="text-center">3. After a while, logged data is transported and charts are updated.</p>
-      </div>
-      <div class="col-xl-4">
-        <h2 class="text-center">Temp & Humid Sensor</h2>
-        <div id="chart_temp"></div>
-      </div>
-      <div class="col-xl-4">
-        <h2 class="text-center">Illum Sensor</h2>
-        <div id="chart_ilum"></div>
-      </div>
-      <div class="col-xl-4">
-        <h2 class="text-center">Battery Voltage</h2>
-        <div id="chart_batt"></div>
-      </div>
-
-      <div class="col-12 text-center">
-        <hr>
-        <p>4. You can download the plots as a csv file.</p>
-        <button type="button" class="btn btn-primary" id="button-download"
-         download="data.csv" href="#">Download All Plots as CSV</button>
-        <hr>
-      </div>
-
-      <div class="col-12 mx-auto">
-        <h2>Settings</h2>
-        <p>5. You can change the parameters during connecting.</p>
-        <div class="alert alert-warning" role="alert" style="display:none;" id="alert-controller">
-          Error: Connect to Leafony First!
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+        <div class="my-3 text-center">
+          <button type="button" class="btn btn-lg btn-primary" id="ble-connect-button">Connect</button>
+          <button type="button" class="btn btn-lg btn-danger" id="ble-disconnect-button" style="display:none;">Disconnect</button>
         </div>
-        <div class="form-group">
-          <label for="version-text-input">Version</label>
-          <div class="input-group">
-            <input type="text" class="form-control" placeholder="Version" id="version-text-input">
-            <button class="btn btn-outline-secondary" type="button" id="check-version-button">Check</button>
+
+        <div class="text-center">
+          <b>Device Name: </b>
+          <p id="textUniqueName"></p>
+        </div>
+
+        <p class="langCng" lang="en">2. A few seconds after turning on Leafony, tap Leafony twice with your finger as shown in the video. This will put Leafony in Bluetooth connectable mode for 20 seconds.</p>
+        <p class="langCng" lang="ja">2. Leafonyの電源を入れてから数秒後に、動画のようにLeafonyを指で2回つつきましょう。こうすることで、Leafonyは20秒間、Bluetooth接続モードに入ります。</p>
+
+        <div class="text-center">
+          <p>GIF動画を入れる</p>
+          <img src="" alg="gif image">
+        </div>
+
+        <p class="langCng" lang="en">3. Click <b> Leafony_AB </b> and press the pairing button.</p>
+        <p class="langCng" lang="ja">3. <b>Leafony_AB</b>をクリックし、ペア設定ボタンを押しましょう。</p>
+
+        <p class="langCng" lang="en">4. The time is now set.</p>
+        <p class="langCng" lang="ja">4. これで時刻が設定できました。</p>
+
+        <p class="langCng" lang="en">5. While connected to Leafony, you can check the version information of the sketch and change the sleep time.</p>
+        <p class="langCng" lang="ja">5. Leafonyと接続中は、スケッチのバージョン情報を確認したり、スリープ時間を変更することができます。</p>
+
+        <div class="m-3 p-3 border rounded shadow-sm" id="settingCtrl">
+          <div class="alert alert-warning" role="alert" style="display:none;" id="alert-controller">
+            Error: Connect to Leafony First!
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="form-group">
+            <label for="version-text-input">Version</label>
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Version" id="version-text-input">
+              <button class="btn btn-outline-secondary" type="button" id="check-version-button">Check</button>
+            </div>
+          </div>
+          <div class="form-group" style="display:none;">
+            <label for="wake-text-input">Wake Time [s] (0～65535)</label>
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Wake Time" id="wake-text-input">
+              <button class="btn btn-outline-secondary" type="button" id="check-wake-button">Check</button>
+              <button class="btn btn-outline-secondary" type="button" id="submit-wake-button">Submit</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="sleep-text-input">Sleep Time [s] (0～65535)</label>
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Sleep Time" id="sleep-text-input">
+              <button class="btn btn-outline-secondary" type="button" id="check-sleep-button">Check</button>
+              <button class="btn btn-outline-secondary" type="button" id="submit-sleep-button">Submit</button>
+            </div>
+          </div>
+
+          <div class="form-group" style="display:none;">
+            <label for="sens-text-input">Sensor ON Frequency</label>
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Sensor ON Frequency" id="sens-text-input">
+              <button class="btn btn-outline-secondary" type="button" id="check-sens-button">Check</button>
+              <button class="btn btn-outline-secondary" type="button" id="submit-sens-button">Submit</button>
+            </div>
+          </div>
+
+          <div class="form-group" style="display:none;">
+            <label for="save-text-input">Data Save Frequency</label>
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Data Save Frequency" id="save-text-input">
+              <button class="btn btn-outline-secondary" type="button" id="check-save-button">Check</button>
+              <button class="btn btn-outline-secondary" type="button" id="submit-save-button">Submit</button>
+            </div>
+          </div>
+
+          <div class="input-group" style="display:none;">
+            <button class="btn btn-outline-secondary" type="button" id="check-all-button">Check All</button>
+            <button class="btn btn-outline-secondary" type="button" id="submit-all-button">Submit All</button>
           </div>
         </div>
-        <div class="form-group">
-          <label for="wake-text-input">Wake Time [s] (0～65535)</label>
-          <div class="input-group">
-            <input type="text" class="form-control" placeholder="Wake Time" id="wake-text-input">
-            <button class="btn btn-outline-secondary" type="button" id="check-wake-button">Check</button>
-            <button class="btn btn-outline-secondary" type="button" id="submit-wake-button">Submit</button>
-          </div>
-        </div>
 
-        <div class="form-group">
-          <label for="sleep-text-input">Sleep Time [s] (0～65535)</label>
-          <div class="input-group">
-            <input type="text" class="form-control" placeholder="Sleep Time" id="sleep-text-input">
-            <button class="btn btn-outline-secondary" type="button" id="check-sleep-button">Check</button>
-            <button class="btn btn-outline-secondary" type="button" id="submit-sleep-button">Submit</button>
-          </div>
-        </div>
+        <p class="langCng" lang="en">6. When you press the Disconnect button, Bluetooth will be disconnected and Leafony will start measuring the data. The data is measured at the intervals specified by Sleep Time. Please wait for a while before proceeding to the next chapter.</p>
+        <p class="langCng" lang="ja">6. Disconnectボタンを押すとBluetoothが切断され、Leafonyはデータの測定をスタートします。データはSleep Timeで指定した間隔で測定されます。しばらく待ってから次の章に進みましょう。</p>
 
-        <div class="form-group" style="display:none;">
-          <label for="sens-text-input">Sensor ON Frequency</label>
-          <div class="input-group">
-            <input type="text" class="form-control" placeholder="Sensor ON Frequency" id="sens-text-input">
-            <button class="btn btn-outline-secondary" type="button" id="check-sens-button">Check</button>
-            <button class="btn btn-outline-secondary" type="button" id="submit-sens-button">Submit</button>
-          </div>
-        </div>
-
-        <div class="form-group" style="display:none;">
-          <label for="save-text-input">Data Save Frequency</label>
-          <div class="input-group">
-            <input type="text" class="form-control" placeholder="Data Save Frequency" id="save-text-input">
-            <button class="btn btn-outline-secondary" type="button" id="check-save-button">Check</button>
-            <button class="btn btn-outline-secondary" type="button" id="submit-save-button">Submit</button>
-          </div>
-        </div>
-
-        <div class="input-group" style="display:none;">
-          <button class="btn btn-outline-secondary" type="button" id="check-all-button">Check All</button>
-          <button class="btn btn-outline-secondary" type="button" id="submit-all-button">Submit All</button>
-        </div>
       </div>
 
+      <div class="col-12 my-3 p-3 bg-white rounded shadow-sm">
+        <h2 class="langCng border-bottom" lang="en">Get Sensors Data</h2>
+        <h2 class="langCng border-bottom" lang="ja">センサデータのグラフ化</h2>
+
+        <p class="langCng" lang="en">You can graph the data measured by Leafony.</p>
+        <p class="langCng" lang="ja">Leafonyが測定したデータをグラフ化することができます。</p>
+
+        <p class="langCng" lang="en">1. Press the Connect button in the initialization procedure to establish a Bluetooth connection with Leafony.</p>
+        <p class="langCng" lang="ja">1. 初期化の手順にあるConnectボタンを押してLeafonyとBluetooth接続をしてください。</p>
+
+        <p class="langCng" lang="en">2. Once the connection is established, press the Get Data button below and wait for a while to graph the sensor data.</p>
+        <p class="langCng" lang="ja">2. 接続が完了したら、下のGet Dataボタンを押してしばらく待つと、センサデータがグラフ化されます。</p>
+
+
+        <div class="my-3 text-center">
+          <button type="button" class="btn btn-lg btn-primary" id="ble-get-button">Get Data</button>
+        </div>
+
+        <div class="row m-3 p-3 border rounded shadow-sm">
+          <div class="col-xl-4">
+            <h2 class="text-center">Temp & Humid</h2>
+            <div id="chart_temp"></div>
+          </div>
+          <div class="col-xl-4">
+            <h2 class="text-center">Illuminance</h2>
+            <div id="chart_ilum"></div>
+          </div>
+          <div class="col-xl-4">
+            <h2 class="text-center">Battery Voltage</h2>
+            <div id="chart_batt"></div>
+          </div>
+        </div>
+
+        <p class="langCng" lang="en">3. Graph plots can also be saved as CSV files.</p>
+        <p class="langCng" lang="ja">3. グラフプロットはCSVファイルとして保存することもできます。</p>
+
+        <div class="my-3 text-center">
+          <button type="button" class="btn btn-primary" id="button-download" download="data.csv" href="#">Download All Plots as CSV</button>
+        </div>
+      </div>
 
       <div id="feature-beacon">
         <div class="col-12 text-center">
@@ -225,6 +270,48 @@
 
   <a style="display:none;" id="downloader" href="#"></a>
 
+  <script>
+    let langSelect = document.getElementById('languageSelect');
+
+    let lang = (window.navigator.languages && window.navigator.languages[0]) ||
+                window.navigator.language ||
+                window.navigator.userLanguage ||
+                window.navigator.browserLanguage;
+
+    if (lang === 'en') {
+      langSelect.value = 'en';
+    }
+    else if (lang === 'jp') {
+      langSelect.value = 'jp';
+    }
+    else {
+      langSelect.value = 'en';
+    }
+
+    langSet(langSelect.value);
+    console.log(lang);
+
+
+    langSelect.addEventListener('change', () => {
+      langSet(langSelect.value);
+    });
+
+    function langSet(argLang){
+      var elm = document.getElementsByClassName("langCng");
+      for (var i = 0; i < elm.length; i++) {
+        if(elm[i].getAttribute('lang') === argLang){
+          elm[i].style.display = '';
+        }
+        else{
+          elm[i].style.display = 'none';
+        }
+      }
+    }
+  </script>
+
+  <!-- fontawesome -->
+  <script src="https://kit.fontawesome.com/6f58eaa068.js" crossorigin="anonymous"></script>
+
   <!-- Load c3.css -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.css" rel="stylesheet">
 
@@ -232,6 +319,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js" charset="utf-8"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.min.js"></script>
 
+  <!-- Bootstrap -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
@@ -241,6 +329,7 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
     crossorigin="anonymous"></script>
+
   <script type="text/javascript" src="leafony.js"></script>
   <script type="text/javascript" src="app.js"></script>
 </body>
