@@ -51,7 +51,7 @@ const String FIRMWARE_VERSION = "2021.06.020";
 //=====================================================================
 // BLE Local device name
 //=====================================================================
-const String strDeviceName = "Leaf_ABCDEFG";
+const String strDeviceName = "Leaf_AB";
 
 //=====================================================================
 // シリアルコンソールへのデバック出力
@@ -62,12 +62,13 @@ const String strDeviceName = "Leaf_ABCDEFG";
 
 //=====================================================================
 // スリープ時間、送信時間の設定
-//  SLEEP_INTERVAL : スリープ時間 (秒)
-//  WAKE_INTERVAL　：パケット送信時間 (秒)
+//  DEFAULT_SLEEP_INTERVAL : スリープ時間 (秒)
+//  DEFAULT_WAKE_INTERVAL　：Beacon送信時間 (秒)
+//  DEFAULT_CLICK_WAKE_INTERVAL : ダブルタップをしたときの起動時間 (秒)
 //=====================================================================
 #define DEFAULT_SLEEP_INTERVAL 10
-#define DEFAULT_CLICK_WAKE_INTERVAL 20
 #define DEFAULT_WAKE_INTERVAL 0
+#define DEFAULT_CLICK_WAKE_INTERVAL 20
 
 //=====================================================================
 // センサ測定間隔、データ保存間隔の設定
@@ -196,7 +197,6 @@ void setupPort() {
   pinMode(BLE_WAKEUP, OUTPUT);    // BLE Wakeup/Sleep
   digitalWrite(BLE_WAKEUP, HIGH); // BLE Wakeup
 }
-
 
 //-----------------------------------------------
 // BLE initialization
@@ -364,7 +364,6 @@ void getSensors() {
 #endif
 }
 
-
 //-----------------------------------------
 // sleep sensors
 // センサーリーフをスリープさせる
@@ -379,7 +378,6 @@ void sleepSensors() {
   newConfig.ModeOfConversionOperation = B00;
   errorConfig = light.writeConfig(newConfig);
 }
-
 
 //-----------------------------------------
 // wakeup sensors
@@ -402,7 +400,6 @@ void wakeupSensors() {
   delay(300);
 }
 
-
 //---------------------------------------
 // sleep BLE
 // BLE リーフをスリープさせる
@@ -418,7 +415,6 @@ void sleepBLE() {
   ble112.ble_cmd_system_halt(1);
   while (ble112.checkActivity());
 }
-
 
 //---------------------------------------
 // wakeup BLE
@@ -440,14 +436,10 @@ void wakeupBLE() {
   while (ble112.checkActivity());
 }
 
-
 //---------------------------------------
 // EEPROM
 //---------------------------------------
 void setupRingBuffer() {
-  // read ring buffer start address from RTC backup register.
-  rb_addr = getBackupRegister(RTC_BKP_DR3);
-
   // read control registers.
   if (rtc.isTimeSet()) {
     wake_intval  = (EEPROM.read(0) << 8) + EEPROM.read(1);
@@ -478,7 +470,6 @@ void setupRingBuffer() {
   // Serial.println(save_freq);
 #endif
 }
-
 
 /**
  * 
@@ -521,7 +512,6 @@ void writeEEPROM() {
 
   // write next ring buffer address to RTC backup register.
   rb_addr += PACKET_LENGTH;
-  setBackupRegister(RTC_BKP_DR3, rb_addr);
 
 #ifdef DEBUG
   Serial.print("{ temp = ");
@@ -538,7 +528,6 @@ void writeEEPROM() {
   Serial.println("");
 #endif
 }
-
 
 /**
  * decode RTC to timestamp.
@@ -571,31 +560,9 @@ uint32_t getTimestamp() {
     DateTime date (year, month, day, hours, minutes, seconds);
     return date.unixtime();
   }
+
   return 0;
 }
-
-
-/**
- * read RTC backup register
- */
-uint32_t rtc_read_backup_reg(uint32_t BackupRegister) {
-    RTC_HandleTypeDef RtcHandle;
-    RtcHandle.Instance = RTC;
-    return HAL_RTCEx_BKUPRead(&RtcHandle, BackupRegister);
-}
-
-
-/**
- * write RTC backup register
- */
-void rtc_write_backup_reg(uint32_t BackupRegister, uint32_t data) {
-    RTC_HandleTypeDef RtcHandle;
-    RtcHandle.Instance = RTC;
-    HAL_PWR_EnableBkUpAccess();
-    HAL_RTCEx_BKUPWrite(&RtcHandle, BackupRegister, data);
-    HAL_PWR_DisableBkUpAccess();
-}
-
 
 /**
  * 
@@ -613,7 +580,6 @@ void sleepAllDevices() {
 
   LowPower.deepSleep(sleep_intval * 1000);
 }
-
 
 /**
  * 
@@ -640,7 +606,6 @@ void setup() {
   Serial.println("=========================================");
 #endif
 }
-
 
 /**
  * 
