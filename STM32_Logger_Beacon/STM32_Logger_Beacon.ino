@@ -475,6 +475,10 @@ void setupRingBuffer() {
  * 
  */
 void writeEEPROM() {
+  if (!rtc.isTimeSet()) {
+    return;
+  }
+
   uint16_t temp, humid, illum, battVolt;
   uint32_t u_time = getTimestamp();
 
@@ -622,10 +626,7 @@ void loop() {
     getSensors();
     sleepSensors();
 
-    // if time is set via bluetooth, then start to write EEPROM
-    if (rtc.isTimeSet()) {
-      writeEEPROM();
-    }
+    writeEEPROM();
 
     StartAdvData();
 

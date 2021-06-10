@@ -47,8 +47,7 @@ const inputSensText = document.getElementById('sens-text-input');
 const inputSaveText = document.getElementById('save-text-input');
 
 const buttonSetTime = document.getElementById('set-time-button');
-
-const buttonDownload = document.getElementById("button-download");
+const buttonDownload = document.getElementById('button-download');
 
 let leafony;
 let chart_temp, chart_ilum, chart_batt;
@@ -131,6 +130,31 @@ window.onload = function () {
   buttonSubmitSave.disabled = true;
 };
 
+/**
+ * Download CSV button
+ */
+buttonDownload.addEventListener('click', () => {
+  let bom_utf_8 = new Uint8Array([0xEF, 0xBB, 0xBF]);
+  let csvText = "";
+  // let csvText = "timestamp,temperature,humidity,illuminance,battery_voltage\n";
+
+  for (var i = 0; i < array_temp.length; i++) {
+    csvText += array_time[i] + "," + array_temp[i] + "," +
+      array_humd[i] + "," + array_ilum[i] + "," + array_batt[i] + '\n';
+  }
+
+  let blob = new Blob([bom_utf_8, csvText], { "type": "text/csv" });
+
+  let url = window.URL.createObjectURL(blob);
+
+  let downloader = document.getElementById("downloader");
+  downloader.download = "data.csv";
+  downloader.href = url;
+  $("#downloader")[0].click();
+
+  delete csvText;
+  delete blob;
+});
 
 /**
  * Connect button
@@ -157,7 +181,6 @@ buttonConnect.addEventListener('click', async () => {
   return isConnected();
 });
 
-
 /**
  * Disconnect button
  */
@@ -169,7 +192,6 @@ buttonDisconnect.addEventListener('click', () => {
   buttonConnect.disabled = false;
   buttonConnect.innerHTML = 'Connect';
 });
-
 
 /**
  * Get Data button
@@ -300,7 +322,6 @@ buttonSetTime.addEventListener('click', function () {
  * 
  */
 function clearTable() {
-
   textDeviceName.innerHTML = '';
   textUniqueName.innerHTML = '';
   textDateTime.innerHTML = '';
@@ -308,7 +329,6 @@ function clearTable() {
   textHumid.innerHTML = '';
   textIllum.innerHTML = '';
   textBatt.innerHTML = '';
-
 }
 
 
@@ -592,13 +612,11 @@ function onStateChange(state) {
   }
 }
 
-
 /**
  * This function is called when Bluetooth receives advertising packet.
  * @param {*} state 
  */
 function onAdvertisementReceived(devname, state) {
-
   let textDecoder = new TextDecoder('ascii');
   let asciiString = textDecoder.decode(state).split(',');
   textDevNameLe.innerText = devname;
@@ -607,9 +625,7 @@ function onAdvertisementReceived(devname, state) {
   textBattLe.innerText = asciiString[1] + 'V';
   textTimeLe.innerText = 'Last Update: ' + new Date().toTimeString();
   console.log("onAdvertisementReceived: " + asciiString);
-
 }
-
 
 /**
  * This function is called when Bluetooth is disconnected.
@@ -635,7 +651,6 @@ function onDisconnected(state) {
   buttonSubmitSave.disabled = true;
 }
 
-
 /**
  * Send command to Leafony.
  * If leafony is not connected, show alert popups.
@@ -648,34 +663,6 @@ async function sendCommand(command) {
     alertController.style.display = "";
   }
 }
-
-/**
- * Download CSV button
- */
-buttonDownload.addEventListener('click', function () {
-
-  let bom_utf_8 = new Uint8Array([0xEF, 0xBB, 0xBF]);
-  let csvText = "";
-  // let csvText = "timestamp,temperature,humidity,illuminance,battery_voltage\n";
-
-  for (var i = 0; i < array_temp.length; i++) {
-    csvText += array_time[i] + "," + array_temp[i] + "," +
-      array_humd[i] + "," + array_ilum[i] + "," + array_batt[i] + '\n';
-  }
-
-  let blob = new Blob([bom_utf_8, csvText], { "type": "text/csv" });
-
-  let url = window.URL.createObjectURL(blob);
-
-  let downloader = document.getElementById("downloader");
-  downloader.download = "data.csv";
-  downloader.href = url;
-  $("#downloader")[0].click();
-
-  delete csvText;
-  delete blob;
-});
-
 
 /**
  * Get Hex Timestamp Value
