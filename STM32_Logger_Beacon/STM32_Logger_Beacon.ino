@@ -220,8 +220,11 @@ void setupBLE() {
 
   Serialble.begin(9600);
 
-  while (!bSystemBootBle) {
+  uint8_t tm=0;
+  while (!bSystemBootBle && tm <150){  // Wait for BLE Start-up
     ble112.checkActivity(100);
+    tm++;
+    delay(10);
   }
 
   // ble_rsp_system_get_bt_address handler is called.
@@ -440,12 +443,20 @@ void wakeupBLE() {
 // EEPROM
 //---------------------------------------
 void setupRingBuffer() {
+  uint16_t rb_work = 0;
+
   // read control registers.
   if (rtc.isTimeSet()) {
     wake_intval  = (EEPROM.read(0) << 8) + EEPROM.read(1);
     sleep_intval = (EEPROM.read(2) << 8) + EEPROM.read(3);
     sens_freq    = (EEPROM.read(4) << 8) + EEPROM.read(5);
     save_freq    = (EEPROM.read(6) << 8) + EEPROM.read(7);
+  }
+
+  rb_work = 0;
+  while (rb_work < 2048){
+    EEPROM.read(rb_work);
+    rb_work++;
   }
 
   // when address is invalid;
