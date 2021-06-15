@@ -36,6 +36,7 @@ const buttonCheckSleep = document.getElementById('check-sleep-button');
 const buttonCheckSens = document.getElementById('check-sens-button');
 const buttonCheckSave = document.getElementById('check-save-button');
 const buttonCheckAll = document.getElementById('check-all-button');
+const buttonClearEEPROM = document.getElementById('clear-eeprom-button');
 const buttonSubmitWake = document.getElementById('submit-wake-button');
 const buttonSubmitSleep = document.getElementById('submit-sleep-button');
 const buttonSubmitSens = document.getElementById('submit-sens-button');
@@ -101,7 +102,7 @@ window.onload = function () {
       buttonSubmitSleep.disabled = false
       buttonSubmitSens.disabled = false;
       buttonSubmitSave.disabled = false;
-
+      buttonClearEEPROM.disabled = false;
     }, 1500);
   });
 
@@ -130,6 +131,7 @@ window.onload = function () {
   buttonSubmitSleep.disabled = true;
   buttonSubmitSens.disabled = true;
   buttonSubmitSave.disabled = true;
+  buttonClearEEPROM.disabled = true;
 };
 
 /**
@@ -317,6 +319,13 @@ buttonSubmitSave.addEventListener('click', function () {
   sendCommand('setSaveFreq ' + inputSaveText.value);
 });
 
+/**
+ * Wake time check button
+ */
+buttonClearEEPROM.addEventListener('click', function () {
+  recv_state = "clearEEPROM";
+  sendCommand('clearEEPROM');
+});
 
 buttonSetTime.addEventListener('click', function () {
   sendCommand('setTime ' + timeStamp());
@@ -568,6 +577,9 @@ function onStateChange(state) {
   else if (recv_state == 'checkAll') {
     recv_state = 'main';
   }
+  else if (recv_state == 'clearEEPROM') {
+    recv_state = 'main';
+  }
   else {
     if (recv == 'finish') {
       console.log('Finish!');
@@ -653,6 +665,7 @@ function onDisconnected(state) {
   buttonSubmitSleep.disabled = true;
   buttonSubmitSens.disabled = true;
   buttonSubmitSave.disabled = true;
+  buttonClearEEPROM.disabled = true;
 }
 
 /**

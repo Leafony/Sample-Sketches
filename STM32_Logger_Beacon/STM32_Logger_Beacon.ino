@@ -904,6 +904,12 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
     Serial.println(")");
 #endif
   }
+  else if (rcv_data.startsWith("clearEEPROM")){
+    // Clear All
+    for(int i = RINGBUFF_OFFSET_ADDR; i < EEPROM.length(); i++) {
+      EEPROM.write(i, 0);
+    }
+  }
 }
 
 // called when the connection is opened
