@@ -18,6 +18,7 @@ const textTempLe = document.getElementById('textTempLe');
 const textHumidLe = document.getElementById('textHumidLe');
 const textBattLe = document.getElementById('textBattLe');
 const textTimeLe = document.getElementById('textTimeLe');
+const textGetDataStatus = document.getElementById('text-get-data-status');
 
 const alertBox = document.getElementById('alertBox');
 const alertMessage = document.getElementById('alertMessage');
@@ -53,6 +54,7 @@ let leafony;
 let chart_temp, chart_ilum, chart_batt;
 let array_temp, array_humd, array_ilum, array_batt;
 let array_time;
+let dataCount;
 
 let recv_state; // string
 
@@ -162,7 +164,7 @@ buttonDownload.addEventListener('click', () => {
 buttonConnect.addEventListener('click', async () => {
   // Spinner connect button
   buttonConnect.disabled = true;
-  buttonConnect.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Connecting...';
+  buttonConnect.innerHTML = '<span class="spinner-border" role="status" aria-hidden="true"></span> Connecting...';
 
   // initialize display
   clearTable();
@@ -178,7 +180,7 @@ buttonConnect.addEventListener('click', async () => {
     buttonConnect.innerHTML = 'Connect';
   }
 
-  return isConnected();
+  return isConnected;
 });
 
 /**
@@ -197,8 +199,10 @@ buttonDisconnect.addEventListener('click', () => {
  * Get Data button
  */
 buttonGetData.addEventListener('click', function () {
-  buttonGetData.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Receiving data...';
+  buttonGetData.innerHTML = '<span class="spinner-border" role="status" aria-hidden="true"></span> Receiving data...';
   buttonGetData.disabled = true;
+  dataCount = 0;
+  textGetDataStatus.innerText = 'Waiting for response...'
   sendCommand('getData');
 });
 
@@ -527,10 +531,10 @@ function updateChart(state) {
     array_humd.push(humd);
     array_ilum.push(illm);
     array_batt.push(batt);
-  } else {
-    console.log('invalid timestamp');
   }
 
+  dataCount += 1;
+  textGetDataStatus.innerText = `${dataCount}/170 samples are received.`;
 }
 
 /**
