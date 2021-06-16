@@ -417,6 +417,7 @@ void sleepBLE() {
 
   ble112.ble_cmd_system_halt(1);
   while (ble112.checkActivity());
+  digitalWrite(BLE_WAKEUP, LOW);
 }
 
 //---------------------------------------
@@ -428,7 +429,6 @@ void wakeupBLE() {
   Serial.println("Wakeup BLE");
 #endif
 
-  digitalWrite(BLE_WAKEUP, LOW);
   digitalWrite(BLE_WAKEUP, HIGH);
   delay(10);
 

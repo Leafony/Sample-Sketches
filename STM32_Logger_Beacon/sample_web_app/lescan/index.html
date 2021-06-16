@@ -200,25 +200,30 @@
         </div>
       </div>
 
-      <div id="feature-beacon">
-        <div class="col-12 text-center">
-          <p>6.  Press <b>Scan Beacon</b> button to start scanning beacon. (Android or Mac only. Please see <a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">the documentation</a>.)</p>
+      <div class="col-12 my-3 p-3 bg-white rounded shadow-sm" id="feature-beacon">
+        <h2 class="langCng border-bottom" lang="en">Scanning Beacon</h2>
+        <h2 class="langCng border-bottom" lang="ja">ビーコンスキャン</h2>
+
+        <p class="langCng" lang="en">You can scan advertising packet (beacon).</p>
+        <p class="langCng" lang="ja">Leafonyが発するビーコンの電波をスキャンすることができます。</p>
+
+        <p class="langCng" lang="en">1.  Press <b>Scan Beacon</b> button to start scanning beacon. (Android or Mac only. Please see <a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">the documentation</a>.)</p>
+        <p class="langCng" lang="ja">1. <b>Scan Beacon</b>ボタンを押してビーコンの電波をスキャンします。(AndroidまたはMac限定機能です。詳しくは<a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">WebBluetoothドキュメント</a>をご覧ください。)</p>
+
+        <div class="my-3 text-center">
           <button type="button" class="btn btn-primary" id="ble-lescan-button">Scan Beacon</button>
           <button type="button" class="btn btn-danger" id="ble-lestop-button" style="display:none;">Stop Scan</button>
-          <hr>
         </div>
-        <div class="col-12 text-center">
-          <p>7. Display updated when beacon packet is received.</p>
+
+        <p class="langCng" lang="en">2. Display updated when beacon packet is received.</p>
+        <p class="langCng" lang="ja">2. ビーコンの電波をキャッチすると画面が更新されます。</p>
+
+        <div class="m-3 p-3 border rounded shadow-sm text-center">
           <p class="display-4" id="textDevNameLe">Device Name</p>
           <p class="display-4" id="textTempLe">00.0℃</p>
           <p class="display-4" id="textHumidLe" style="display:none;">00%</p>
           <p class="display-4" id="textBattLe">0.00V</p>
           <p class="font-weight-light" id="textTimeLe">Last Update: 0000/00/00 00:00:00</p>
-          <hr>
-        </div>
-        <div class="col-12 text-center">
-          <p>8. Push <b>Success!</b> when it successfully works.</p>
-          <a type="button" class="btn btn-success" href="#section-ble-connect">Success!</a>
         </div>
       </div>
 
@@ -269,7 +274,7 @@
   <div class="py-5 bg-dark">
     <div class="text-center text-light col-sm-12">
       <p>&copy; 2021 Trillion-Node Engine Project</p>
-      <p>Version 1.2.1</p>
+      <p>Version 1.3.0</p>
     </div>
   </div>
 

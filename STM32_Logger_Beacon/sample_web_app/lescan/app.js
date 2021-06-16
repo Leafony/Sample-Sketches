@@ -327,9 +327,11 @@ buttonClearEEPROM.addEventListener('click', function () {
   sendCommand('clearEEPROM');
 });
 
+/*
 buttonSetTime.addEventListener('click', function () {
   sendCommand('setTime ' + timeStamp());
 });
+*/
 
 /**
  * 
