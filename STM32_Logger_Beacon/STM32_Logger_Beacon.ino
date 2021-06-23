@@ -607,6 +607,10 @@ void setup() {
   rtc.begin(); // initialize RTC 24H format
 
 #ifdef DEBUG
+  Serial.print("FIRMWARE VERSION: ");
+	Serial.println(FIRMWARE_VERSION);
+  Serial.print("CPU Clock Frequency = ");
+	Serial.println(HAL_RCC_GetHCLKFreq());
   Serial.println("=========================================");
   Serial.println("Setup start.");
 #endif
