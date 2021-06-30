@@ -1,11 +1,11 @@
 //=====================================================================
 //  STM32 Sound level meter
 //
-//    (c) 2021 Trillion-Node Study Group
+//    (c) 2021 LEAFONY SYSTEMS Co., Ltd
 //    Released under the MIT license
 //    https://opensource.org/licenses/MIT
 //
-//      Rev.00 2021/01/26  First release
+//      Rev.00 2020/04/01  First release
 //=====================================================================
 #define LED1            PA8       // D6
 #define LED2            PB12      // D7
