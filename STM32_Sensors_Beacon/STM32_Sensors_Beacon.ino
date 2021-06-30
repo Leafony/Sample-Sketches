@@ -11,11 +11,11 @@
 //       (3) AP03 STM32 MCU
 //       (4) AZ01 USB           :Bus-A
 //
-//    (c) 2020 Trillion-Node Study Group
+//    (c) 2021 LEAFONY SYSTEMS Co., Ltd
 //    Released under the MIT license
 //    https://opensource.org/licenses/MIT
 //
-//      Rev.00 2020/10/08 First release
+//      Rev.00 2021/04/01 First release
 //=====================================================================
 //  Required Libraries
 //    https://github.com/adafruit/Adafruit_LIS3DH
