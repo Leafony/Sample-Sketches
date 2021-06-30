@@ -9,11 +9,11 @@
 //       (2) AP01 AVR MCU
 //       (3) AZ01 USB
 //
-//		(c) 2020  Trillion-Node Study Group
+//		(c) 2021 LEAFONY SYSTEMS Co., Ltd
 //		Released under the MIT license
 //		https://opensource.org/licenses/MIT
 //
-//      Rev.00 2019/08/01  First release
+//      Rev.00 2021/04/01  First release
 //=====================================================================
 //=====================================================================
 // difinition
