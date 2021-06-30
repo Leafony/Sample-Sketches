@@ -1,11 +1,11 @@
 //=====================================================================
 //  STM32 Human Sensing
 //
-//    (c) 2021 Trillion-Node Study Group
+//    (c) 2021 LEAFONY SYSTEMS Co., Ltd
 //    Released under the MIT license
 //    https://opensource.org/licenses/MIT
 //
-//      Rev.00 2021/01/26  First release
+//      Rev.00 2021/04/01  First release
 //=====================================================================
 #include <Wire.h>
 
