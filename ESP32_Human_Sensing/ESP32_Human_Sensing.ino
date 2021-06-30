@@ -9,11 +9,11 @@
 //       (1) AI02 SP&PIR
 //       (2) AP02 ESP32 MCU
 //
-//		(c) 2020  Trillion-Node Study Group
+//		(c) 2021 LEAFONY SYSTEMS Co., Ltd
 //		Released under the MIT license
 //		https://opensource.org/licenses/MIT
 //
-//      Rev.00 2020/08/20  First release
+//      Rev.00 2021/04/01  First release
 //=====================================================================
 //---------------------------------------------------------------------
 // difinition
