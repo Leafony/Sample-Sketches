@@ -46,7 +46,7 @@
 //=====================================================================
 // Sketch firmware version
 //=====================================================================
-const String FIRMWARE_VERSION = "2021.06.020";
+const String FIRMWARE_VERSION = "2021.06.030";
 
 //=====================================================================
 // BLE Local device name
@@ -127,6 +127,11 @@ const String strDeviceName = "Leaf_AB";
 #define BLE_STATE_CONNECTED_MASTER (4)
 #define BLE_STATE_CONNECTED_SLAVE  (5)
 
+// BLE Connecting Mode
+#define MODE_IDLE               (0)
+#define MODE_SEND_DATA          (1)
+#define MODE_CLEAR_EEPROM       (2)
+
 // Baudrate
 #define SERIAL_BAUD 115200
 
@@ -165,9 +170,7 @@ float dataBatt = 0;
 volatile bool bSystemBootBle = false;
 volatile uint8_t ble_state = BLE_STATE_STANDBY;
 bool bBleConnected = false;
-bool bBleSendData = false;
-bool bBleSendSleepInterval = false;
-bool bBleSendWakeInterval = false;
+uint8_t mode = MODE_IDLE;
 
 // EEPROM ringbuffer
 uint16_t rb_addr = 0;  // ringbuffer read address
@@ -296,6 +299,7 @@ void setupSensors() {
   // LIS2DH (accelerometer)
   accel.begin(LIS2DH_ADDRESS);
   accel.setRange(LIS3DH_RANGE_2_G);  // Full scale +/- 2G
+  accel.setDataRate(LIS3DH_DATARATE_25_HZ);  // Data rate = 10Hz
   accel.setClick(DOUBLETAP, CLICKTHRESHHOLD);  // enable click interrupt
 
   // enable interrupt from accelerometer click event
@@ -682,7 +686,7 @@ void loop() {
       sleepAllDevices();
     }
   } else { // when ble is connected, this scope will run continuously.
-    if (bBleSendData) {
+    if (mode == MODE_SEND_DATA) {
 #ifdef DEBUG
       Serial.println("Start to send data.");
 #endif
@@ -703,8 +707,24 @@ void loop() {
 
       // after all the data trasnported,
       ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, 6, (const uint8_t *)"finish");
-      bBleSendData = false;
-    } else {
+      while (ble112.checkActivity(1000));
+      mode = MODE_IDLE;
+    }
+    else if (mode == MODE_CLEAR_EEPROM) {
+      for(int i = RINGBUFF_OFFSET_ADDR; i < EEPROM.length(); i++) {
+        EEPROM.write(i, 0);
+#ifdef DEBUG
+        if (i % 10 == 0) {
+          Serial.print(i);
+          Serial.print("/");
+          Serial.println(EEPROM.length() - RINGBUFF_OFFSET_ADDR);
+        }
+#endif
+      }
+      ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, 6, (const uint8_t *)"finish");
+      while (ble112.checkActivity(1000));
+      mode = MODE_IDLE;
+    } else { // MODE_IDLE
       ble112.checkActivity(100);
     }
   }
@@ -779,7 +799,7 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
   if (rcv_data.startsWith("getData"))
   {
     // Start to send EEPROM data
-    bBleSendData = true;
+    mode = MODE_SEND_DATA;
   }
   else if (rcv_data.startsWith("getSleep"))
   {
@@ -859,10 +879,6 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
     Serial.println("s)");
     #endif
   }
-  else if (rcv_data.startsWith("setData"))
-  {
-    bBleSendData = false;
-  }
   else if (rcv_data.startsWith("version"))
   {
     char sendData[16];
@@ -909,10 +925,11 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
 #endif
   }
   else if (rcv_data.startsWith("clearEEPROM")){
-    // Clear All
-    for(int i = RINGBUFF_OFFSET_ADDR; i < EEPROM.length(); i++) {
-      EEPROM.write(i, 0);
-    }
+    mode = MODE_CLEAR_EEPROM;
+    // // Clear All
+    // for(int i = RINGBUFF_OFFSET_ADDR; i < EEPROM.length(); i++) {
+    //   EEPROM.write(i, 0);
+    // }
   }
 }
 
