@@ -10,11 +10,11 @@
 //       (3) AZ01 USB
 //       (4) HX711
 //
-//    (c)2021 Trillion-Node Study Group
+//    (c)2021 LEAFONY SYSTEMS Co., Ltd
 //    Released under the MIT license
 //    https://opensource.org/licenses/MIT
 //
-//      Rev.00 2021/03/15 First release
+//      Rev.00 2021/04/01 First release
 //=====================================================================
 //---------------------------------------------------------------------
 // difinition
