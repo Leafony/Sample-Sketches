@@ -623,6 +623,8 @@ function onStateChange(state) {
         ]
       });
 
+      leafony.disconnect();
+
     }
     else {
       updateChart(state);
