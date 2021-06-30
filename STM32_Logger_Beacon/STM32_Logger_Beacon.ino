@@ -16,11 +16,11 @@
 //      センサデータをBeaconで送信しながらSTM32のFlashに書き込み、
 //      Webbluetoothから接続要求があれば、Flashのデータをすべて送信するサンプルスケッチです。
 //
-//    (c) 2021 Trillion-Node Study Group
+//    (c) 2021 LEAFONY SYSTEMS Co., Ltd
 //    Released under the MIT license
 //    https://opensource.org/licenses/MIT
 //
-//      Rev.01 2020/10/08 First release
+//      Rev.01 2021/04/01 First release
 //=====================================================================
 //  Required Libraries
 //    https://github.com/ameltech/sme-hts221-library
