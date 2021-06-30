@@ -8,12 +8,12 @@
 //       (2) AP01 AVR MCU
 //       (3) AZ01 USB
 //
-//		(c)2019 Trillion-Node Study Group
+//		(c)2021 LEAFONY SYSTEMS Co., Ltd
 //		Released under the MIT license
 //		https://opensource.org/licenses/MIT
 //
-//      Rev.00 2019/08/20 First release
-//      Rev.01 2020/07/29 不要部分削除等体裁修正
+//      Rev.00 2021/04/01 First release
+//      
 //=====================================================================
 // use libraries
 //  Adafruit Unified Sensor Driver
