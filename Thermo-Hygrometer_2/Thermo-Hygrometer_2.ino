@@ -1,11 +1,11 @@
 //=====================================================================
 //  Thermo-hygrometer
 //  Change the library to Adafruit_HTS221
-//    (c) 2021 Trillion-Node Study Group
+//    (c) 2021 LEAFONY SYSTEMS Co., Ltd
 //    Released under the MIT license
 //    https://opensource.org/licenses/MIT
 //
-//      Rev.00 2021/02/08  First release
+//      Rev.00 2021/04/01  First release
 //=====================================================================
 #include <Wire.h>
 #include <Adafruit_HTS221.h>                // humidity and temperature sensor
