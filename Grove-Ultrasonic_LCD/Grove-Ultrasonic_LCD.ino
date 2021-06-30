@@ -11,11 +11,11 @@
 //           ※  Ultrasonic RangerはGrove&5VのUARTに接続する
 //       (4) AZ01 USB
 //
-//		(c) 2020  Trillion-Node Study Group
+//		(c) 2021 LEAFONY SYSTEMS Co., Ltd
 //		Released under the MIT license
 //		https://opensource.org/licenses/MIT
 //
-//      Rev.00 2019/08/01 First release
+//      Rev.00 2021/04/01 First release
 //=====================================================================
 // Grove - Demonstration using Ultrasonic Ranger
 // Displays the distance from the object obtained from the ultrasonic sensor on the LCD.
@@ -86,4 +86,3 @@ void loop() {
 
   delay(250);
 }
-
