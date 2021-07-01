@@ -52,12 +52,12 @@ const buttonSetTime = document.getElementById('set-time-button');
 const buttonDownload = document.getElementById('button-download');
 
 let leafony;
-let chart_temp, chart_ilum, chart_batt;
-let array_temp, array_humd, array_ilum, array_batt;
-let array_time;
+let chartTemp, chartIlum, chartBatt;
+let arrayTemp, arrayHumd, arrayIlum, arrayBatt;
+let arrayTime;
 let dataCount;
 
-let recv_state; // string
+let stateRecv; // string
 
 // Check OS
 const platform = navigator.platform;
@@ -142,9 +142,9 @@ buttonDownload.addEventListener('click', () => {
   let csvText = "";
   // let csvText = "timestamp,temperature,humidity,illuminance,battery_voltage\n";
 
-  for (var i = 0; i < array_temp.length; i++) {
-    csvText += array_time[i] + "," + array_temp[i] + "," +
-      array_humd[i] + "," + array_ilum[i] + "," + array_batt[i] + '\n';
+  for (var i = 0; i < arrayTemp.length; i++) {
+    csvText += arrayTime[i] + "," + arrayTemp[i] + "," +
+      arrayHumd[i] + "," + arrayIlum[i] + "," + arrayBatt[i] + '\n';
   }
 
   let blob = new Blob([bom_utf_8, csvText], { "type": "text/csv" });
@@ -235,7 +235,7 @@ buttonLestop.addEventListener('click', function () {
  * Wake time check button
  */
 buttonCheckVersion.addEventListener('click', function () {
-  recv_state = "checkVersion";
+  stateRecv = "checkVersion";
   sendCommand('version');
 });
 
@@ -244,7 +244,7 @@ buttonCheckVersion.addEventListener('click', function () {
  * Wake time check button
  */
 buttonCheckWake.addEventListener('click', function () {
-  recv_state = "checkWake";
+  stateRecv = "checkWake";
   sendCommand('getWake');
 });
 
@@ -253,7 +253,7 @@ buttonCheckWake.addEventListener('click', function () {
  * Sleep time check button
  */
 buttonCheckSleep.addEventListener('click', function () {
-  recv_state = "checkSleep";
+  stateRecv = "checkSleep";
   sendCommand('getSleep');
 });
 
@@ -262,7 +262,7 @@ buttonCheckSleep.addEventListener('click', function () {
  * Sens frequency check button
  */
 buttonCheckSens.addEventListener('click', function () {
-  recv_state = "checkSens";
+  stateRecv = "checkSens";
   sendCommand('getSensFreq');
 });
 
@@ -271,7 +271,7 @@ buttonCheckSens.addEventListener('click', function () {
  * Save frequency check button
  */
 buttonCheckSave.addEventListener('click', function () {
-  recv_state = "checkSave";
+  stateRecv = "checkSave";
   sendCommand('getSaveFreq');
 });
 
@@ -323,7 +323,7 @@ buttonSubmitSave.addEventListener('click', function () {
  * Wake time check button
  */
 buttonClearEEPROM.addEventListener('click', function () {
-  recv_state = "clearEEPROM";
+  stateRecv = "clearEEPROM";
   sendCommand('clearEEPROM');
 });
 
@@ -351,21 +351,21 @@ function clearTable() {
  * Initialize Charts
  */
 function initChart() {
-  array_time = ['times', new Date(0)];
-  array_temp = ['Temperature', 0];
-  array_humd = ['Humidity', 0];
-  array_ilum = ['Illuminance', 0];
-  array_batt = ['Battery', 0];
+  arrayTime = ['times', new Date(0)];
+  arrayTemp = ['Temperature', 0];
+  arrayHumd = ['Humidity', 0];
+  arrayIlum = ['Illuminance', 0];
+  arrayBatt = ['Battery', 0];
 
-  chart_temp = c3.generate({
-    bindto: '#chart_temp',
+  chartTemp = c3.generate({
+    bindto: '#chart-temp',
     data: {
       x: 'times',
       xFormat: '%Y/%m/%d %H:%M:%S',
       columns: [
-        array_time,
-        array_temp,
-        array_humd,
+        arrayTime,
+        arrayTemp,
+        arrayHumd,
       ],
       axes: {
         Humidity: 'y2'
@@ -409,14 +409,14 @@ function initChart() {
     },
   });
 
-  chart_ilum = c3.generate({
-    bindto: '#chart_ilum',
+  chartIlum = c3.generate({
+    bindto: '#chart-ilum',
     data: {
       x: 'times',
       xFormat: '%Y/%m/%d %H:%M:%S',
       columns: [
-        array_time,
-        array_ilum,
+        arrayTime,
+        arrayIlum,
       ],
       colors: {
         Illuminance: '#ff9896'
@@ -450,14 +450,14 @@ function initChart() {
 
   });
 
-  chart_batt = c3.generate({
-    bindto: '#chart_batt',
+  chartBatt = c3.generate({
+    bindto: '#chart-batt',
     data: {
       x: 'times',
       xFormat: '%Y/%m/%d %H:%M:%S',
       columns: [
-        array_time,
-        array_batt,
+        arrayTime,
+        arrayBatt,
       ],
       colors: {
         Battery: '#2ca02c'
@@ -537,11 +537,11 @@ function updateChart(state) {
   let min_date = new Date(2021, 1, 1);
   let max_date = new Date();
   if (time.getTime() > min_date.getTime() && time.getTime() <= max_date.getTime()) {
-    array_time.push(str_time);
-    array_temp.push(temp);
-    array_humd.push(humd);
-    array_ilum.push(illm);
-    array_batt.push(batt);
+    arrayTime.push(str_time);
+    arrayTemp.push(temp);
+    arrayHumd.push(humd);
+    arrayIlum.push(illm);
+    arrayBatt.push(batt);
   }
 
   dataCount += 1;
@@ -556,31 +556,31 @@ function onStateChange(state) {
   let data = new Uint8Array(state.data.buffer);
   let recv = new TextDecoder('utf-8').decode(data);
 
-  if (recv_state == 'checkVersion') {
+  if (stateRecv == 'checkVersion') {
     inputVersionText.value = recv;
-    recv_state = 'main';
+    stateRecv = 'main';
   }
-  else if (recv_state == 'checkSleep') {
+  else if (stateRecv == 'checkSleep') {
     inputSleepText.value = parseInt(recv);
-    recv_state = 'main';
+    stateRecv = 'main';
   }
-  else if (recv_state == 'checkWake') {
+  else if (stateRecv == 'checkWake') {
     inputWakeText.value = parseInt(recv);
-    recv_state = 'main';
+    stateRecv = 'main';
   }
-  else if (recv_state == 'checkSens') {
+  else if (stateRecv == 'checkSens') {
     inputSensText.value = parseInt(recv);
-    recv_state = 'main';
+    stateRecv = 'main';
   }
-  else if (recv_state == 'checkSave') {
+  else if (stateRecv == 'checkSave') {
     inputSaveText.value = parseInt(recv);
-    recv_state = 'main';
+    stateRecv = 'main';
   }
-  else if (recv_state == 'checkAll') {
-    recv_state = 'main';
+  else if (stateRecv == 'checkAll') {
+    stateRecv = 'main';
   }
-  else if (recv_state == 'clearEEPROM') {
-    recv_state = 'main';
+  else if (stateRecv == 'clearEEPROM') {
+    stateRecv = 'main';
   }
   else {
     if (recv == 'finish') {
@@ -588,38 +588,38 @@ function onStateChange(state) {
       buttonGetData.innerHTML = 'Get Data';
       buttonGetData.disabled = false;
 
-      array_time.pop();
-      array_temp.pop();
-      array_humd.pop();
-      array_ilum.pop();
-      array_batt.pop();
+      arrayTime.pop();
+      arrayTemp.pop();
+      arrayHumd.pop();
+      arrayIlum.pop();
+      arrayBatt.pop();
 
-      array_time.splice(1, 1); // グラフに最初から登録しているデータを消す
-      array_temp.splice(1, 1);
-      array_humd.splice(1, 1);
-      array_ilum.splice(1, 1);
-      array_batt.splice(1, 1);
+      arrayTime.splice(1, 1); // グラフに最初から登録しているデータを消す
+      arrayTemp.splice(1, 1);
+      arrayHumd.splice(1, 1);
+      arrayIlum.splice(1, 1);
+      arrayBatt.splice(1, 1);
 
       // Update charts
-      chart_temp.load({
+      chartTemp.load({
         columns: [
-          array_time,
-          array_temp,
-          array_humd,
+          arrayTime,
+          arrayTemp,
+          arrayHumd,
         ]
       });
 
-      chart_ilum.load({
+      chartIlum.load({
         columns: [
-          array_time,
-          array_ilum,
+          arrayTime,
+          arrayIlum,
         ]
       });
 
-      chart_batt.load({
+      chartBatt.load({
         columns: [
-          array_time,
-          array_batt,
+          arrayTime,
+          arrayBatt,
         ]
       });
 
