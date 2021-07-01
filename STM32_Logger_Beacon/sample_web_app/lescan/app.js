@@ -6,13 +6,6 @@
  * https://github.com/WebBluetoothCG/web-bluetooth/blob/master/implementation-status.md
  */
 
-const textDeviceName = document.getElementById('textDeviceName');
-const textUniqueName = document.getElementById('textUniqueName');
-const textDateTime = document.getElementById('textDateTime');
-const textTemp = document.getElementById('textTemp');
-const textHumid = document.getElementById('textHumid');
-const textIllum = document.getElementById('textIllum');
-const textBatt = document.getElementById('textBatt');
 const textDevNameLe = document.getElementById('textDevNameLe');
 const textTempLe = document.getElementById('textTempLe');
 const textHumidLe = document.getElementById('textHumidLe');
@@ -169,7 +162,6 @@ buttonConnect.addEventListener('click', async () => {
   buttonConnect.innerHTML = '<span class="spinner-border" role="status" aria-hidden="true"></span> Connecting...';
 
   // initialize display
-  clearTable();
   initChart();
 
   // connect to leafony
@@ -205,6 +197,7 @@ buttonGetData.addEventListener('click', function () {
   buttonGetData.disabled = true;
   dataCount = 0;
   textGetDataStatus.innerText = 'Waiting for response...'
+  stateRecv = 'getData';
   sendCommand('getData');
 });
 
@@ -326,26 +319,6 @@ buttonClearEEPROM.addEventListener('click', function () {
   stateRecv = "clearEEPROM";
   sendCommand('clearEEPROM');
 });
-
-/*
-buttonSetTime.addEventListener('click', function () {
-  sendCommand('setTime ' + timeStamp());
-});
-*/
-
-/**
- * 
- */
-function clearTable() {
-  textDeviceName.innerHTML = '';
-  textUniqueName.innerHTML = '';
-  textDateTime.innerHTML = '';
-  textTemp.innerHTML = '';
-  textHumid.innerHTML = '';
-  textIllum.innerHTML = '';
-  textBatt.innerHTML = '';
-}
-
 
 /**
  * Initialize Charts
@@ -496,7 +469,7 @@ function initChart() {
  * Update charts
  * @param {*} state: received ble state from onStateChange handler
  */
-function updateChart(state) {
+function decodeData(state) {
   // Reveiced datetime
   let date = new Date();
   let year = String(date.getFullYear());
@@ -525,14 +498,6 @@ function updateChart(state) {
     + ':' + ('0' + time.getSeconds()).slice(-2);
   console.log(str_time, unixtime, temp, humd, illm, batt);
 
-  textDeviceName.innerText = state.devn;
-  textUniqueName.innerText = state.unin;
-  textDateTime.innerText = datetime;
-  textTemp.innerText = temp;
-  textHumid.innerText = humd;
-  textIllum.innerText = illm;
-  textBatt.innerText = batt;
-
   // Append sensors values to array
   let min_date = new Date(2021, 1, 1);
   let max_date = new Date();
@@ -543,10 +508,46 @@ function updateChart(state) {
     arrayIlum.push(illm);
     arrayBatt.push(batt);
   }
-
-  dataCount += 1;
-  textGetDataStatus.innerText = `${dataCount}/170 samples are received.`;
 }
+
+const drawChart = () => {
+  arrayTime.pop();
+  arrayTemp.pop();
+  arrayHumd.pop();
+  arrayIlum.pop();
+  arrayBatt.pop();
+
+  arrayTime.splice(1, 1); // グラフに最初から登録しているデータを消す
+  arrayTemp.splice(1, 1);
+  arrayHumd.splice(1, 1);
+  arrayIlum.splice(1, 1);
+  arrayBatt.splice(1, 1);
+
+  // Update charts
+  chartTemp.load({
+    columns: [
+      arrayTime,
+      arrayTemp,
+      arrayHumd,
+    ]
+  });
+
+  chartIlum.load({
+    columns: [
+      arrayTime,
+      arrayIlum,
+    ]
+  });
+
+  chartBatt.load({
+    columns: [
+      arrayTime,
+      arrayBatt,
+    ]
+  });
+
+  leafony.disconnect();
+};
 
 /**
  * This function is called when bluetooth reveice data.
@@ -556,79 +557,47 @@ function onStateChange(state) {
   let data = new Uint8Array(state.data.buffer);
   let recv = new TextDecoder('utf-8').decode(data);
 
-  if (stateRecv == 'checkVersion') {
+  if (stateRecv === 'checkVersion') {
     inputVersionText.value = recv;
     stateRecv = 'main';
   }
-  else if (stateRecv == 'checkSleep') {
+  else if (stateRecv === 'checkSleep') {
     inputSleepText.value = parseInt(recv);
     stateRecv = 'main';
   }
-  else if (stateRecv == 'checkWake') {
+  else if (stateRecv === 'checkWake') {
     inputWakeText.value = parseInt(recv);
     stateRecv = 'main';
   }
-  else if (stateRecv == 'checkSens') {
+  else if (stateRecv === 'checkSens') {
     inputSensText.value = parseInt(recv);
     stateRecv = 'main';
   }
-  else if (stateRecv == 'checkSave') {
+  else if (stateRecv === 'checkSave') {
     inputSaveText.value = parseInt(recv);
     stateRecv = 'main';
   }
-  else if (stateRecv == 'checkAll') {
+  else if (stateRecv === 'checkAll') {
     stateRecv = 'main';
   }
-  else if (stateRecv == 'clearEEPROM') {
+  else if (stateRecv === 'clearEEPROM') {
     stateRecv = 'main';
   }
-  else {
-    if (recv == 'finish') {
+  else if (stateRecv === 'getData'){
+    if (recv === 'finish') {
       console.log('Finish!');
       buttonGetData.innerHTML = 'Get Data';
       buttonGetData.disabled = false;
-
-      arrayTime.pop();
-      arrayTemp.pop();
-      arrayHumd.pop();
-      arrayIlum.pop();
-      arrayBatt.pop();
-
-      arrayTime.splice(1, 1); // グラフに最初から登録しているデータを消す
-      arrayTemp.splice(1, 1);
-      arrayHumd.splice(1, 1);
-      arrayIlum.splice(1, 1);
-      arrayBatt.splice(1, 1);
-
-      // Update charts
-      chartTemp.load({
-        columns: [
-          arrayTime,
-          arrayTemp,
-          arrayHumd,
-        ]
-      });
-
-      chartIlum.load({
-        columns: [
-          arrayTime,
-          arrayIlum,
-        ]
-      });
-
-      chartBatt.load({
-        columns: [
-          arrayTime,
-          arrayBatt,
-        ]
-      });
-
-      leafony.disconnect();
-
+      drawChart();
     }
     else {
-      updateChart(state);
+      dataCount += 1;
+      textGetDataStatus.innerText = `${dataCount}/170 samples are received.`;
+      decodeData(state);
     }
+  }
+  else {
+
   }
 }
 
