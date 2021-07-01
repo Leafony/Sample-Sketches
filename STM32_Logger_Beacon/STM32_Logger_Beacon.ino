@@ -718,9 +718,15 @@ void loop() {
           Serial.print(i);
           Serial.print("/");
           Serial.println(EEPROM.length() - RINGBUFF_OFFSET_ADDR);
+
+          char sendData[PACKET_LENGTH];
+          uint8_t len = sprintf(sendData, "%05d", i);
+          ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
+          while (ble112.checkActivity(1000));
         }
 #endif
       }
+
       ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, 6, (const uint8_t *)"finish");
       while (ble112.checkActivity(1000));
       mode = MODE_IDLE;
@@ -807,6 +813,7 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
     char sendData[8];
     uint8_t len = sprintf(sendData, "%05d", (int)sleep_intval);
     ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
+    while (ble112.checkActivity(1000));
   }
   else if (rcv_data.startsWith("getWake"))
   {
@@ -814,6 +821,7 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
     char sendData[8];
     uint8_t len = sprintf(sendData, "%05d", (int)wake_intval);
     ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
+    while (ble112.checkActivity(1000));
   }
   else if (rcv_data.startsWith("getSensFreq"))
   {
@@ -821,6 +829,7 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
     char sendData[8];
     uint8_t len = sprintf(sendData, "%05d", (int)sens_freq);
     ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
+    while (ble112.checkActivity(1000));
   }
   else if (rcv_data.startsWith("getSaveFreq"))
   {
@@ -828,6 +837,7 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
     char sendData[8];
     uint8_t len = sprintf(sendData, "%05d", (int)save_freq);
     ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
+    while (ble112.checkActivity(1000));
   }
   else if (rcv_data.startsWith("setSleep"))
   {
@@ -883,6 +893,7 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
   {
     char sendData[16];
     ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, FIRMWARE_VERSION.length(), (const uint8_t *)FIRMWARE_VERSION.c_str());
+    while (ble112.checkActivity(1000));
   }
   else if (rcv_data.startsWith("setTime"))
   {

@@ -12,6 +12,7 @@ const textHumidLe = document.getElementById('textHumidLe');
 const textBattLe = document.getElementById('textBattLe');
 const textTimeLe = document.getElementById('textTimeLe');
 const textGetDataStatus = document.getElementById('text-get-data-status');
+const textClearEEPROMStatus = document.getElementById('text-clear-eeprom-status');
 
 const alertBox = document.getElementById('alertBox');
 const alertMessage = document.getElementById('alertMessage');
@@ -316,6 +317,7 @@ buttonSubmitSave.addEventListener('click', function () {
  * Wake time check button
  */
 buttonClearEEPROM.addEventListener('click', function () {
+  textClearEEPROMStatus.innerText = 'Waiting for response...'
   stateRecv = "clearEEPROM";
   sendCommand('clearEEPROM');
 });
@@ -470,17 +472,6 @@ function initChart() {
  * @param {*} state: received ble state from onStateChange handler
  */
 function decodeData(state) {
-  // Reveiced datetime
-  let date = new Date();
-  let year = String(date.getFullYear());
-  let month = ('00' + (date.getMonth() + 1)).slice(-2);
-  let day = ('00' + date.getDate()).slice(-2);
-  let hours = ('00' + date.getHours()).slice(-2);
-  let minutes = ('00' + date.getMinutes()).slice(-2);
-  let seconds = ('00' + date.getSeconds()).slice(-2);
-  let datetime = year + '/' + month + '/' + day + ' ' +
-    hours + ':' + minutes + ':' + seconds;
-
   // Decode received data
   let data = new Uint8Array(state.data.buffer);
   let temp = (data[0] * 256.0 + data[1]) / 256.0;
@@ -545,8 +536,6 @@ const drawChart = () => {
       arrayBatt,
     ]
   });
-
-  leafony.disconnect();
 };
 
 /**
@@ -581,14 +570,23 @@ function onStateChange(state) {
     stateRecv = 'main';
   }
   else if (stateRecv === 'clearEEPROM') {
-    stateRecv = 'main';
+    if (recv === 'finish') {
+      console.log('clearEEPROM Finished!')
+      textClearEEPROMStatus.innerText = 'EEPROM clear successfully finished!';
+      leafony.disconnect(); // Automatically disconnect from Leafony.
+      stateRecv = 'main';
+    } else {
+      textClearEEPROMStatus.innerText = `${parseInt(recv)}bytes/2040bytes cleared.`;
+    }
   }
   else if (stateRecv === 'getData'){
     if (recv === 'finish') {
-      console.log('Finish!');
+      console.log('getData Finished!');
       buttonGetData.innerHTML = 'Get Data';
       buttonGetData.disabled = false;
       drawChart();
+      leafony.disconnect(); // Automatically disconnect from Leafony.
+      stateRecv = 'main';
     }
     else {
       dataCount += 1;
@@ -596,8 +594,11 @@ function onStateChange(state) {
       decodeData(state);
     }
   }
+  else if (stateRecv === 'main') {
+    console.error('Main state does not have any process.')
+  }
   else {
-
+    console.error('Invalid state.')
   }
 }
 
