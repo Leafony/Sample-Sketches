@@ -299,7 +299,7 @@ void setupSensors() {
   // LIS2DH (accelerometer)
   accel.begin(LIS2DH_ADDRESS);
   accel.setRange(LIS3DH_RANGE_2_G);  // Full scale +/- 2G
-  accel.setDataRate(LIS3DH_DATARATE_25_HZ);  // Data rate = 10Hz
+  accel.setDataRate(LIS3DH_DATARATE_50_HZ);  // Data rate = 10Hz
   accel.setClick(DOUBLETAP, CLICKTHRESHHOLD);  // enable click interrupt
 
   // enable interrupt from accelerometer click event

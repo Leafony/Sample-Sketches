@@ -502,13 +502,8 @@ function decodeData(state) {
 }
 
 const drawChart = () => {
-  arrayTime.pop();
-  arrayTemp.pop();
-  arrayHumd.pop();
-  arrayIlum.pop();
-  arrayBatt.pop();
-
-  arrayTime.splice(1, 1); // グラフに最初から登録しているデータを消す
+  // グラフに最初から登録しているunixtime=0のデータを消す
+  arrayTime.splice(1, 1);
   arrayTemp.splice(1, 1);
   arrayHumd.splice(1, 1);
   arrayIlum.splice(1, 1);
