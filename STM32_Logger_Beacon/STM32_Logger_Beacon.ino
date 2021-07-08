@@ -516,18 +516,24 @@ void writeEEPROM() {
   illum = (uint16_t)dataLight;
   battVolt = (uint16_t)(dataBatt * 256.0);
 
-  EEPROM.write(rb_addr + 0, (temp >> 8) & 0xFF);
-  EEPROM.write(rb_addr + 1, temp & 0xFF);
-  EEPROM.write(rb_addr + 2, (humid >> 8) & 0xFF);
-  EEPROM.write(rb_addr + 3, humid & 0xFF);
-  EEPROM.write(rb_addr + 4, (illum >> 8) & 0xFF);
-  EEPROM.write(rb_addr + 5, illum & 0xFF);
-  EEPROM.write(rb_addr + 6, (battVolt >> 8) & 0xFF);
-  EEPROM.write(rb_addr + 7, battVolt & 0xFF);
-  EEPROM.write(rb_addr + 8, (u_time >> 0) & 0xFF);
-  EEPROM.write(rb_addr + 9, (u_time >> 8) & 0xFF);
-  EEPROM.write(rb_addr + 10, (u_time >> 16) & 0xFF);
-  EEPROM.write(rb_addr + 11, (u_time >> 24) & 0xFF);
+  uint8_t dat[12];
+  dat[0]  = (temp >> 8) & 0xFF;
+  dat[1]  = temp & 0xFF;
+  dat[2]  = (humid >> 8) & 0xFF;
+  dat[3]  = humid & 0xFF;
+  dat[4]  = (illum >> 8) & 0xFF;
+  dat[5]  = illum & 0xFF;
+  dat[6]  = (battVolt >> 8) & 0xFF;
+  dat[7]  = battVolt & 0xFF;
+  dat[8]  = (u_time >> 0) & 0xFF;
+  dat[9]  = (u_time >> 8) & 0xFF;
+  dat[10] = (u_time >> 16) & 0xFF;
+  dat[11] = (u_time >> 24) & 0xFF;
+
+  for (uint8_t i = 0; i < 12; i++) {
+    EEPROM.write(rb_addr + i, dat[i]);
+    delay(10);  // EEPROM書き込み後しばらく待つ
+  }
 
   // write next ring buffer address to RTC backup register.
   rb_addr += PACKET_LENGTH;
