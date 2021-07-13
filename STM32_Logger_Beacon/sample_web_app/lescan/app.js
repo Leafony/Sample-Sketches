@@ -17,8 +17,8 @@ const textClearEEPROMStatus = document.getElementById('text-clear-eeprom-status'
 const alertBox = document.getElementById('alertBox');
 const alertMessage = document.getElementById('alertMessage');
 
-const buttonConnect = document.getElementById('ble-connect-button');
-const buttonDisconnect = document.getElementById('ble-disconnect-button');
+const buttonConnect = document.querySelectorAll('#ble-connect-button');
+const buttonDisconnect = document.querySelectorAll('#ble-disconnect-button');
 const buttonGetData = document.getElementById('ble-get-button');
 const buttonLescan = document.getElementById('ble-lescan-button');
 const buttonLestop = document.getElementById('ble-lestop-button');
@@ -81,8 +81,10 @@ window.onload = function () {
     setTimeout(function () {
       sendCommand('setTime ' + timeStamp());
 
-      buttonConnect.style.display = 'none';
-      buttonDisconnect.style.display = '';
+      for(let i=0; i<buttonConnect.length; i++) {
+        buttonConnect[i].style.display = 'none';
+        buttonDisconnect[i].style.display = '';
+      }
 
       textUniqueName.innerText = uniqueName;
 
@@ -157,38 +159,48 @@ buttonDownload.addEventListener('click', () => {
 /**
  * Connect button
  */
-buttonConnect.addEventListener('click', async () => {
-  // Spinner connect button
-  buttonConnect.disabled = true;
-  buttonConnect.innerHTML = '<span class="spinner-border" role="status" aria-hidden="true"></span> Connecting...';
+for (let i=0; i<buttonConnect.length; i++) {
+  buttonConnect[i].addEventListener('click', async () => {
+    // Spinner connect button
+    for (let j=0; j<buttonConnect.length; j++) {
+      buttonConnect[j].disabled = true;
+      buttonConnect[j].innerHTML = '<span class="spinner-border" role="status" aria-hidden="true"></span> Connecting...';
+    }
 
-  // initialize display
-  initChart();
+    // initialize display
+    initChart();
 
-  // connect to leafony
-  leafony.disableSleep();
+    // connect to leafony
+    leafony.disableSleep();
 
-  let isConnected = await leafony.connect();
+    let isConnected = await leafony.connect();
 
-  if (!isConnected) {
-    buttonConnect.disabled = false;
-    buttonConnect.innerHTML = 'Connect';
-  }
+    if (!isConnected) {
+      for (let j=0; j<buttonConnect.length; j++) {
+        buttonConnect[j].disabled = false;
+        buttonConnect[j].innerHTML = 'Connect';
+      }
+    }
 
-  return isConnected;
-});
+    return isConnected;
+  });
+}
 
 /**
  * Disconnect button
  */
-buttonDisconnect.addEventListener('click', () => {
-  leafony.disconnect();
+for (let i=0; i<buttonConnect.length; i++) {
+  buttonDisconnect[i].addEventListener('click', () => {
+    leafony.disconnect();
 
-  buttonConnect.style.display = '';
-  buttonDisconnect.style.display = 'none';
-  buttonConnect.disabled = false;
-  buttonConnect.innerHTML = 'Connect';
-});
+    for (let j=0; j<buttonConnect.length; j++) {
+      buttonConnect[j].style.display = '';
+      buttonDisconnect[j].style.display = 'none';
+      buttonConnect[j].disabled = false;
+      buttonConnect[j].innerHTML = 'Connect';
+    }
+  });
+}
 
 /**
  * Get Data button
@@ -619,10 +631,12 @@ function onAdvertisementReceived(devname, state) {
 function onDisconnected(state) {
   textUniqueName.innerText = '';
 
-  buttonConnect.style.display = '';
-  buttonDisconnect.style.display = 'none';
-  buttonConnect.disabled = false;
-  buttonConnect.innerHTML = 'Connect';
+  for(let i=0; i<buttonConnect.length; i++) {
+    buttonConnect[i].style.display = '';
+    buttonDisconnect[i].style.display = 'none';
+    buttonConnect[i].disabled = false;
+    buttonConnect[i].innerHTML = 'Connect';
+  }
 
   buttonGetData.disabled = true;
   buttonCheckVersion.disabled = true;

@@ -49,7 +49,7 @@
     <div class="row justify-content-center">
 
       <div class="col-12 mb-3 p-3 bg-white rounded shadow-sm">
-        <h2 class="border-bottom"><i class="fas fa-globe-americas"></i> Language</h2>
+        <h2 class="border-bottom">Language</h2>
         <select class="form-control form-control-lg" id="languageSelect">
           <option value="en">English</option>
           <option value="ja">Japanese</option>
@@ -170,6 +170,11 @@
         <p class="langCng" lang="en">1. Press the Connect button in the initialization procedure to establish a Bluetooth connection with Leafony.</p>
         <p class="langCng" lang="ja">1. 初期化の手順にあるConnectボタンを押してLeafonyとBluetooth接続をしてください。</p>
 
+        <div class="my-3 text-center">
+          <button type="button" class="btn btn-lg btn-primary" id="ble-connect-button">Connect</button>
+          <button type="button" class="btn btn-lg btn-danger" id="ble-disconnect-button" style="display:none;">Disconnect</button>
+        </div>
+
         <p class="langCng" lang="en">2. Once the connection is established, press the Get Data button below and wait for a while to graph the sensor data.</p>
         <p class="langCng" lang="ja">2. 接続が完了したら、下のGet Dataボタンを押してしばらく待つと、センサデータがグラフ化されます。</p>
 
@@ -240,9 +245,6 @@
   </div>
 
   <a style="display:none;" id="downloader" href="#"></a>
-
-  <!-- fontawesome -->
-  <script src="https://kit.fontawesome.com/6f58eaa068.js" crossorigin="anonymous"></script>
 
   <!-- Load c3.css -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.css" rel="stylesheet">
