@@ -55,10 +55,10 @@ let stateRecv; // string
 
 // Check OS
 const platform = navigator.platform;
-const isMac = /Mac/.test(platform);
 const userAgent = navigator.userAgent;
+const isMac = /Mac/.test(platform);
 const isAndroid = /Android/.test(userAgent);
-const isScanningSupported = isAndroid || isMac;
+const isScanningSupported = isAndroid;
 
 /**
  * 
@@ -135,8 +135,7 @@ window.onload = function () {
  */
 buttonDownload.addEventListener('click', () => {
   let bom_utf_8 = new Uint8Array([0xEF, 0xBB, 0xBF]);
-  let csvText = "";
-  // let csvText = "timestamp,temperature,humidity,illuminance,battery_voltage\n";
+  let csvText = `Device Name,${textUniqueName.innerText}\n`;
 
   for (var i = 0; i < arrayTemp.length; i++) {
     csvText += arrayTime[i] + "," + arrayTemp[i] + "," +
