@@ -46,12 +46,12 @@
 //=====================================================================
 // Sketch firmware version
 //=====================================================================
-const String FIRMWARE_VERSION = "2021.06.030";
+const String FIRMWARE_VERSION = "2021.07.140";
 
 //=====================================================================
 // BLE Local device name
 //=====================================================================
-const String strDeviceName = "Leaf_AB";
+String strDeviceName = "Leaf_AB";
 
 //=====================================================================
 // シリアルコンソールへのデバック出力
@@ -895,9 +895,19 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
     Serial.println("s)");
     #endif
   }
+  else if (rcv_data.startsWith("setDevName"))
+  {
+    // Set Device Name
+    Serial.print(rcv_data);
+    strDeviceName = "Leaf_" + rcv_data.substring(11);
+  }
+  else if (rcv_data.startsWith("getDevName"))
+  {
+    ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, strDeviceName.length(), (const uint8_t *)strDeviceName.c_str());
+    while (ble112.checkActivity(1000));
+  }
   else if (rcv_data.startsWith("version"))
   {
-    char sendData[16];
     ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, FIRMWARE_VERSION.length(), (const uint8_t *)FIRMWARE_VERSION.c_str());
     while (ble112.checkActivity(1000));
   }

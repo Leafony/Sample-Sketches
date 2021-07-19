@@ -29,18 +29,21 @@ const buttonCheckWake = document.getElementById('check-wake-button');
 const buttonCheckSleep = document.getElementById('check-sleep-button');
 const buttonCheckSens = document.getElementById('check-sens-button');
 const buttonCheckSave = document.getElementById('check-save-button');
+const buttonCheckDeviceName = document.getElementById('check-device-name-button');
 const buttonCheckAll = document.getElementById('check-all-button');
 const buttonClearEEPROM = document.getElementById('clear-eeprom-button');
 const buttonSubmitWake = document.getElementById('submit-wake-button');
 const buttonSubmitSleep = document.getElementById('submit-sleep-button');
 const buttonSubmitSens = document.getElementById('submit-sens-button');
 const buttonSubmitSave = document.getElementById('submit-save-button');
+const buttonSubmitDeviceName = document.getElementById('submit-device-name-button');
 const buttonSubmitAll = document.getElementById('submit-all-button');
 const inputVersionText = document.getElementById('version-text-input');
 const inputWakeText = document.getElementById('wake-text-input');
 const inputSleepText = document.getElementById('sleep-text-input');
 const inputSensText = document.getElementById('sens-text-input');
 const inputSaveText = document.getElementById('save-text-input');
+const inputDeviceNameText = document.getElementById('device-name-input');
 
 const buttonSetTime = document.getElementById('set-time-button');
 const buttonDownload = document.getElementById('button-download');
@@ -94,10 +97,12 @@ window.onload = function () {
       buttonCheckSleep.disabled = false;
       buttonCheckSens.disabled = false;
       buttonCheckSave.disabled = false;
+      buttonCheckDeviceName.disabled = false;
       buttonSubmitWake.disabled = false;
       buttonSubmitSleep.disabled = false
       buttonSubmitSens.disabled = false;
       buttonSubmitSave.disabled = false;
+      buttonSubmitDeviceName.disabled = false;
       buttonClearEEPROM.disabled = false;
     }, 1500);
   });
@@ -123,10 +128,12 @@ window.onload = function () {
   buttonCheckSleep.disabled = true;
   buttonCheckSens.disabled = true;
   buttonCheckSave.disabled = true;
+  buttonCheckDeviceName.disabled = true;
   buttonSubmitWake.disabled = true;
   buttonSubmitSleep.disabled = true;
   buttonSubmitSens.disabled = true;
   buttonSubmitSave.disabled = true;
+  buttonSubmitDeviceName.disabled = true;
   buttonClearEEPROM.disabled = true;
 };
 
@@ -282,6 +289,14 @@ buttonCheckSave.addEventListener('click', function () {
 
 
 /**
+ * Device Name check button
+ */
+buttonCheckDeviceName.addEventListener('click', function () {
+  stateRecv = "checkDeviceName";
+  sendCommand('getDevName');
+});
+
+/**
  * Wake time submit button
  */
 buttonSubmitWake.addEventListener('click', function () {
@@ -323,6 +338,18 @@ buttonSubmitSave.addEventListener('click', function () {
   }
   sendCommand('setSaveFreq ' + inputSaveText.value);
 });
+
+
+/**
+ * Save frequency submit button
+ */
+buttonSubmitDeviceName.addEventListener('click', function () {
+  if (!inputDeviceNameText.value) {
+    return;
+  }
+  sendCommand('setDevName ' + inputDeviceNameText.value);
+});
+
 
 /**
  * Wake time check button
@@ -572,6 +599,10 @@ function onStateChange(state) {
     inputSaveText.value = parseInt(recv);
     stateRecv = 'main';
   }
+  else if (stateRecv === 'checkDeviceName') {
+    inputDeviceNameText.value = recv.slice(5); // remove "Leaf_"
+    stateRecv = 'main';
+  }
   else if (stateRecv === 'checkAll') {
     stateRecv = 'main';
   }
@@ -643,10 +674,12 @@ function onDisconnected(state) {
   buttonCheckSleep.disabled = true;
   buttonCheckSens.disabled = true;
   buttonCheckSave.disabled = true;
+  buttonCheckDeviceName.disabled = true;
   buttonSubmitWake.disabled = true;
   buttonSubmitSleep.disabled = true;
   buttonSubmitSens.disabled = true;
   buttonSubmitSave.disabled = true;
+  buttonSubmitDeviceName.disabled = true;
   buttonClearEEPROM.disabled = true;
 }
 

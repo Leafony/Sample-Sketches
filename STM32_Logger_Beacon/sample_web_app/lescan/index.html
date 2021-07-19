@@ -103,15 +103,19 @@
             <label for="version-text-input">Version</label>
             <div class="input-group">
               <input type="text" class="form-control" placeholder="Version" id="version-text-input">
-              <button class="btn btn-outline-secondary" type="button" id="check-version-button">Check</button>
+              <div class="input-group-append" id="version-text-input">
+                <button class="btn btn-outline-secondary" type="button" id="check-version-button">Check</button>
+              </div>
             </div>
           </div>
           <div class="form-group" style="display:none;">
             <label for="wake-text-input">Wake Time [s] (0～65535)</label>
             <div class="input-group">
               <input type="text" class="form-control" placeholder="Wake Time" id="wake-text-input">
-              <button class="btn btn-outline-secondary" type="button" id="check-wake-button">Check</button>
-              <button class="btn btn-outline-secondary" type="button" id="submit-wake-button">Submit</button>
+              <div class="input-group-append" id="wake-text-input">
+                <button class="btn btn-outline-secondary" type="button" id="check-wake-button">Check</button>
+                <button class="btn btn-outline-secondary" type="button" id="submit-wake-button">Submit</button>
+              </div>
             </div>
           </div>
 
@@ -119,8 +123,10 @@
             <label for="sleep-text-input">Sleep Time [s] (0～65535)</label>
             <div class="input-group">
               <input type="text" class="form-control" placeholder="Sleep Time" id="sleep-text-input">
-              <button class="btn btn-outline-secondary" type="button" id="check-sleep-button">Check</button>
-              <button class="btn btn-outline-secondary" type="button" id="submit-sleep-button">Submit</button>
+              <div class="input-group-append" id="sleep-text-input">
+                <button class="btn btn-outline-secondary" type="button" id="check-sleep-button">Check</button>
+                <button class="btn btn-outline-secondary" type="button" id="submit-sleep-button">Submit</button>
+              </div>
             </div>
           </div>
 
@@ -147,8 +153,22 @@
             <button class="btn btn-outline-secondary" type="button" id="submit-all-button">Submit All</button>
           </div>
 
+          <div class="form-group">
+            <label for="device-name-input">Device Name (Up to 5 characters)</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="device-name-input">Leaf_</label>
+              </div>
+              <input type="text" class="form-control" placeholder="ABCDE" id="device-name-input">
+              <div class="input-group-append" id="device-name-input">
+                <button class="btn btn-outline-secondary" type="button" id="check-device-name-button">Check</button>
+                <button class="btn btn-outline-secondary" type="button" id="submit-device-name-button">Submit</button>
+              </div>
+            </div>
+          </div>
+
           <div class="my-3">
-            <p class="small langCng" lang="en">EEPROMに書き込まれたセンサデータをすべて削除します。(数分かかることがあります。)</p>
+            <p class="small langCng" lang="en">Clear EEPROM and delete all saved data. (This may take several minutes...)</p>
             <p class="small langCng" lang="jp">EEPROMに書き込まれたセンサデータをすべて削除します。(数分かかることがあります。)</p>
             <button class="btn btn-outline-danger" type="button" id="clear-eeprom-button">Clear EEPROM</button>
             <p class="text-muted" id="text-clear-eeprom-status"></p>
@@ -157,7 +177,33 @@
 
         <p class="langCng" lang="en">6. When you press the Disconnect button, Bluetooth will be disconnected and Leafony will start measuring the data. The data is measured at the intervals specified by Sleep Time. Please wait for a while before proceeding to the next chapter.</p>
         <p class="langCng" lang="ja">6. Disconnectボタンを押すとBluetoothが切断され、Leafonyはデータの測定をスタートします。データはSleep Timeで指定した間隔で測定されます。しばらく待ってから次の章に進みましょう。</p>
+      </div>
 
+      <div class="col-12 my-3 p-3 bg-white rounded shadow-sm" id="feature-beacon">
+        <h2 class="langCng border-bottom" lang="en">Scanning Beacon</h2>
+        <h2 class="langCng border-bottom" lang="ja">ビーコンスキャン</h2>
+
+        <p class="langCng" lang="en">You can scan advertising packet (beacon).</p>
+        <p class="langCng" lang="ja">Leafonyが発するビーコンの電波をスキャンすることができます。</p>
+
+        <p class="langCng" lang="en">1.  Press <b>Scan Beacon</b> button to start scanning beacon. (Android or Mac only. Please see <a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">the documentation</a>.)</p>
+        <p class="langCng" lang="ja">1. <b>Scan Beacon</b>ボタンを押してビーコンの電波をスキャンします。(AndroidまたはMac限定機能です。詳しくは<a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">WebBluetoothドキュメント</a>をご覧ください。)</p>
+
+        <div class="my-3 text-center">
+          <button type="button" class="btn btn-primary" id="ble-lescan-button">Scan Beacon</button>
+          <button type="button" class="btn btn-danger" id="ble-lestop-button" style="display:none;">Stop Scan</button>
+        </div>
+
+        <p class="langCng" lang="en">2. Display updated when beacon packet is received.</p>
+        <p class="langCng" lang="ja">2. ビーコンの電波をキャッチすると画面が更新されます。</p>
+
+        <div class="m-3 p-3 border rounded shadow-sm text-center">
+          <p class="display-4" id="textDevNameLe">Device Name</p>
+          <p class="display-4" id="textTempLe">00.0℃</p>
+          <p class="display-4" id="textHumidLe">00%</p>
+          <p class="display-4" id="textBattLe">0.00V</p>
+          <p class="font-weight-light" id="textTimeLe">Last Update: 0000/00/00 00:00:00</p>
+        </div>
       </div>
 
       <div class="col-12 my-3 p-3 bg-white rounded shadow-sm">
@@ -204,33 +250,6 @@
 
         <div class="my-3 text-center">
           <button type="button" class="btn btn-primary" id="button-download" download="data.csv" href="#">Download All Plots as CSV</button>
-        </div>
-      </div>
-
-      <div class="col-12 my-3 p-3 bg-white rounded shadow-sm" id="feature-beacon">
-        <h2 class="langCng border-bottom" lang="en">Scanning Beacon</h2>
-        <h2 class="langCng border-bottom" lang="ja">ビーコンスキャン</h2>
-
-        <p class="langCng" lang="en">You can scan advertising packet (beacon).</p>
-        <p class="langCng" lang="ja">Leafonyが発するビーコンの電波をスキャンすることができます。</p>
-
-        <p class="langCng" lang="en">1.  Press <b>Scan Beacon</b> button to start scanning beacon. (Android or Mac only. Please see <a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">the documentation</a>.)</p>
-        <p class="langCng" lang="ja">1. <b>Scan Beacon</b>ボタンを押してビーコンの電波をスキャンします。(AndroidまたはMac限定機能です。詳しくは<a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">WebBluetoothドキュメント</a>をご覧ください。)</p>
-
-        <div class="my-3 text-center">
-          <button type="button" class="btn btn-primary" id="ble-lescan-button">Scan Beacon</button>
-          <button type="button" class="btn btn-danger" id="ble-lestop-button" style="display:none;">Stop Scan</button>
-        </div>
-
-        <p class="langCng" lang="en">2. Display updated when beacon packet is received.</p>
-        <p class="langCng" lang="ja">2. ビーコンの電波をキャッチすると画面が更新されます。</p>
-
-        <div class="m-3 p-3 border rounded shadow-sm text-center">
-          <p class="display-4" id="textDevNameLe">Device Name</p>
-          <p class="display-4" id="textTempLe">00.0℃</p>
-          <p class="display-4" id="textHumidLe" style="display:none;">00%</p>
-          <p class="display-4" id="textBattLe">0.00V</p>
-          <p class="font-weight-light" id="textTimeLe">Last Update: 0000/00/00 00:00:00</p>
         </div>
       </div>
     </div>
