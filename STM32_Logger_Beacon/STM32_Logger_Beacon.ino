@@ -246,13 +246,25 @@ void setupBLE() {
 // BLE Advertising data configuration
 //-----------------------------------------------
 void StartAdvData() {
-  char charTemp[7], charHumid[7], charBatt[7];
+  // char charTemp[7], charHumid[7], charBatt[7];
+  uint16_t temp, humid, illum, battVolt;
   char userData[15];
   uint8_t dataLen;
   uint8_t stLen;
   uint8_t adv_data[25]; // advertising data (max 25bytes)
   uint8_t index = 0;
 
+  //-------------------------
+  // Sensors data
+  //-------------------------
+  temp     = (short int)(dataTemp  * 256);
+  humid    = (short int)(dataHumid * 256);
+  battVolt = (short int)(dataBatt  * 256);
+  illum    = (short int)dataLight;
+
+  //-------------------------
+  // Advertising Packet
+  //-------------------------
   // AD Structure 1 (Flags)
   adv_data[index++] = 0x02;                    // field length
   adv_data[index++] = BGLIB_GAP_AD_TYPE_FLAGS; // AD Type (Flags)
@@ -266,16 +278,24 @@ void StartAdvData() {
   }
 
   // AD Structure 3 (Manufacturer Specific Data)
-  dtostrf(dataTemp, 4, 1, charTemp); // Temperature (5byte)
-  dtostrf(dataBatt, 4, 2, charBatt); // Battery Voltage (4byte)
-  dataLen = sprintf(userData, "TT%4s,%4s", charTemp, charBatt);
+  adv_data[index++] = 9;    // field lengh
+  adv_data[index++] = 0xff; // AD Type (Manufacturer Specific Data)
+  adv_data[index++] = (temp >> 8) & 0xFF;
+  adv_data[index++] = temp & 0xFF;
+  adv_data[index++] = (humid >> 8) & 0xFF;
+  adv_data[index++] = humid & 0xFF;
+  adv_data[index++] = (illum >> 8) & 0xFF;
+  adv_data[index++] = illum & 0xFF;
+  adv_data[index++] = (battVolt >> 8) & 0xFF;
+  adv_data[index++] = battVolt & 0xFF;
 
-  adv_data[index++] = dataLen + 1; // field lengh
-  adv_data[index++] = 0xff;        // AD Type (Manufacturer Specific Data)
+  // dtostrf(dataTemp, 4, 1, charTemp); // Temperature (5byte)
+  // dtostrf(dataBatt, 4, 2, charBatt); // Battery Voltage (4byte)
+  // dataLen = sprintf(userData, "TT%4s,%4s", charTemp, charBatt);
 
-  for (uint8_t i = 0; i < dataLen; i++) {
-    adv_data[index++] = userData[i]; // User Data
-  }
+  // for (uint8_t i = 0; i < dataLen; i++) {
+  //   adv_data[index++] = userData[i]; // User Data
+  // }
 
   // register advertising packet
   stLen = index;

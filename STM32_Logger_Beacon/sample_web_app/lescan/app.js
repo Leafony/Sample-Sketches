@@ -644,12 +644,23 @@ function onStateChange(state) {
  * @param {*} state 
  */
 function onAdvertisementReceived(devname, state) {
-  let textDecoder = new TextDecoder('ascii');
-  let asciiString = textDecoder.decode(state).split(',');
+  // let textDecoder = new TextDecoder('ascii');
+  // let asciiString = textDecoder.decode(state).split(',');
   textDevNameLe.innerText = devname;
-  textTempLe.innerText = asciiString[0] + '℃';
+  // textTempLe.innerText = asciiString[0] + '℃';
   // textHumidLe.innerText = asciiString[1] + '%';
-  textBattLe.innerText = asciiString[1] + 'V';
+  // textBattLe.innerText = asciiString[1] + 'V';
+
+  const data = new Uint8Array(state);
+  const temp = ((data[0] << 8) + data[1]) / 256;
+  const humd = ((data[2] << 8) + data[3]) / 256;
+  const illm = (data[4] << 8) + data[5];
+  const batt = ((data[6] << 8) + data[7]) / 256;
+
+  textTempLe.innerText = `${temp} ℃`;
+  textHumidLe.innerText = `${humd} %`;
+  textBattLe.innerText = `${batt} V`;
+
   textTimeLe.innerText = 'Last Update: ' + new Date().toTimeString();
   console.log("onAdvertisementReceived: " + asciiString);
 }
