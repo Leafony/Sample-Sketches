@@ -51,7 +51,7 @@ const String FIRMWARE_VERSION = "2021.07.140";
 //=====================================================================
 // BLE Local device name
 //=====================================================================
-String strDeviceName = "Leaf_AB";
+String strDeviceName = "Leaf_A";
 
 //=====================================================================
 // シリアルコンソールへのデバック出力
@@ -280,12 +280,14 @@ void StartAdvData() {
   // AD Structure 3 (Manufacturer Specific Data)
   adv_data[index++] = 9;    // field lengh
   adv_data[index++] = 0xff; // AD Type (Manufacturer Specific Data)
+  adv_data[index++] = 'T'; // Dummy
+  adv_data[index++] = 'T'; // Dummy
   adv_data[index++] = (temp >> 8) & 0xFF;
   adv_data[index++] = temp & 0xFF;
   adv_data[index++] = (humid >> 8) & 0xFF;
   adv_data[index++] = humid & 0xFF;
-  adv_data[index++] = (illum >> 8) & 0xFF;
-  adv_data[index++] = illum & 0xFF;
+  // adv_data[index++] = (illum >> 8) & 0xFF;
+  // adv_data[index++] = illum & 0xFF;
   adv_data[index++] = (battVolt >> 8) & 0xFF;
   adv_data[index++] = battVolt & 0xFF;
 

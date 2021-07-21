@@ -63,6 +63,9 @@ const isMac = /Mac/.test(platform);
 const isAndroid = /Android/.test(userAgent);
 const isScanningSupported = isAndroid;
 
+// NoSleep.js
+const noSleep = new NoSleep();
+
 /**
  * 
  */
@@ -226,6 +229,7 @@ buttonGetData.addEventListener('click', function () {
  */
 buttonLescan.addEventListener('click', function () {
   leafony.lescan();
+  noSleep.enable();
 
   buttonLescan.style.display = 'none';
   buttonLestop.style.display = '';
@@ -237,6 +241,7 @@ buttonLescan.addEventListener('click', function () {
  */
 buttonLestop.addEventListener('click', function () {
   leafony.lestop();
+  noSleep.disable();
 
   buttonLescan.style.display = '';
   buttonLestop.style.display = 'none';
@@ -511,25 +516,25 @@ function initChart() {
  */
 function decodeData(state) {
   // Decode received data
-  let data = new Uint8Array(state.data.buffer);
-  let temp = (data[0] * 256.0 + data[1]) / 256.0;
-  let humd = (data[2] * 256.0 + data[3]) / 256.0;
-  let illm = data[4] * 256.0 + data[5];
-  let batt = (data[6] * 256.0 + data[7]) / 256.0;
+  const data = new Uint8Array(state.data.buffer);
+  const temp = (data[0] * 256.0 + data[1]) / 256.0;
+  const humd = (data[2] * 256.0 + data[3]) / 256.0;
+  const illm = data[4] * 256.0 + data[5];
+  const batt = (data[6] * 256.0 + data[7]) / 256.0;
 
-  let unixtime = new Uint32Array(state.data.buffer)[2];
-  let time = new Date(unixtime * 1000);
-  var str_time = time.getFullYear()
+  const unixtime = new Uint32Array(state.data.buffer)[2];
+  const time = new Date(unixtime * 1000);
+  const str_time = time.getFullYear()
     + '/' + ('0' + (time.getMonth() + 1)).slice(-2)
     + '/' + ('0' + time.getDate()).slice(-2)
     + ' ' + ('0' + time.getHours()).slice(-2)
     + ':' + ('0' + time.getMinutes()).slice(-2)
     + ':' + ('0' + time.getSeconds()).slice(-2);
-  console.log(str_time, unixtime, temp, humd, illm, batt);
+  // console.log(str_time, unixtime, temp, humd, illm, batt);
 
   // Append sensors values to array
-  let min_date = new Date(2021, 1, 1);
-  let max_date = new Date();
+  const min_date = new Date(2021, 1, 1);
+  const max_date = new Date();
   if (time.getTime() > min_date.getTime() && time.getTime() <= max_date.getTime()) {
     arrayTime.push(str_time);
     arrayTemp.push(temp);
@@ -644,20 +649,13 @@ function onStateChange(state) {
  * @param {*} state 
  */
 function onAdvertisementReceived(devname, state) {
-  // let textDecoder = new TextDecoder('ascii');
-  // let asciiString = textDecoder.decode(state).split(',');
   textDevNameLe.innerText = devname;
-  // textTempLe.innerText = asciiString[0] + '℃';
-  // textHumidLe.innerText = asciiString[1] + '%';
-  // textBattLe.innerText = asciiString[1] + 'V';
-  console.log(state);
-  console.log(state.buffer);
 
   const data = new Uint8Array(state);
   const temp = ((data[0] << 8) + data[1]) / 256;
   const humd = ((data[2] << 8) + data[3]) / 256;
-  const illm = (data[4] << 8) + data[5];
-  const batt = ((data[6] << 8) + data[7]) / 256;
+  // const illm = (data[4] << 8) + data[5];
+  const batt = ((data[4] << 8) + data[5]) / 256;
 
   textTempLe.innerText = `${parseInt(temp)} ℃`;
   textHumidLe.innerText = `${parseInt(humd)} %`;
