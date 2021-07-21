@@ -257,10 +257,10 @@ void StartAdvData() {
   //-------------------------
   // Sensors data
   //-------------------------
-  temp     = (short int)(dataTemp  * 256);
-  humid    = (short int)(dataHumid * 256);
-  battVolt = (short int)(dataBatt  * 256);
-  illum    = (short int)dataLight;
+  temp     = (uint16_t)(dataTemp  * 256);
+  humid    = (uint16_t)(dataHumid * 256);
+  battVolt = (uint16_t)(dataBatt  * 256);
+  illum    = (uint16_t)dataLight;
 
   //-------------------------
   // Advertising Packet

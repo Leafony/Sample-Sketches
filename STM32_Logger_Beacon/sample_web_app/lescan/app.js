@@ -650,6 +650,8 @@ function onAdvertisementReceived(devname, state) {
   // textTempLe.innerText = asciiString[0] + '℃';
   // textHumidLe.innerText = asciiString[1] + '%';
   // textBattLe.innerText = asciiString[1] + 'V';
+  console.log(state);
+  console.log(state.buffer);
 
   const data = new Uint8Array(state);
   const temp = ((data[0] << 8) + data[1]) / 256;
@@ -657,9 +659,9 @@ function onAdvertisementReceived(devname, state) {
   const illm = (data[4] << 8) + data[5];
   const batt = ((data[6] << 8) + data[7]) / 256;
 
-  textTempLe.innerText = `${temp} ℃`;
-  textHumidLe.innerText = `${humd} %`;
-  textBattLe.innerText = `${batt} V`;
+  textTempLe.innerText = `${parseInt(temp)} ℃`;
+  textHumidLe.innerText = `${parseInt(humd)} %`;
+  textBattLe.innerText = `${parseFloat(batt)} V`;
 
   textTimeLe.innerText = 'Last Update: ' + new Date().toTimeString();
   console.log("onAdvertisementReceived: " + asciiString);
