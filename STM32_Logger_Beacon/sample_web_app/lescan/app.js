@@ -19,6 +19,7 @@ const alertMessage = document.getElementById('alertMessage');
 
 const buttonConnect = document.querySelectorAll('#ble-connect-button');
 const buttonDisconnect = document.querySelectorAll('#ble-disconnect-button');
+const textUniqueName = document.querySelectorAll('#textUniqueName');
 const buttonGetData = document.getElementById('ble-get-button');
 const buttonLescan = document.getElementById('ble-lescan-button');
 const buttonLestop = document.getElementById('ble-lestop-button');
@@ -53,6 +54,7 @@ let chartTemp, chartIlum, chartBatt;
 let arrayTemp, arrayHumd, arrayIlum, arrayBatt;
 let arrayTime;
 let dataCount;
+let deviceName;
 
 let stateRecv; // string
 
@@ -90,9 +92,10 @@ window.onload = function () {
       for(let i=0; i<buttonConnect.length; i++) {
         buttonConnect[i].style.display = 'none';
         buttonDisconnect[i].style.display = '';
+        textUniqueName[i].innerText = uniqueName;
       }
 
-      textUniqueName.innerText = uniqueName;
+      deviceName = uniqueName;
 
       buttonGetData.disabled = false;
       buttonCheckVersion.disabled = false;
@@ -107,6 +110,7 @@ window.onload = function () {
       buttonSubmitSave.disabled = false;
       buttonSubmitDeviceName.disabled = false;
       buttonClearEEPROM.disabled = false;
+      buttonLescan.disabled = true;
     }, 1500);
   });
 
@@ -145,11 +149,12 @@ window.onload = function () {
  */
 buttonDownload.addEventListener('click', () => {
   let bom_utf_8 = new Uint8Array([0xEF, 0xBB, 0xBF]);
-  let csvText = `Device Name,${textUniqueName.innerText}\n`;
+  // let csvText = `Device Name,${deviceName}\n`;
+  let csvText = 'Device Name,Time,Temperature,Humidity,Illuminance,Battery Voltage\n';
 
-  for (var i = 0; i < arrayTemp.length; i++) {
-    csvText += arrayTime[i] + "," + arrayTemp[i] + "," +
-      arrayHumd[i] + "," + arrayIlum[i] + "," + arrayBatt[i] + '\n';
+  for (var i = 1; i < arrayTemp.length; i++) {
+    csvText += deviceName + ','  + arrayTime[i] + ',' + arrayTemp[i] + ',' +
+      arrayHumd[i] + ',' + arrayIlum[i] + ',' + arrayBatt[i] + '\n';
   }
 
   let blob = new Blob([bom_utf_8, csvText], { "type": "text/csv" });
@@ -174,6 +179,7 @@ for (let i=0; i<buttonConnect.length; i++) {
     for (let j=0; j<buttonConnect.length; j++) {
       buttonConnect[j].disabled = true;
       buttonConnect[j].innerHTML = '<span class="spinner-border" role="status" aria-hidden="true"></span> Connecting...';
+      buttonLescan.disabled = true;
     }
 
     // initialize display
@@ -188,6 +194,7 @@ for (let i=0; i<buttonConnect.length; i++) {
       for (let j=0; j<buttonConnect.length; j++) {
         buttonConnect[j].disabled = false;
         buttonConnect[j].innerHTML = 'Connect';
+        buttonLescan.disabled = false;
       }
     }
 
@@ -670,13 +677,13 @@ function onAdvertisementReceived(devname, state) {
  * @param {*} state 
  */
 function onDisconnected(state) {
-  textUniqueName.innerText = '';
 
   for(let i=0; i<buttonConnect.length; i++) {
     buttonConnect[i].style.display = '';
     buttonDisconnect[i].style.display = 'none';
     buttonConnect[i].disabled = false;
     buttonConnect[i].innerHTML = 'Connect';
+    textUniqueName[i].innerText = '';
   }
 
   buttonGetData.disabled = true;
@@ -692,6 +699,7 @@ function onDisconnected(state) {
   buttonSubmitSave.disabled = true;
   buttonSubmitDeviceName.disabled = true;
   buttonClearEEPROM.disabled = true;
+  buttonLescan.disabled = false;
 }
 
 /**

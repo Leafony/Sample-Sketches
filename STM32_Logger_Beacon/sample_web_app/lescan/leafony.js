@@ -301,6 +301,7 @@ function Leafony() {
       if (scan != null) {
         scan.stop();
         console.log('Scanning is stopped. scan.active = ' + scan.active);
+        scan = null;
       }
     } catch (error) {
       console.log(error);
