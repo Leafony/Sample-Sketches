@@ -639,7 +639,7 @@ function onStateChange(state) {
     }
     else {
       dataCount += 1;
-      textGetDataStatus.innerText = `${dataCount}/170 samples are received.`;
+      textGetDataStatus.innerText = `${dataCount}/169 samples are received.`;
       decodeData(state);
     }
   }

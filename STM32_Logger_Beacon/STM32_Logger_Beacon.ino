@@ -174,7 +174,7 @@ uint8_t mode = MODE_IDLE;
 
 // EEPROM ringbuffer
 uint16_t rb_addr = 0;  // ringbuffer read address
-const uint8_t RINGBUFF_OFFSET_ADDR = 8;
+const uint8_t RINGBUFF_OFFSET_ADDR = 20;
 const uint8_t PACKET_LENGTH = 12;
 
 uint16_t wake_intval = DEFAULT_WAKE_INTERVAL;   // Wake time
@@ -467,22 +467,71 @@ void wakeupBLE() {
 
 //---------------------------------------
 // EEPROM
+//
+// Address Map
+//   Addr, Description
+//   0, EEPROM Configuration Check (if 0xAA: EEPROM is configured)
+//   1, EEPROM Configuration Check (if 0xAA: EEPROM is configured)
+//   2, Wake Interval (Upper)
+//   3, Wake Interval (Lower)
+//   4, Sleep Interval (Upper)
+//   5, Sleep Interval (Lower)
+//   6, Sens Frequency (Upper)
+//   7, Sens Frequency (Lower)
+//   8, Save Frequency (Upper)
+//   9, Save Frequency (Lower)
+//   10-11, Reserved
+//   12, Device Name [0]
+//   13, Device Name [1]
+//   14, Device Name [2]
+//   15, Device Name [3]
+//   16, Device Name [4]
+//   17-19, Reserved
 //---------------------------------------
-void setupRingBuffer() {
-  uint16_t rb_work = 0;
+void setupEEPROM() {
+  bool eeprom_configured = false;
 
-  // read control registers.
-  if (rtc.isTimeSet()) {
-    wake_intval  = (EEPROM.read(0) << 8) + EEPROM.read(1);
-    sleep_intval = (EEPROM.read(2) << 8) + EEPROM.read(3);
-    sens_freq    = (EEPROM.read(4) << 8) + EEPROM.read(5);
-    save_freq    = (EEPROM.read(6) << 8) + EEPROM.read(7);
+  // EEPROM Configuration Check
+  if (EEPROM.read(0) == 0xAA && EEPROM.read(1) == 0xAA) {
+    #ifdef DEBUG
+    Serial.println("EEPROM is already configured!");
+    #endif
+    eeprom_configured = true;
+  } else {
+    #ifdef DEBUG
+    Serial.println("EEPROM is not configured. All variables are set to default.");
+    #endif
   }
 
-  rb_work = 0;
-  while (rb_work < 2048){
+  // read control registers
+  if (eeprom_configured) {
+    wake_intval  = (EEPROM.read(2) << 8) + EEPROM.read(3);
+    sleep_intval = (EEPROM.read(4) << 8) + EEPROM.read(5);
+    sens_freq    = (EEPROM.read(6) << 8) + EEPROM.read(7);
+    save_freq    = (EEPROM.read(8) << 8) + EEPROM.read(9);
+  } else {
+    // Set default value
+    wake_intval = DEFAULT_WAKE_INTERVAL;
+    sleep_intval = DEFAULT_SLEEP_INTERVAL;
+    sens_freq = DEFAULT_SENS_FREQ;
+    save_freq = DEFAULT_SAVE_FREQ;
+
+    // Save default value
+    EEPROM.write(2, (wake_intval >> 8) & 0xFF);
+    EEPROM.write(3, (wake_intval & 0xFF));
+    EEPROM.write(4, (sleep_intval >> 8) & 0xFF);
+    EEPROM.write(5, (sleep_intval & 0xFF));
+    EEPROM.write(6, (sens_freq >> 8) & 0xFF);
+    EEPROM.write(7, (sens_freq & 0xFF));
+    EEPROM.write(8, (save_freq >> 8) & 0xFF);
+    EEPROM.write(9, (save_freq & 0xFF));
+    EEPROM.write(0, 0xAA); // EEPROM configured
+    EEPROM.write(1, 0xAA); // EEPROM configured
+  }
+
+  // EEPROM Test
+  for (uint16_t rb_work; rb_work < EEPROM.length(); rb_work++) {
     EEPROM.read(rb_work);
-    rb_work++;
   }
 
   // when address is invalid;
@@ -512,12 +561,16 @@ void setupRingBuffer() {
  * 
  */
 void writeEEPROM() {
+  uint16_t temp, humid, illum, battVolt;
+  uint32_t u_time;
+
   if (!rtc.isTimeSet()) {
+    // RTC is not set, skip to save data.
     return;
   }
 
-  uint16_t temp, humid, illum, battVolt;
-  uint32_t u_time = getTimestamp();
+  // Get current time from RTC
+  u_time = getTimestamp();
 
   // Reset the ring buffer address when the size is not enough;
   if (rb_addr + PACKET_LENGTH >= EEPROM.length()) {
@@ -538,22 +591,22 @@ void writeEEPROM() {
   illum = (uint16_t)dataLight;
   battVolt = (uint16_t)(dataBatt * 256.0);
 
-  uint8_t dat[12];
-  dat[0]  = (temp >> 8) & 0xFF;
-  dat[1]  = temp & 0xFF;
-  dat[2]  = (humid >> 8) & 0xFF;
-  dat[3]  = humid & 0xFF;
-  dat[4]  = (illum >> 8) & 0xFF;
-  dat[5]  = illum & 0xFF;
-  dat[6]  = (battVolt >> 8) & 0xFF;
-  dat[7]  = battVolt & 0xFF;
-  dat[8]  = (u_time >> 0) & 0xFF;
-  dat[9]  = (u_time >> 8) & 0xFF;
-  dat[10] = (u_time >> 16) & 0xFF;
-  dat[11] = (u_time >> 24) & 0xFF;
+  uint8_t data[12];
+  data[0]  = (temp >> 8) & 0xFF;
+  data[1]  = temp & 0xFF;
+  data[2]  = (humid >> 8) & 0xFF;
+  data[3]  = humid & 0xFF;
+  data[4]  = (illum >> 8) & 0xFF;
+  data[5]  = illum & 0xFF;
+  data[6]  = (battVolt >> 8) & 0xFF;
+  data[7]  = battVolt & 0xFF;
+  data[8]  = (u_time >> 0) & 0xFF;
+  data[9]  = (u_time >> 8) & 0xFF;
+  data[10] = (u_time >> 16) & 0xFF;
+  data[11] = (u_time >> 24) & 0xFF;
 
   for (uint8_t i = 0; i < 12; i++) {
-    EEPROM.write(rb_addr + i, dat[i]);
+    EEPROM.write(rb_addr + i, data[i]);
     delay(10);  // EEPROM書き込み後しばらく待つ
   }
 
@@ -580,35 +633,34 @@ void writeEEPROM() {
  * decode RTC to timestamp.
  */
 uint32_t getTimestamp() {
-  if (rtc.isTimeSet()) {
-    uint8_t year = rtc.getYear();
-    uint8_t month = rtc.getMonth();
-    uint8_t day = rtc.getDay();
-    uint8_t hours = rtc.getHours();
-    uint8_t minutes = rtc.getMinutes();
-    uint8_t seconds = rtc.getSeconds();
-
-#ifdef DEBUG
-    Serial.print("RTC Timestamp: ");
-    Serial.print(year + 2000);
-    Serial.print("/");
-    Serial.print(month);
-    Serial.print("/");
-    Serial.print(day);
-    Serial.print(" ");
-    Serial.print(hours);
-    Serial.print(":");
-    Serial.print(minutes);
-    Serial.print(":");
-    Serial.print(seconds);
-    Serial.println(" (GMT+0)");
-#endif
-
-    DateTime date (year, month, day, hours, minutes, seconds);
-    return date.unixtime();
+  if (!rtc.isTimeSet()) {
+    return 0;
   }
 
-  return 0;
+  uint8_t year = rtc.getYear();
+  uint8_t month = rtc.getMonth();
+  uint8_t day = rtc.getDay();
+  uint8_t hours = rtc.getHours();
+  uint8_t minutes = rtc.getMinutes();
+  uint8_t seconds = rtc.getSeconds();
+
+#ifdef DEBUG
+  Serial.print("RTC Timestamp: ");
+  Serial.print(year + 2000);
+  Serial.print("/");
+  Serial.print(month);
+  Serial.print("/");
+  Serial.print(day);
+  Serial.print(" ");
+  Serial.print(hours);
+  Serial.print(":");
+  Serial.print(minutes);
+  Serial.print(":");
+  Serial.print(seconds);
+  Serial.println(" (GMT+0)");
+#endif
+  DateTime date (year, month, day, hours, minutes, seconds);
+  return date.unixtime();
 }
 
 /**
@@ -648,7 +700,7 @@ void setup() {
 #endif
 
   setupPort();
-  setupRingBuffer();
+  setupEEPROM();
   setupSensors();
   setupBLE();
 
@@ -835,6 +887,13 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
     // Start to send EEPROM data
     mode = MODE_SEND_DATA;
   }
+  else if (rcv_data.startsWith("getRomSize"))
+  {
+    char sendData[8];
+    uint8_t len = sprintf(sendData, "%06d", EEPROM.length());
+    ble112.ble_cmd_gatt_server_send_characteristic_notification(1, 0x000C, len, (const uint8_t *)sendData);
+    while (ble112.checkActivity(1000));
+  }
   else if (rcv_data.startsWith("getSleep"))
   {
     // send SLEEP_INTERVAL
@@ -871,8 +930,8 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
   {
     // rcv_data = "setSleep <SLEEP_INTERVAL>"
     uint16_t num = rcv_data.substring(9).toInt();
-    EEPROM.write(2, (num >> 8) & 0xFF); // sleep_intval
-    EEPROM.write(3, (num & 0xFF));      // sleep_intval
+    EEPROM.write(4, (num >> 8) & 0xFF); // sleep_intval
+    EEPROM.write(5, (num & 0xFF));      // sleep_intval
     sleep_intval = num;
     #ifdef DEBUG
     Serial.print("Sleep interval is changed. (");
@@ -884,8 +943,8 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
   {
     // rcv_data = "setWake <WAKE_INTERVAL>"
     uint16_t num = rcv_data.substring(8).toInt();
-    EEPROM.write(0, (num >> 8) & 0xFF);  // wake_intval
-    EEPROM.write(1, (num & 0xFF));       // wake_intval
+    EEPROM.write(2, (num >> 8) & 0xFF);  // wake_intval
+    EEPROM.write(3, (num & 0xFF));       // wake_intval
     wake_intval = num;
     #ifdef DEBUG
     Serial.print("Wake interval is changed. (");
@@ -897,8 +956,8 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
   {
     // rcv_data = "setSensFreq <SENS_FREQUENCY>"
     uint16_t num = rcv_data.substring(12).toInt();
-    EEPROM.write(4, (num >> 8) & 0xFF);  // sens_freq
-    EEPROM.write(5, (num & 0xFF));       // sens_freq
+    EEPROM.write(6, (num >> 8) & 0xFF);  // sens_freq
+    EEPROM.write(7, (num & 0xFF));       // sens_freq
     #ifdef DEBUG
     Serial.print("Sens frequency is changed. (");
     Serial.print(num);
@@ -909,8 +968,8 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
   {
     // rcv_data = "setSaveFreq <SAVE_FREQUENCY>"
     uint16_t num = rcv_data.substring(12).toInt();
-    EEPROM.write(6, (num >> 8) & 0xFF);  // save_freq
-    EEPROM.write(7, (num & 0xFF));  // save_freq
+    EEPROM.write(8, (num >> 8) & 0xFF);  // save_freq
+    EEPROM.write(9, (num & 0xFF));  // save_freq
     #ifdef DEBUG
     Serial.print("Save frequency is changed. (");
     Serial.print(num);
@@ -946,14 +1005,14 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
     rtc.setMinutes(timestamp.minute());
     rtc.setSeconds(timestamp.second());
 
-    EEPROM.write(0, (wake_intval >> 8) & 0xFF);
-    EEPROM.write(1, (wake_intval & 0xFF));
-    EEPROM.write(2, (sleep_intval >> 8) & 0xFF);
-    EEPROM.write(3, (sleep_intval & 0xFF));
-    EEPROM.write(4, (sens_freq >> 8) & 0xFF);
-    EEPROM.write(5, (sens_freq & 0xFF));
-    EEPROM.write(6, (save_freq >> 8) & 0xFF);
-    EEPROM.write(7, (save_freq & 0xFF));
+    EEPROM.write(2, (wake_intval >> 8) & 0xFF);
+    EEPROM.write(3, (wake_intval & 0xFF));
+    EEPROM.write(4, (sleep_intval >> 8) & 0xFF);
+    EEPROM.write(5, (sleep_intval & 0xFF));
+    EEPROM.write(6, (sens_freq >> 8) & 0xFF);
+    EEPROM.write(7, (sens_freq & 0xFF));
+    EEPROM.write(8, (save_freq >> 8) & 0xFF);
+    EEPROM.write(9, (save_freq & 0xFF));
 
 #ifdef DEBUG
     Serial.print("STM32 received timestamp: ");
