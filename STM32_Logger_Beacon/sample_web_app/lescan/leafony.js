@@ -159,7 +159,8 @@ function Leafony() {
   function onDisconnected(event) {
 
     console.log('> Bluetooth Device disconnected');
-
+    uniqueName = null;
+    device = null;
     onDisconnectedCallback(event);
 
     if (enSleep) {

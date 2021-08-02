@@ -46,12 +46,14 @@
 //=====================================================================
 // Sketch firmware version
 //=====================================================================
-const String FIRMWARE_VERSION = "2021.07.140";
+const String FIRMWARE_VERSION = "2021.08.010";
 
 //=====================================================================
 // BLE Local device name
 //=====================================================================
-String strDeviceName = "Leaf_A";
+const String strDeviceNamePrefix = "Leaf_";
+const String strDeviceNameUnique = "A";
+String strDeviceName = strDeviceNamePrefix + strDeviceNameUnique;
 
 //=====================================================================
 // シリアルコンソールへのデバック出力
@@ -503,12 +505,31 @@ void setupEEPROM() {
     #endif
   }
 
-  // read control registers
   if (eeprom_configured) {
+    // Load saved registers
     wake_intval  = (EEPROM.read(2) << 8) + EEPROM.read(3);
     sleep_intval = (EEPROM.read(4) << 8) + EEPROM.read(5);
     sens_freq    = (EEPROM.read(6) << 8) + EEPROM.read(7);
     save_freq    = (EEPROM.read(8) << 8) + EEPROM.read(9);
+
+    // Load device name
+    strDeviceName = strDeviceNamePrefix;
+    for (uint8_t i=0; i<5; i++){
+      char c = EEPROM.read(12+i);
+      // c is NOT Alphabet or Numeric
+      if (!((c>='a'&& c<='z') || (c>='A' && c<='Z') || (c>='0' && c<='9'))) {
+        if (i==0) {  // Device Name is not set.
+          strDeviceName += strDeviceNameUnique; // Set default unique name.
+        }
+        break;
+      }
+      strDeviceName += String(c);
+    }
+#ifdef DEBUG
+    Serial.print("BLE Device Name is ");
+    Serial.println(strDeviceName);
+#endif
+
   } else {
     // Set default value
     wake_intval = DEFAULT_WAKE_INTERVAL;
@@ -978,9 +999,16 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
   }
   else if (rcv_data.startsWith("setDevName"))
   {
-    // Set Device Name
     Serial.print(rcv_data);
-    strDeviceName = "Leaf_" + rcv_data.substring(11);
+
+    String rcvUniqueName = rcv_data.substring(11);
+
+    // Set device name
+    strDeviceName = strDeviceNamePrefix + rcvUniqueName;
+    // Save device name
+    for(uint8_t i=0; i<rcvUniqueName.length(); i++){
+      EEPROM.write(12+i, (uint8_t)rcvUniqueName.charAt(i));
+    }
   }
   else if (rcv_data.startsWith("getDevName"))
   {
