@@ -110,6 +110,8 @@ window.onload = function () {
       buttonSubmitSave.disabled = false;
       buttonSubmitDeviceName.disabled = false;
       buttonClearEEPROM.disabled = false;
+      inputDeviceNameText.disabled = false;
+      inputSleepText.disabled = false;
       buttonLescan.disabled = true;
     }, 1500);
   });
@@ -142,6 +144,8 @@ window.onload = function () {
   buttonSubmitSave.disabled = true;
   buttonSubmitDeviceName.disabled = true;
   buttonClearEEPROM.disabled = true;
+  inputDeviceNameText.disabled = true;
+  inputSleepText.disabled = true;
 };
 
 /**
@@ -362,6 +366,16 @@ buttonSubmitDeviceName.addEventListener('click', function () {
   sendCommand('setDevName ' + inputDeviceNameText.value);
 });
 
+
+inputDeviceNameText.addEventListener('input', function () {
+  if (/^(\w{1,5})$/g.test(inputDeviceNameText.value)) {
+    inputDeviceNameText.classList.remove('is-invalid');
+    buttonSubmitDeviceName.disabled = false;
+  } else {
+    inputDeviceNameText.classList.add('is-invalid');
+    buttonSubmitDeviceName.disabled = true;
+  }
+});
 
 /**
  * Wake time check button
@@ -699,6 +713,8 @@ function onDisconnected(state) {
   buttonSubmitSave.disabled = true;
   buttonSubmitDeviceName.disabled = true;
   buttonClearEEPROM.disabled = true;
+  inputDeviceNameText.disabled = true;
+  inputSleepText.disabled = true;
   buttonLescan.disabled = false;
 }
 
