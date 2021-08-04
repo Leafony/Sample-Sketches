@@ -57,14 +57,14 @@
       </div>
 
       <div class="col-12 mb-3 p-3 bg-white rounded shadow-sm">
-        <h2 class="langCng border-bottom" lang="en">Initialize</h2>
-        <h2 class="langCng border-bottom" lang="ja">初期化</h2>
+        <h2 class="langCng border-bottom" lang="en">Initial Settings and Start Logging</h2>
+        <h2 class="langCng border-bottom" lang="ja">初期設定とセンサ測定開始設定</h2>
 
-        <p class="langCng" lang="en">First, let's connect with Leafony via Bluetooth once to set the time in Leafony.</p>
-        <p class="langCng" lang="ja">はじめに、Leafonyに時刻を設定するために、一度BluetoothでLeafonyと接続しましょう。</p>
+        <h4 class="langCng" lang="en">Bluetooth Connection</h4>
+        <h4 class="langCng" lang="ja">Bluetooth接続</h4>
 
         <p class="langCng" lang="en">1. Press the Connect button to search for nearby Bluetooth.</p>
-        <p class="langCng" lang="ja">1. Connectボタンを押すと周辺のBluetoothを検索します。</p>
+        <p class="langCng" lang="ja">1. Connectボタンを押します。</p>
 
         <div class="my-3 text-center">
           <button type="button" class="btn btn-lg btn-primary" id="ble-connect-button">Connect</button>
@@ -76,21 +76,27 @@
           <p id="textUniqueName"></p>
         </div>
 
-        <p class="langCng" lang="en">2. A few seconds after turning on Leafony, tap Leafony twice with your finger as shown in the video. This will put Leafony in Bluetooth connectable mode for 20 seconds.</p>
-        <p class="langCng" lang="ja">2. Leafonyの電源を入れてから数秒後に、動画のようにLeafonyを指で2回つつきましょう。こうすることで、Leafonyは20秒間、Bluetooth接続モードに入ります。</p>
+        <p class="langCng" lang="en">2. When you turn on Leafony and shake it like the image below, it will enter the connection waiting mode for about 20 seconds.</p>
+        <p class="langCng" lang="ja">2. Leafonyに電源を入れて動画のように振ると、約20秒間、接続待ちモードに入ります。</p>
 
         <div class="text-center">
           <img src="doubletap.gif" alg="gif image" class="img-thumbnail">
         </div>
 
-        <p class="langCng" lang="en">3. Click <b> Leaf_AB </b> and press the pairing button.</p>
-        <p class="langCng" lang="ja">3. <b>Leaf_AB</b>をクリックし、ペア設定ボタンを押しましょう。</p>
+        <p class="langCng" lang="en">3. Select <b> Leaf_A </b> and press the pairing button.</p>
+        <p class="langCng" lang="ja">3. <b>Leaf_A</b>を選択し、ペア設定ボタンを押すと接続完了です。</p>
 
-        <p class="langCng" lang="en">4. The time is now set.</p>
-        <p class="langCng" lang="ja">4. これで時刻が設定できました。</p>
+        <p class="langCng" lang="en">4. Now Leafony set its internal calendar and start logging.</p>
+        <p class="langCng" lang="ja">4. Leafonyがパソコンやスマートフォンと接続すると、時刻が設定されます。</p>
 
-        <p class="langCng" lang="en">5. While connected to Leafony, you can check the version information of the sketch and change the sleep time.</p>
-        <p class="langCng" lang="ja">5. Leafonyと接続中は、スケッチのバージョン情報を確認したり、スリープ時間を変更することができます。</p>
+        <h4 class="langCng" lang="en">Initial Settings</h4>
+        <h4 class="langCng" lang="ja">初期設定</h4>
+
+        <p class="langCng" lang="en">1. During the bluetooth paring mode, The variables like sleep time or device name can be changed.</p>
+        <p class="langCng" lang="ja">1. 初期設定は、Bluetoothの接続中に行います。測定間隔や名称の設定ができます。</p>
+
+        <p class="langCng" lang="en">2. You can clear the saved data on the non-volatile memory.</p>
+        <p class="langCng" lang="ja">2. メモリに保存された測定データを消去することもできます。</p>
 
         <div class="m-3 p-3 border rounded shadow-sm" id="settingCtrl">
           <div class="alert alert-warning" role="alert" style="display:none;" id="alert-controller">
@@ -100,7 +106,8 @@
             </button>
           </div>
           <div class="form-group">
-            <label for="version-text-input">Version</label>
+            <label for="version-text-input" class="langCng" lang="en">Version</label>
+            <label for="version-text-input" class="langCng" lang="ja">バージョン</label>
             <div class="input-group">
               <input type="text" class="form-control" placeholder="Version" id="version-text-input">
               <div class="input-group-append" id="version-text-input">
@@ -120,7 +127,8 @@
           </div>
 
           <div class="form-group">
-            <label for="sleep-text-input">Sleep Time [s] (0～65535)</label>
+            <label for="sleep-text-input" class="langCng" lang="en">Sleep Time [s] (0～65535)</label>
+            <label for="sleep-text-input" class="langCng" lang="ja">測定間隔 [秒] (0～65535)</label>
             <div class="input-group">
               <input type="text" class="form-control" placeholder="Sleep Time" id="sleep-text-input">
               <div class="input-group-append" id="sleep-text-input">
@@ -154,7 +162,8 @@
           </div>
 
           <div class="form-group">
-            <label for="device-name-input">Device Name (Up to 5 characters. Alphabet or Numeric only. a-z, 0-9)</label>
+            <label for="device-name-input" class="langCng" lang="en">Device Name (Up to 5 characters. Alphabet or Numeric only. a-z, 0-9)</label>
+            <label for="device-name-input" class="langCng" lang="ja">デバイス名（最大5文字、半角英数字のみ）</label>
             <div class="input-group">
               <div class="input-group-prepend">
                 <label class="input-group-text" for="device-name-input">Leaf_</label>
@@ -178,8 +187,15 @@
           </div>
         </div>
 
-        <p class="langCng" lang="en">6. When you press the Disconnect button, Bluetooth will be disconnected and Leafony will start measuring the data. The data is measured at the intervals specified by Sleep Time. Please wait for a while before proceeding to the next chapter.</p>
-        <p class="langCng" lang="ja">6. Disconnectボタンを押すとBluetoothが切断され、Leafonyはデータの測定をスタートします。データはSleep Timeで指定した間隔で測定されます。しばらく待ってから次の章に進みましょう。</p>
+        <h4 class="langCng" lang="en">Start Logging</h4>
+        <h4 class="langCng" lang="ja">センサデータの測定開始</h4>
+
+        <p class="langCng" lang="en">1. When you press the disconnect button and exit the paring mode, Leafony start logging.</p>
+        <p class="langCng" lang="ja">1. センサデータの測定は、Disconnectボタンを押して、接続モードを解除すると開始します。</p>
+
+        <p class="langCng" lang="en">2. During the logging mode, Leafony get the sensors' data at a certain interval, and save them in the internal non-volatile memory. (Up to 169 samples.)</p>
+        <p class="langCng" lang="ja">2. 一定の間隔で、測定したセンサデータのビーコンの電波を発し、同時にデータをメモリ（最大169サンプル）に保存します。</p>
+
       </div>
 
       <div class="col-12 my-3 p-3 bg-white rounded shadow-sm" id="feature-beacon">
@@ -189,8 +205,8 @@
         <p class="langCng" lang="en">You can scan advertising packet (beacon).</p>
         <p class="langCng" lang="ja">Leafonyが発するビーコンの電波をスキャンすることができます。</p>
 
-        <p class="langCng" lang="en">1.  Press <b>Scan Beacon</b> button to start scanning beacon. (Android or Mac only. Please see <a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">the documentation</a>.)</p>
-        <p class="langCng" lang="ja">1. <b>Scan Beacon</b>ボタンを押してビーコンの電波をスキャンします。(AndroidまたはMac限定機能です。詳しくは<a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">WebBluetoothドキュメント</a>をご覧ください。)</p>
+        <p class="langCng" lang="en">1.  Press <b>Scan Beacon</b> button to start scanning beacon. (This function is Android only. Please see <a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">the documentation</a>.)</p>
+        <p class="langCng" lang="ja">1. <b>Scan Beacon</b>ボタンを押すと、ビーコンの電波をスキャンします。(Android限定機能です。詳しくは<a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">WebBluetoothドキュメント</a>をご覧ください。)</p>
 
         <div class="my-3 text-center">
           <button type="button" class="btn btn-primary" id="ble-lescan-button">Scan Beacon</button>
@@ -200,7 +216,7 @@
         </div>
 
         <p class="langCng" lang="en">2. Display updated when beacon packet is received.</p>
-        <p class="langCng" lang="ja">2. ビーコンの電波をキャッチすると画面が更新されます。</p>
+        <p class="langCng" lang="ja">2. ビーコンの電波をキャッチすると画面が更新されます。ビーコンの電波は初期設定で指定した測定間隔ごとに発される他、Leafonyを振って接続待ちモードに入るときにも発されます。</p>
 
         <div class="m-3 p-3 border rounded shadow-sm text-center">
           <p class="display-4" id="textDevNameLe">Device Name</p>
@@ -219,7 +235,7 @@
         <p class="langCng" lang="ja">Leafonyが測定したデータをグラフ化することができます。</p>
 
         <p class="langCng" lang="en">1. Press the Connect button to search for nearby Bluetooth.</p>
-        <p class="langCng" lang="ja">1. Connectボタンを押すと周辺のBluetoothを検索します。</p>
+        <p class="langCng" lang="ja">1. センサデータのグラフ化は、Bluetooth接続モードで行います。Connectボタンを押して、接続モードにしてください。</p>
 
         <div class="my-3 text-center">
           <button type="button" class="btn btn-lg btn-primary" id="ble-connect-button">Connect</button>
@@ -232,7 +248,7 @@
         </div>
 
         <p class="langCng" lang="en">2. Once the connection is established, press the Get Data button below and wait for a while to graph the sensor data.</p>
-        <p class="langCng" lang="ja">2. 接続が完了したら、下のGet Dataボタンを押してしばらく待つと、センサデータがグラフ化されます。</p>
+        <p class="langCng" lang="ja">2. 接続が完了したら、Get Dataボタンを押すと、保存されたセンサデータがグラフ化されます。</p>
 
 
         <div class="my-3 text-center">
@@ -242,7 +258,7 @@
 
         <div class="row m-3 p-3 border rounded shadow-sm">
           <div class="col-xl-4">
-            <h2 class="text-center">Temp & Humid</h2>
+            <h2 class="text-center">Temperature & Humidity</h2>
             <div id="chart-temp"></div>
           </div>
           <div class="col-xl-4">
