@@ -63,7 +63,7 @@ const platform = navigator.platform;
 const userAgent = navigator.userAgent;
 const isMac = /Mac/.test(platform);
 const isAndroid = /Android/.test(userAgent);
-const isScanningSupported = isAndroid;
+const isScanningSupported = isAndroid || isMac;
 
 // NoSleep.js
 const noSleep = new NoSleep();
@@ -680,7 +680,7 @@ function onAdvertisementReceived(devname, state) {
 
   textTempLe.innerText = `${parseInt(temp)} ℃`;
   textHumidLe.innerText = `${parseInt(humd)} %`;
-  textBattLe.innerText = `${parseFloat(batt)} V`;
+  textBattLe.innerText = `${parseFloat(batt).toFixed(2)} V`;
 
   textTimeLe.innerText = 'Last Update: ' + new Date().toTimeString();
   console.log("onAdvertisementReceived: " + asciiString);
