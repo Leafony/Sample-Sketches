@@ -89,112 +89,142 @@
         <p class="langCng" lang="en">4. Now Leafony set its internal calendar and start logging.</p>
         <p class="langCng" lang="ja">4. Leafonyがパソコンやスマートフォンと接続すると、時刻が設定されます。</p>
 
-        <h4 class="langCng" lang="en">Initial Settings</h4>
-        <h4 class="langCng" lang="ja">初期設定</h4>
+      </div>
+      <div class="col-12 mb-3 p-3 bg-white rounded shadow-sm">
+        <div class="accordion" id="accordionExample">
+          <div class="card">
+            <div class="card-header" id="headingOne">
+              <h5 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                <h4 class="langCng" lang="en">Initial Settings (Optional)</h4>
+                <h4 class="langCng" lang="ja">初期設定 (オプション)</h4>
+                </button>
+              </h5>
+            </div>
+        
+            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+              <div class="card-body">
 
-        <p class="langCng" lang="en">1. During the bluetooth paring mode, The variables like sleep time or device name can be changed.</p>
-        <p class="langCng" lang="ja">1. 初期設定は、Bluetoothの接続中に行います。測定間隔や名称の設定ができます。</p>
 
-        <p class="langCng" lang="en">2. You can clear the saved data on the non-volatile memory.</p>
-        <p class="langCng" lang="ja">2. メモリに保存された測定データを消去することもできます。</p>
+                <p class="langCng" lang="en">1. During the bluetooth paring mode, The variables like sleep time or device name can be changed.</p>
+                <p class="langCng" lang="ja">1. 初期設定は、Bluetoothの接続中に行います。測定間隔や名称の設定ができます。</p>
 
-        <div class="m-3 p-3 border rounded shadow-sm" id="settingCtrl">
-          <div class="alert alert-warning" role="alert" style="display:none;" id="alert-controller">
-            Error: Connect to Leafony First!
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="form-group">
-            <label for="version-text-input" class="langCng" lang="en">Version</label>
-            <label for="version-text-input" class="langCng" lang="ja">バージョン</label>
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="Version" id="version-text-input">
-              <div class="input-group-append" id="version-text-input">
-                <button class="btn btn-outline-secondary" type="button" id="check-version-button">Check</button>
+                <p class="langCng" lang="en">2. You can clear the saved data on the non-volatile memory.</p>
+                <p class="langCng" lang="ja">2. メモリに保存された測定データを消去することもできます。</p>
+
+                <div class="my-3 text-center">
+                  <button type="button" class="btn btn-lg btn-primary" id="ble-connect-button">Connect</button>
+                  <button type="button" class="btn btn-lg btn-danger" id="ble-disconnect-button" style="display:none;">Disconnect</button>
+                </div>
+
+                <div class="m-3 p-3 border rounded shadow-sm" id="settingCtrl">
+                  <div class="alert alert-warning" role="alert" style="display:none;" id="alert-controller">
+                    Error: Connect to Leafony First!
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="form-group">
+                    <label for="version-text-input" class="langCng" lang="en">Version</label>
+                    <label for="version-text-input" class="langCng" lang="ja">バージョン</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control" placeholder="Version" id="version-text-input">
+                      <div class="input-group-append" id="version-text-input">
+                        <button class="btn btn-outline-secondary" type="button" id="check-version-button">Check</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group" style="display:none;">
+                    <label for="wake-text-input">Wake Time [s] (0～65535)</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control" placeholder="Wake Time" id="wake-text-input">
+                      <div class="input-group-append" id="wake-text-input">
+                        <button class="btn btn-outline-secondary" type="button" id="check-wake-button">Check</button>
+                        <button class="btn btn-outline-secondary" type="button" id="submit-wake-button">Submit</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="sleep-text-input" class="langCng" lang="en">Sleep Time [s] (0～65535)</label>
+                    <label for="sleep-text-input" class="langCng" lang="ja">測定間隔 [秒] (0～65535)</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control" placeholder="Sleep Time" id="sleep-text-input">
+                      <div class="input-group-append" id="sleep-text-input">
+                        <button class="btn btn-outline-secondary" type="button" id="check-sleep-button">Check</button>
+                        <button class="btn btn-outline-secondary" type="button" id="submit-sleep-button">Submit</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group" style="display:none;">
+                    <label for="sens-text-input">Sensor ON Frequency</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control" placeholder="Sensor ON Frequency" id="sens-text-input">
+                      <button class="btn btn-outline-secondary" type="button" id="check-sens-button">Check</button>
+                      <button class="btn btn-outline-secondary" type="button" id="submit-sens-button">Submit</button>
+                    </div>
+                  </div>
+
+                  <div class="form-group" style="display:none;">
+                    <label for="save-text-input">Data Save Frequency</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control" placeholder="Data Save Frequency" id="save-text-input">
+                      <button class="btn btn-outline-secondary" type="button" id="check-save-button">Check</button>
+                      <button class="btn btn-outline-secondary" type="button" id="submit-save-button">Submit</button>
+                    </div>
+                  </div>
+
+                  <div class="input-group" style="display:none;">
+                    <button class="btn btn-outline-secondary" type="button" id="check-all-button">Check All</button>
+                    <button class="btn btn-outline-secondary" type="button" id="submit-all-button">Submit All</button>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="device-name-input" class="langCng" lang="en">Device Name (Up to 5 characters. Alphabet or Numeric only. a-z, 0-9)</label>
+                    <label for="device-name-input" class="langCng" lang="ja">デバイス名（最大5文字、半角英数字のみ）</label>
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <label class="input-group-text" for="device-name-input">Leaf_</label>
+                      </div>
+                      <input type="text" class="form-control" placeholder="ABCDE" id="device-name-input">
+                      <div class="input-group-append" id="device-name-input">
+                        <button class="btn btn-outline-secondary" type="button" id="check-device-name-button">Check</button>
+                        <button class="btn btn-outline-secondary" type="button" id="submit-device-name-button">Submit</button>
+                      </div>
+                      <div class="invalid-feedback">
+                        Up to 5 characters. Alphabet or Numeric only.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="my-3">
+                    <p class="small langCng" lang="en">Clear EEPROM and delete all saved data. (This may take several minutes...)</p>
+                    <p class="small langCng" lang="jp">EEPROMに書き込まれたセンサデータをすべて削除します。(数分かかることがあります。)</p>
+                    <button class="btn btn-outline-danger" type="button" id="clear-eeprom-button">Clear EEPROM</button>
+                    <p class="text-muted" id="text-clear-eeprom-status"></p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="form-group" style="display:none;">
-            <label for="wake-text-input">Wake Time [s] (0～65535)</label>
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="Wake Time" id="wake-text-input">
-              <div class="input-group-append" id="wake-text-input">
-                <button class="btn btn-outline-secondary" type="button" id="check-wake-button">Check</button>
-                <button class="btn btn-outline-secondary" type="button" id="submit-wake-button">Submit</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="sleep-text-input" class="langCng" lang="en">Sleep Time [s] (0～65535)</label>
-            <label for="sleep-text-input" class="langCng" lang="ja">測定間隔 [秒] (0～65535)</label>
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="Sleep Time" id="sleep-text-input">
-              <div class="input-group-append" id="sleep-text-input">
-                <button class="btn btn-outline-secondary" type="button" id="check-sleep-button">Check</button>
-                <button class="btn btn-outline-secondary" type="button" id="submit-sleep-button">Submit</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group" style="display:none;">
-            <label for="sens-text-input">Sensor ON Frequency</label>
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="Sensor ON Frequency" id="sens-text-input">
-              <button class="btn btn-outline-secondary" type="button" id="check-sens-button">Check</button>
-              <button class="btn btn-outline-secondary" type="button" id="submit-sens-button">Submit</button>
-            </div>
-          </div>
-
-          <div class="form-group" style="display:none;">
-            <label for="save-text-input">Data Save Frequency</label>
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="Data Save Frequency" id="save-text-input">
-              <button class="btn btn-outline-secondary" type="button" id="check-save-button">Check</button>
-              <button class="btn btn-outline-secondary" type="button" id="submit-save-button">Submit</button>
-            </div>
-          </div>
-
-          <div class="input-group" style="display:none;">
-            <button class="btn btn-outline-secondary" type="button" id="check-all-button">Check All</button>
-            <button class="btn btn-outline-secondary" type="button" id="submit-all-button">Submit All</button>
-          </div>
-
-          <div class="form-group">
-            <label for="device-name-input" class="langCng" lang="en">Device Name (Up to 5 characters. Alphabet or Numeric only. a-z, 0-9)</label>
-            <label for="device-name-input" class="langCng" lang="ja">デバイス名（最大5文字、半角英数字のみ）</label>
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <label class="input-group-text" for="device-name-input">Leaf_</label>
-              </div>
-              <input type="text" class="form-control" placeholder="ABCDE" id="device-name-input">
-              <div class="input-group-append" id="device-name-input">
-                <button class="btn btn-outline-secondary" type="button" id="check-device-name-button">Check</button>
-                <button class="btn btn-outline-secondary" type="button" id="submit-device-name-button">Submit</button>
-              </div>
-              <div class="invalid-feedback">
-                Up to 5 characters. Alphabet or Numeric only.
-              </div>
-            </div>
-          </div>
-
-          <div class="my-3">
-            <p class="small langCng" lang="en">Clear EEPROM and delete all saved data. (This may take several minutes...)</p>
-            <p class="small langCng" lang="jp">EEPROMに書き込まれたセンサデータをすべて削除します。(数分かかることがあります。)</p>
-            <button class="btn btn-outline-danger" type="button" id="clear-eeprom-button">Clear EEPROM</button>
-            <p class="text-muted" id="text-clear-eeprom-status"></p>
           </div>
         </div>
+      </div>
 
+      <div class="col-12 mb-3 p-3 bg-white rounded shadow-sm">
         <h4 class="langCng" lang="en">Start Logging</h4>
         <h4 class="langCng" lang="ja">センサデータの測定開始</h4>
 
         <p class="langCng" lang="en">1. When you press the disconnect button and exit the paring mode, Leafony start logging.</p>
         <p class="langCng" lang="ja">1. センサデータの測定は、Disconnectボタンを押して、接続モードを解除すると開始します。</p>
 
+        <div class="my-3 text-center">
+          <button type="button" class="btn btn-lg btn-primary" id="ble-connect-button">Connect</button>
+          <button type="button" class="btn btn-lg btn-danger" id="ble-disconnect-button" style="display:none;">Disconnect</button>
+        </div>
+
         <p class="langCng" lang="en">2. During the logging mode, Leafony get the sensors' data at a certain interval, and save them in the internal non-volatile memory. (Up to 169 samples.)</p>
-        <p class="langCng" lang="ja">2. 一定の間隔で、測定したセンサデータのビーコンの電波を発し、同時にデータをメモリ（最大169サンプル）に保存します。</p>
+        <p class="langCng" lang="ja">2. 一定の間隔で、測定したセンサデータをビーコンの電波で発し、同時にデータをメモリ（最大169サンプル）に保存します。</p>
 
       </div>
 
