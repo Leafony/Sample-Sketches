@@ -87,7 +87,7 @@ window.onload = function () {
 
   leafony.onConnected(async function (uniqueName) {
     setTimeout(async function () {
-      await sendCommand('setTime ' + timeStamp());
+      await setTimestamp();
       await checkVersion();
 
       for(let i=0; i<buttonConnect.length; i++) {
@@ -274,7 +274,6 @@ buttonCheckSleep.addEventListener('click', function () {
   stateRecv = "checkSleep";
   sendCommand('getSleep');
 });
-
 
 /**
  * Sens frequency check button
@@ -734,9 +733,16 @@ const timeStamp = () => {
 }
 
 /**
+ * Set Timestamp
+ */
+const setTimestamp = async () => {
+  await sendCommand('setTime ' + timeStamp());
+}
+
+/**
  * Firmware Version Check
  */
-const checkVersion = () => {
+const checkVersion = async () => {
   stateRecv = 'checkVersion';
-  sendCommand('version');
+  await sendCommand('version');
 }
