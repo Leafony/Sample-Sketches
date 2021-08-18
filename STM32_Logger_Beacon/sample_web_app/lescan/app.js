@@ -88,7 +88,7 @@ window.onload = function () {
   leafony.onConnected(async function (uniqueName) {
     setTimeout(async function () {
       await setTimestamp();
-      await checkVersion();
+      setTimeout(checkVersion, 1500);
 
       for(let i=0; i<buttonConnect.length; i++) {
         buttonConnect[i].style.display = 'none';
