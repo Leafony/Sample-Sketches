@@ -20,12 +20,13 @@ const alertMessage = document.getElementById('alertMessage');
 const buttonConnect = document.querySelectorAll('#ble-connect-button');
 const buttonDisconnect = document.querySelectorAll('#ble-disconnect-button');
 const textUniqueName = document.querySelectorAll('#textUniqueName');
+const textFWVersion = document.querySelectorAll('#textFWVersion');
+
 const buttonGetData = document.getElementById('ble-get-button');
 const buttonLescan = document.getElementById('ble-lescan-button');
 const buttonLestop = document.getElementById('ble-lestop-button');
 
 const alertController = document.getElementById('alert-controller');
-const buttonCheckVersion = document.getElementById('check-version-button');
 const buttonCheckWake = document.getElementById('check-wake-button');
 const buttonCheckSleep = document.getElementById('check-sleep-button');
 const buttonCheckSens = document.getElementById('check-sens-button');
@@ -39,7 +40,6 @@ const buttonSubmitSens = document.getElementById('submit-sens-button');
 const buttonSubmitSave = document.getElementById('submit-save-button');
 const buttonSubmitDeviceName = document.getElementById('submit-device-name-button');
 const buttonSubmitAll = document.getElementById('submit-all-button');
-const inputVersionText = document.getElementById('version-text-input');
 const inputWakeText = document.getElementById('wake-text-input');
 const inputSleepText = document.getElementById('sleep-text-input');
 const inputSensText = document.getElementById('sens-text-input');
@@ -86,8 +86,9 @@ window.onload = function () {
   }
 
   leafony.onConnected(async function (uniqueName) {
-    setTimeout(function () {
-      sendCommand('setTime ' + timeStamp());
+    setTimeout(async function () {
+      await sendCommand('setTime ' + timeStamp());
+      await checkVersion();
 
       for(let i=0; i<buttonConnect.length; i++) {
         buttonConnect[i].style.display = 'none';
@@ -98,7 +99,6 @@ window.onload = function () {
       deviceName = uniqueName;
 
       buttonGetData.disabled = false;
-      buttonCheckVersion.disabled = false;
       buttonCheckWake.disabled = false;
       buttonCheckSleep.disabled = false;
       buttonCheckSens.disabled = false;
@@ -132,7 +132,6 @@ window.onload = function () {
   });
 
   buttonGetData.disabled = true;
-  buttonCheckVersion.disabled = true;
   buttonCheckWake.disabled = true;
   buttonCheckSleep.disabled = true;
   buttonCheckSens.disabled = true;
@@ -256,15 +255,6 @@ buttonLestop.addEventListener('click', function () {
 
   buttonLescan.style.display = '';
   buttonLestop.style.display = 'none';
-});
-
-
-/**
- * Wake time check button
- */
-buttonCheckVersion.addEventListener('click', function () {
-  stateRecv = "checkVersion";
-  sendCommand('version');
 });
 
 
@@ -606,7 +596,10 @@ function onStateChange(state) {
   let recv = new TextDecoder('utf-8').decode(data);
 
   if (stateRecv === 'checkVersion') {
-    inputVersionText.value = recv;
+    // inputVersionText.value = recv;
+    for (let i=0; i<textFWVersion.length; i++) {
+      textFWVersion[i].innerText = recv;
+    }
     stateRecv = 'main';
   }
   else if (stateRecv === 'checkSleep') {
@@ -698,10 +691,10 @@ function onDisconnected(state) {
     buttonConnect[i].disabled = false;
     buttonConnect[i].innerHTML = 'Connect';
     textUniqueName[i].innerText = '';
+    textFWVersion[i].innerText = '';
   }
 
   buttonGetData.disabled = true;
-  buttonCheckVersion.disabled = true;
   buttonCheckWake.disabled = true;
   buttonCheckSleep.disabled = true;
   buttonCheckSens.disabled = true;
@@ -723,7 +716,7 @@ function onDisconnected(state) {
  * If leafony is not connected, show alert popups.
  * @param {string} command
  */
-async function sendCommand(command) {
+const sendCommand = async (command) => {
   if (leafony.isConnected()) {
     await leafony.sendCommand(command);
   } else {
@@ -734,8 +727,16 @@ async function sendCommand(command) {
 /**
  * Get Hex Timestamp Value
  */
-function timeStamp() {
+const timeStamp = () => {
   let now = new Date();
   timestamp = Math.floor(now.getTime() / 1000);
   return timestamp;
+}
+
+/**
+ * Firmware Version Check
+ */
+const checkVersion = () => {
+  stateRecv = 'checkVersion';
+  sendCommand('version');
 }

@@ -57,8 +57,8 @@
       </div>
 
       <div class="col-12 mb-3 p-3 bg-white rounded shadow-sm">
-        <h2 class="langCng border-bottom" lang="en">Initial Settings and Start Logging</h2>
-        <h2 class="langCng border-bottom" lang="ja">初期設定とセンサ測定開始設定</h2>
+        <h2 class="langCng border-bottom" lang="en">Start Logging</h2>
+        <h2 class="langCng border-bottom" lang="ja">センサ測定開始設定</h2>
 
         <h4 class="langCng" lang="en">Bluetooth Connection</h4>
         <h4 class="langCng" lang="ja">Bluetooth接続</h4>
@@ -69,11 +69,8 @@
         <div class="my-3 text-center">
           <button type="button" class="btn btn-lg btn-primary" id="ble-connect-button">Connect</button>
           <button type="button" class="btn btn-lg btn-danger" id="ble-disconnect-button" style="display:none;">Disconnect</button>
-        </div>
-
-        <div class="text-center">
-          <b>Device Name: </b>
-          <p id="textUniqueName"></p>
+          <div class="small text-muted"><b>Device Name: </b><span id="textUniqueName"></span></div>
+          <div class="small text-muted"><b>FW Version: </b><span id="textFWVersion"></span></div>
         </div>
 
         <p class="langCng" lang="en">2. When you turn on Leafony and shake it like the image below, it will enter the connection waiting mode for about 20 seconds.</p>
@@ -88,18 +85,38 @@
 
         <p class="langCng" lang="en">4. Now Leafony set its internal calendar and start logging.</p>
         <p class="langCng" lang="ja">4. Leafonyがパソコンやスマートフォンと接続すると、時刻が設定されます。</p>
-
       </div>
+
+      <div class="col-12 mb-3 p-3 bg-white rounded shadow-sm">
+        <h2 class="langCng border-bottom" lang="en">Start Logging</h2>
+        <h2 class="langCng border-bottom" lang="ja">センサデータの測定開始</h2>
+
+        <p class="langCng" lang="en">1. When you press the disconnect button and exit the paring mode, Leafony start logging.</p>
+        <p class="langCng" lang="ja">1. センサデータの測定は、Disconnectボタンを押して、接続モードを解除すると開始します。</p>
+
+        <div class="my-3 text-center">
+          <button type="button" class="btn btn-lg btn-primary" id="ble-connect-button">Connect</button>
+          <button type="button" class="btn btn-lg btn-danger" id="ble-disconnect-button" style="display:none;">Disconnect</button>
+          <div class="small text-muted"><b>Device Name: </b><span id="textUniqueName"></span></div>
+          <div class="small text-muted"><b>FW Version: </b><span id="textFWVersion"></span></div>
+        </div>
+
+        <p class="langCng" lang="en">2. During the logging mode, Leafony get the sensors' data at a certain interval, and save them in the internal non-volatile memory. (Up to 169 samples.)</p>
+        <p class="langCng" lang="ja">2. 一定の間隔で、測定したセンサデータをビーコンの電波で発し、同時にデータをメモリ（最大169サンプル）に保存します。</p>
+      </div>
+
       <div class="col-12 mb-3 p-3 bg-white rounded shadow-sm">
         <div class="accordion" id="accordionExample">
           <div class="card">
             <div class="card-header" id="headingOne">
               <h5 class="mb-0">
                 <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                <h4 class="langCng" lang="en">Initial Settings (Optional)</h4>
-                <h4 class="langCng" lang="ja">初期設定 (オプション)</h4>
+                  <h4 class="langCng" lang="en">Initial Settings</h4>
+                  <h4 class="langCng" lang="ja">初期設定</h4>
                 </button>
               </h5>
+              <span class="langCng small" lang="en">(Optional) Set sleep time and device name. Remove saved data.</span>
+              <span class="langCng small" lang="ja">(任意) 測定間隔や名称の設定、測定データの消去ができます。</span>
             </div>
         
             <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
@@ -115,11 +132,8 @@
                 <div class="my-3 text-center">
                   <button type="button" class="btn btn-lg btn-primary" id="ble-connect-button">Connect</button>
                   <button type="button" class="btn btn-lg btn-danger" id="ble-disconnect-button" style="display:none;">Disconnect</button>
-                </div>
-
-                <div class="text-center">
-                  <b>Device Name: </b>
-                  <p id="textUniqueName"></p>
+                  <div class="small text-muted"><b>Device Name: </b><span id="textUniqueName"></span></div>
+                  <div class="small text-muted"><b>FW Version: </b><span id="textFWVersion"></span></div>
                 </div>
 
                 <div class="m-3 p-3 border rounded shadow-sm" id="settingCtrl">
@@ -128,16 +142,6 @@
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
-                  </div>
-                  <div class="form-group">
-                    <label for="version-text-input" class="langCng" lang="en">Version</label>
-                    <label for="version-text-input" class="langCng" lang="ja">バージョン</label>
-                    <div class="input-group">
-                      <input type="text" class="form-control" placeholder="Version" id="version-text-input">
-                      <div class="input-group-append" id="version-text-input">
-                        <button class="btn btn-outline-secondary" type="button" id="check-version-button">Check</button>
-                      </div>
-                    </div>
                   </div>
                   <div class="form-group" style="display:none;">
                     <label for="wake-text-input">Wake Time [s] (0～65535)</label>
@@ -216,28 +220,6 @@
         </div>
       </div>
 
-      <div class="col-12 mb-3 p-3 bg-white rounded shadow-sm">
-        <h4 class="langCng" lang="en">Start Logging</h4>
-        <h4 class="langCng" lang="ja">センサデータの測定開始</h4>
-
-        <p class="langCng" lang="en">1. When you press the disconnect button and exit the paring mode, Leafony start logging.</p>
-        <p class="langCng" lang="ja">1. センサデータの測定は、Disconnectボタンを押して、接続モードを解除すると開始します。</p>
-
-        <div class="my-3 text-center">
-          <button type="button" class="btn btn-lg btn-primary" id="ble-connect-button">Connect</button>
-          <button type="button" class="btn btn-lg btn-danger" id="ble-disconnect-button" style="display:none;">Disconnect</button>
-        </div>
-
-        <div class="text-center">
-          <b>Device Name: </b>
-          <p id="textUniqueName"></p>
-        </div>
-
-        <p class="langCng" lang="en">2. During the logging mode, Leafony get the sensors' data at a certain interval, and save them in the internal non-volatile memory. (Up to 169 samples.)</p>
-        <p class="langCng" lang="ja">2. 一定の間隔で、測定したセンサデータをビーコンの電波で発し、同時にデータをメモリ（最大169サンプル）に保存します。</p>
-
-      </div>
-
       <div class="col-12 my-3 p-3 bg-white rounded shadow-sm" id="feature-beacon">
         <h2 class="langCng border-bottom" lang="en">Scanning Beacon</h2>
         <h2 class="langCng border-bottom" lang="ja">ビーコンスキャン</h2>
@@ -280,11 +262,8 @@
         <div class="my-3 text-center">
           <button type="button" class="btn btn-lg btn-primary" id="ble-connect-button">Connect</button>
           <button type="button" class="btn btn-lg btn-danger" id="ble-disconnect-button" style="display:none;">Disconnect</button>
-        </div>
-
-        <div class="text-center">
-          <b>Device Name: </b>
-          <p id="textUniqueName"></p>
+          <div class="small text-muted"><b>Device Name: </b><span id="textUniqueName"></span></div>
+          <div class="small text-muted"><b>FW Version: </b><span id="textFWVersion"></span></div>
         </div>
 
         <p class="langCng" lang="en">2. Once the connection is established, press the Get Data button below and wait for a while to graph the sensor data.</p>
