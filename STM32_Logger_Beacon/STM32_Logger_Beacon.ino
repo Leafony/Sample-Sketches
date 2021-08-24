@@ -542,14 +542,17 @@ void setupEEPROM() {
     strDeviceName = strDeviceNamePrefix;
     for (uint8_t i=0; i<5; i++){
       char c = EEPROM.read(12+i);
-      // c is NOT Alphabet or Numeric
-      if (!((c>='a'&& c<='z') || (c>='A' && c<='Z') || (c>='0' && c<='9'))) {
+      // c is NOT alphabet or numeric
+      if (!((c>='a' && c<='z') || (c>='A' && c<='Z') || (c>='0' && c<='9'))) {
         if (i==0) {  // Device Name is not set.
           strDeviceName += strDeviceNameUnique; // Set default unique name.
         }
         break;
       }
-      strDeviceName += String(c);
+      // c is alphabet or numeric
+      else {
+        strDeviceName += String(c);
+      }
     }
 #ifdef DEBUG
     Serial.print("BLE Device Name is ");
@@ -1025,16 +1028,26 @@ void my_evt_gatt_server_attribute_value(const struct ble_msg_gatt_server_attribu
   }
   else if (rcv_data.startsWith("setDevName"))
   {
-    Serial.print(rcv_data);
-
     String rcvUniqueName = rcv_data.substring(11);
 
     // Set device name
     strDeviceName = strDeviceNamePrefix + rcvUniqueName;
+
     // Save device name
-    for(uint8_t i=0; i<rcvUniqueName.length(); i++){
-      EEPROM.write(12+i, (uint8_t)rcvUniqueName.charAt(i));
+    for(uint8_t i=0; i<5; i++){
+      if (i<rcvUniqueName.length()) {
+        EEPROM.write(12+i, (uint8_t)rcvUniqueName.charAt(i));
+      }
+      else {
+        EEPROM.write(12+i, 0);
+      }
     }
+
+    #ifdef DEBUG
+    Serial.print("Device name is changed. (");
+    Serial.print(strDeviceName);
+    Serial.println(")");
+    #endif
   }
   else if (rcv_data.startsWith("getDevName"))
   {
