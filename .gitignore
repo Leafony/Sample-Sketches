@@ -1,5 +1,7 @@
 # User Settings
 .DS_Store
+credentials.json
+token.json
 
 # Prerequisites
 *.d
@@ -41,6 +43,4 @@
 node_modules
 npm-debug.log
 .env
-package.json
-package-lock.json
 .eslintrc.js

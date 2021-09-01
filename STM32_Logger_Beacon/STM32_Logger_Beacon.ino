@@ -282,24 +282,14 @@ void StartAdvData() {
   // AD Structure 3 (Manufacturer Specific Data)
   adv_data[index++] = 9;    // field lengh
   adv_data[index++] = 0xff; // AD Type (Manufacturer Specific Data)
-  adv_data[index++] = 'T'; // Dummy
-  adv_data[index++] = 'T'; // Dummy
-  adv_data[index++] = (temp >> 8) & 0xFF;
-  adv_data[index++] = temp & 0xFF;
-  adv_data[index++] = (humid >> 8) & 0xFF;
-  adv_data[index++] = humid & 0xFF;
-  // adv_data[index++] = (illum >> 8) & 0xFF;
-  // adv_data[index++] = illum & 0xFF;
-  adv_data[index++] = (battVolt >> 8) & 0xFF;
-  adv_data[index++] = battVolt & 0xFF;
-
-  // dtostrf(dataTemp, 4, 1, charTemp); // Temperature (5byte)
-  // dtostrf(dataBatt, 4, 2, charBatt); // Battery Voltage (4byte)
-  // dataLen = sprintf(userData, "TT%4s,%4s", charTemp, charBatt);
-
-  // for (uint8_t i = 0; i < dataLen; i++) {
-  //   adv_data[index++] = userData[i]; // User Data
-  // }
+  adv_data[index++] = (illum >> 8) & 0xFF;    // Illuminance (Upper)
+  adv_data[index++] = illum & 0xFF;           // Illuminance (Lower)
+  adv_data[index++] = (temp >> 8) & 0xFF;     // Temperature (Upper)
+  adv_data[index++] = temp & 0xFF;            // Temperature (Lower)
+  adv_data[index++] = (humid >> 8) & 0xFF;    // Humidity (Upper)
+  adv_data[index++] = humid & 0xFF;           // Humidity (Lower)
+  adv_data[index++] = (battVolt >> 8) & 0xFF; // Battery Voltage (Upper)
+  adv_data[index++] = battVolt & 0xFF;        // Battery Boltage (Lower)
 
   // register advertising packet
   stLen = index;

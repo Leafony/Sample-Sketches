@@ -1,0 +1,19 @@
+{
+  "name": "spreadsheet-logger",
+  "version": "1.0.0",
+  "description": "A BLE beacon logger with Google SpreadSheet",
+  "main": "index.js",
+  "dependencies": {
+    "date-utils": "^1.2.21",
+    "googleapis": "^39.2.0",
+    "text-encoding": "^0.7.0",
+    "@abandonware/noble": "^1.9.2-14"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Leafony",
+  "license": "MIT"
+}
