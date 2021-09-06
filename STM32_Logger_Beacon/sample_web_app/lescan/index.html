@@ -242,9 +242,30 @@
 
         <div class="m-3 p-3 border rounded shadow-sm text-center">
           <p class="display-4" id="textDevNameLe">Device Name</p>
-          <p class="display-4"><ion-icon name="thermometer-outline" style="color: rgb(230, 54, 54);"></ion-icon><span id="textTempLe">00.0℃</span></p>
-          <p class="display-4"><ion-icon name="water-outline" style="color: rgb(116, 203, 238);"></ion-icon><span id="textHumidLe">00%</span></p>
-          <p class="display-4"><ion-icon name="battery-half-outline" style="color: rgb(112, 212, 30);"></ion-icon><span id="textBattLe">0.00V</span></p>
+          <div class="row mx-auto" style="max-width: 500px;">
+            <div class="col-4 text-right">
+              <ion-icon name="thermometer-outline" style="color: rgb(230, 54, 54); font-size: 56px;"></ion-icon>
+            </div>
+            <div class="col-8 text-left">
+              <p class="display-4"><span id="textTempLe">00.0℃</span></p>
+            </div>
+          </div>
+          <div class="row mx-auto" style="max-width: 500px;">
+            <div class="col-4 text-right">
+              <ion-icon name="water-outline" style="color: rgb(116, 203, 238); font-size: 56px;"></ion-icon>
+            </div>
+            <div class="col-8 text-left">
+              <p class="display-4"><span id="textHumidLe">00%</span></p>
+            </div>
+          </div>
+          <div class="row mx-auto" style="max-width: 500px;">
+            <div class="col-4 text-right">
+              <ion-icon name="battery-full-outline" style="color: rgb(112, 212, 30); font-size: 56px;"></ion-icon>
+            </div>
+            <div class="col-8 text-left">
+              <p class="display-4"><span id="textBattLe">0.00V</span></p>
+            </div>
+          </div>
           <p class="font-weight-light" id="textTimeLe">Last Update: 0000/00/00 00:00:00</p>
         </div>
       </div>

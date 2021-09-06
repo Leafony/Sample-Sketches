@@ -46,7 +46,7 @@
 //=====================================================================
 // Sketch firmware version
 //=====================================================================
-const String FIRMWARE_VERSION = "2021.08.010";
+const String FIRMWARE_VERSION = "2021.09.060";
 
 //=====================================================================
 // BLE Local device name
@@ -69,7 +69,7 @@ String strDeviceName = strDeviceNamePrefix + strDeviceNameUnique;
 //  DEFAULT_CLICK_WAKE_INTERVAL : ダブルタップをしたときの起動時間 (秒)
 //=====================================================================
 #define DEFAULT_SLEEP_INTERVAL 10
-#define DEFAULT_WAKE_INTERVAL 0
+#define DEFAULT_WAKE_INTERVAL 1
 #define DEFAULT_CLICK_WAKE_INTERVAL 20
 
 //=====================================================================
@@ -133,6 +133,13 @@ String strDeviceName = strDeviceNamePrefix + strDeviceNameUnique;
 #define MODE_IDLE               (0)
 #define MODE_SEND_DATA          (1)
 #define MODE_CLEAR_EEPROM       (2)
+
+// BLE Advertising Interval
+// Example: If the minimum advertisement interval is 40ms and the maximum advertisement interval is 100ms
+// then the real advertisement interval will be mostly the middle value (70ms) plus a randomly added 20ms delay,
+// which needs to be added according to the Bluetooth specification.
+#define MIN_ADV_INTVAL 64  // 64 * 0.625ms = 40ms
+#define MAX_ADV_INTVAL 160 // 160 * 0.625ms = 100ms
 
 // Baudrate
 #define SERIAL_BAUD 115200
@@ -237,9 +244,7 @@ void setupBLE() {
   while (ble112.checkActivity(100));
 
   // set advertising parameters
-  //  interval_min : 250ms( = 400 x 0.625ms )
-  //  interval_max : 500ms( = 800 x 0.625ms )
-  ble112.ble_cmd_le_gap_set_adv_parameters(400, 800, 7); /* [BGLIB] <interval_min> <interval_max> <channel_map> */
+  ble112.ble_cmd_le_gap_set_adv_parameters(MIN_ADV_INTVAL, MAX_ADV_INTVAL, 7); /* [BGLIB] <interval_min> <interval_max> <channel_map> */
   while (ble112.checkActivity(100));
 }
 
@@ -479,7 +484,7 @@ void wakeupBLE() {
   ble112.ble_cmd_system_halt(0);
   while (ble112.checkActivity());
 
-  ble112.ble_cmd_le_gap_set_adv_parameters(400, 800, 7); /* [BGLIB] <interval_min> <interval_max> <channel_map> */
+  ble112.ble_cmd_le_gap_set_adv_parameters(MIN_ADV_INTVAL, MAX_ADV_INTVAL, 7); /* [BGLIB] <interval_min> <interval_max> <channel_map> */
   while (ble112.checkActivity());
 }
 
@@ -523,10 +528,10 @@ void setupEEPROM() {
 
   if (eeprom_configured) {
     // Load saved registers
-    wake_intval  = (EEPROM.read(2) << 8) + EEPROM.read(3);
+    // wake_intval  = (EEPROM.read(2) << 8) + EEPROM.read(3); // Reserved
     sleep_intval = (EEPROM.read(4) << 8) + EEPROM.read(5);
-    sens_freq    = (EEPROM.read(6) << 8) + EEPROM.read(7);
-    save_freq    = (EEPROM.read(8) << 8) + EEPROM.read(9);
+    // sens_freq    = (EEPROM.read(6) << 8) + EEPROM.read(7); // Reserved
+    // save_freq    = (EEPROM.read(8) << 8) + EEPROM.read(9); // Reserved
 
     // Load device name
     strDeviceName = strDeviceNamePrefix;
@@ -782,8 +787,10 @@ void loop() {
       // Continue Advertising; (check BLE status every 0.1 secound.)
       for (int i = 0; i < click_wake_intval * 10; i++) {
         delay(100);
+        // check ble status; if connection requested, my_evt_le_connection_opend handler is called.
         ble112.checkActivity();
       }
+
     } else {  // Normal operation
 #ifdef DEBUG
       Serial.print("Start advertising (");
@@ -791,11 +798,13 @@ void loop() {
       Serial.println("s)");
 #endif
 
-      // Continue Advertising; (check BLE status every 0.1 secound.)
+      // Continue Advertising;
       for (int i = 0; i <= wake_intval * 10; i++) {
         delay(100);
-        ble112.checkActivity();
+        // don't check activity, if ble is not connectable during normal advertising operation.
+        // ble112.checkActivity();
       }
+
       // bBleConnected turns true at this time, when the connection is requested;
     }
 
