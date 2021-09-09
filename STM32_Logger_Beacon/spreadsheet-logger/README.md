@@ -11,7 +11,7 @@ A data logger for Leafony beacons with Google SpreadSheet.
 
 ### Ubuntu/Debian
 
-```sh
+```bash
 sudo apt-get install bluetooth libbluetooth-dev libudev-dev
 git clone https://github.com/Leafony/Sample-Sketches/
 cd Sample-Sketches/STM32_Logger_Beacon/spreadsheet-logger
@@ -20,7 +20,7 @@ npm install
 
 ### Raspberry Pi (Raspbian)
 
-```sh
+```bash
 sudo apt update
 sudo apt upgrade
 
@@ -40,7 +40,7 @@ npm install
 
 ### Fedra/ Other-RPM based
 
-```sh
+```bash
 sudo yum install bluez bluez-libs bluez-libs-devel
 git clone https://github.com/Leafony/Sample-Sketches/
 cd Sample-Sketches/STM32_Logger_Beacon/spreadsheet-logger
@@ -51,7 +51,7 @@ npm install
 1. Install [Xcode](https://itunes.apple.com/ca/app/xcode/id497799835?mt=12)
 2. On newer versions of OSX, allow bluetooth access on the terminal app: "System Preferences" —> "Security & Privacy" —> "Bluetooth" -> Add terminal app.
 
-```
+```bash
 # Clone this repository and install required packages
 git clone https://github.com/Leafony/Sample-Sketches/
 cd Sample-Sketches/STM32_Logger_Beacon/spreadsheet-logger
