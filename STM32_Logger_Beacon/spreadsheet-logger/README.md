@@ -14,7 +14,7 @@ A data logger for Leafony beacons with Google SpreadSheet.
 ```sh
 sudo apt-get install bluetooth libbluetooth-dev libudev-dev
 git clone https://github.com/Leafony/Sample-Sketches/
-cd STM32_Logger_Beacon/spreadsheet-logger
+cd Sample-Sketches/STM32_Logger_Beacon/spreadsheet-logger
 npm install
 ```
 
@@ -34,7 +34,7 @@ sudo apt install nodejs
 sudo apt install -y bluetooth libbluetooth-dev libudev-dev git
 # Clone this repository and install required packages
 git clone https://github.com/Leafony/Sample-Sketches/
-cd STM32_Logger_Beacon/spreadsheet-logger
+cd Sample-Sketches/STM32_Logger_Beacon/spreadsheet-logger
 npm install
 ```
 
@@ -43,7 +43,7 @@ npm install
 ```sh
 sudo yum install bluez bluez-libs bluez-libs-devel
 git clone https://github.com/Leafony/Sample-Sketches/
-cd STM32_Logger_Beacon/spreadsheet-logger
+cd Sample-Sketches/STM32_Logger_Beacon/spreadsheet-logger
 npm install
 ```
 
