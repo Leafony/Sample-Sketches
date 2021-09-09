@@ -47,6 +47,17 @@ cd Sample-Sketches/STM32_Logger_Beacon/spreadsheet-logger
 npm install
 ```
 
+### OSX
+1. Install [Xcode](https://itunes.apple.com/ca/app/xcode/id497799835?mt=12)
+2. On newer versions of OSX, allow bluetooth access on the terminal app: "System Preferences" —> "Security & Privacy" —> "Bluetooth" -> Add terminal app.
+
+```
+# Clone this repository and install required packages
+git clone https://github.com/Leafony/Sample-Sketches/
+cd Sample-Sketches/STM32_Logger_Beacon/spreadsheet-logger
+npm install
+```
+
 ## Usage
 
 Change `spreadsheetID` and `sheetName` according to your sheet.
