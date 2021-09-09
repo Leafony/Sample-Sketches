@@ -15,7 +15,7 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const TOKEN_PATH = 'token.json';
 
 let authenticate;
-const spreadsheetId = '<YOUR SPREADSHEET ID HERE>';
+const spreadsheetId = '1HYl9B-q_beEfXjmkPzGVbWkzENH3AKXh-43sfCywBhQ';
 const sheetName = 'Sheet1';
 
 // Load client secrets from a local file.
@@ -153,7 +153,7 @@ const discovered = (peripheral) => {
         let dt_s = dt.toFormat('YYYY/MM/DD HH24:MI:SS');
 
         // Decode sensors data (for STM32 MCU)
-        let light = ((device.data[0] << 8) + device.data[1]) / 256;
+        let light = (device.data[0] << 8) + device.data[1];
         let temperature = ((device.data[2] << 8) + device.data[3]) / 256;
         let humid = ((device.data[4] << 8) + device.data[5]) / 256;
         let battery = ((device.data[6] << 8) + device.data[7]) / 256;
