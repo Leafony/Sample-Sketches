@@ -15,7 +15,7 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const TOKEN_PATH = 'token.json';
 
 let authenticate;
-const spreadsheetId = '1HYl9B-q_beEfXjmkPzGVbWkzENH3AKXh-43sfCywBhQ';
+const spreadsheetId = '<YOUR SPREADSHEET ID HERE>';
 const sheetName = 'Sheet1';
 
 // Load client secrets from a local file.
