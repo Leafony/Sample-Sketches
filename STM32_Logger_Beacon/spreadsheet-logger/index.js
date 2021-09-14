@@ -2,9 +2,8 @@
 
 const fs = require('fs');
 const readline = require('readline');
-const {google} = require('googleapis');
+const { google } = require('googleapis');
 const noble = require('@abandonware/noble');
-const textEncoding = require('text-encoding');
 require('date-utils');
 
 // If modifying these scopes, delete token.json.
@@ -13,10 +12,16 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 // created automatically when the authorization flow completes for the first
 // time.
 const TOKEN_PATH = 'token.json';
-
 let authenticate;
+
+// Your Spreadsheet Settings
 const spreadsheetId = '<YOUR SPREADSHEET ID HERE>';
 const sheetName = 'Sheet1';
+
+// Scanned devices in last lifecycle secounds.
+let scannedDevices = [];
+// During this period after one device scanned, this device will not be logged again.
+const lifecycle = 5;
 
 // Load client secrets from a local file.
 fs.readFile('credentials.json', (err, content) => {
@@ -32,9 +37,9 @@ fs.readFile('credentials.json', (err, content) => {
  * @param {function} callback The callback to call with the authorized client.
  */
 const authorize = (credentials, callback) => {
-  const {client_secret, client_id, redirect_uris} = credentials.installed;
+  const { client_secret, client_id, redirect_uris } = credentials.installed;
   const oAuth2Client = new google.auth.OAuth2(
-      client_id, client_secret, redirect_uris[0]);
+    client_id, client_secret, redirect_uris[0]);
 
   // Check if we have previously stored a token.
   fs.readFile(TOKEN_PATH, (err, token) => {
@@ -80,20 +85,20 @@ const getNewToken = (oAuth2Client, callback) => {
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
 const writeTitles = (auth) => {
-  const sheets = google.sheets({version: 'v4', auth});
+  const sheets = google.sheets({ version: 'v4', auth });
   sheets.spreadsheets.values.update({
     spreadsheetId: spreadsheetId,
     range: sheetName + '!A1:G1',
     valueInputOption: "USER_ENTERED",
     resource: {
-        values: [
-          ['Device', 'Datetime', 'Temperature', 'Humidity', 'Illuminum', 'Battery', 'RSSI']
-        ],
+      values: [
+        ['Device', 'Datetime', 'Temperature', 'Humidity', 'Illuminum', 'Battery', 'RSSI']
+      ],
     },
   }, (err, res) => {
     if (err) {
-        console.log('The API returned an error: ' + err);
-        return;
+      console.log('The API returned an error: ' + err);
+      return;
     }
   });
 }
@@ -104,64 +109,98 @@ const writeTitles = (auth) => {
  * @param {Array} value The list of row data
  */
 const appendData = (auth, values) => {
-  const sheets = google.sheets({version: 'v4', auth});
+  const sheets = google.sheets({ version: 'v4', auth });
   sheets.spreadsheets.values.append({
     spreadsheetId: spreadsheetId,
     range: sheetName,
     valueInputOption: "USER_ENTERED",
     resource: {
-        values: values,
+      values: values,
     },
   }, (err, res) => {
     if (err) {
-        console.log('The API returned an error: ' + err);
-        return;
+      console.log('The API returned an error: ' + err);
+      return;
     }
   });
 }
 
+/**
+ * This is the entry point of main scanning routine.
+ * @param {*} auth 
+ */
 const scanBeacon = (auth) => {
-    authenticate = auth;
-    writeTitles(auth);
+  authenticate = auth;
 
-    if(noble.state === 'poweredOn'){
-        scanStart();
-    }else{
-        noble.on('stateChange', scanStart);
-    }
+  writeTitles(auth);
+
+  if (noble.state === 'poweredOn') {
+    scanStart();
+  } else {
+    noble.on('stateChange', scanStart);
+  }
 }
 
-//BLE scan start
+/**
+ * BLE scan start
+ */
 const scanStart = () => {
-    noble.startScanning([], true);
-    noble.on('discover', discovered);
-    console.log('Start scanning...');
+  noble.startScanning([], true);
+  noble.on('discover', discovered);
+  console.log('Start scanning...');
 }
 
-//discovered BLE device
+/**
+ * Discovered BLE device
+ * @param {*} peripheral 
+ */
 const discovered = (peripheral) => {
-    const TextDecoder = textEncoding.TextDecoder;
-    const device = {
-        name: peripheral.advertisement.localName,
-        uuid: peripheral.uuid,
-        rssi: peripheral.rssi,
-        data: peripheral.advertisement.manufacturerData
-    };
+  const dt = new Date();
+  const device = {
+    name: peripheral.advertisement.localName,
+    uuid: peripheral.uuid,
+    rssi: peripheral.rssi,
+    data: peripheral.advertisement.manufacturerData
+  };
 
-    if (String(device.name).match(/^Leaf_\w+$/) != null){
-        let dt = new Date();
-        let dt_s = dt.toFormat('YYYY/MM/DD HH24:MI:SS');
+  // If devicename start with "Leaf_":
+  if (String(device.name).match(/^Leaf_\w+$/) != null) {
+    console.log(`${device.name} is scanned.`);
+    // Find scanned devices.
+    const index = scannedDevices.findIndex(dev => dev.name === device.name);
 
-        // Decode sensors data (for STM32 MCU)
-        let light = (device.data[0] << 8) + device.data[1];
-        let temperature = ((device.data[2] << 8) + device.data[3]) / 256;
-        let humid = ((device.data[4] << 8) + device.data[5]) / 256;
-        let battery = ((device.data[6] << 8) + device.data[7]) / 256;
-
-        let values = [
-          [device.name, dt_s, temperature, humid, light, battery, device.rssi]
-        ];
-        appendData(authenticate, values);
-        console.log(`${device.name},${dt_s}`);
+    if (index === -1) {
+      // If this is the first time.
+      scannedDevices.push({ name: device.name, datetime: dt });
+      decode(dt, device);
+    } else {
+      // If last scanned time is older than the lifecycles.
+      if (dt.getTime() - scannedDevices[index].datetime.getTime() < lifecycle * 1000) {
+        return;
+      }
+      // Update last scanned time.
+      scannedDevices[index].datetime = dt;
+      decode(dt, device);
     }
+  }
+}
+
+/**
+ * Decode and append data
+ * @param {*} dt 
+ * @param {*} device 
+ */
+const decode = (dt, device) => {
+  const dt_s = dt.toFormat('YYYY/MM/DD HH24:MI:SS');
+
+  const light = (device.data[0] << 8) + device.data[1];
+  const temperature = ((device.data[2] << 8) + device.data[3]) / 256;
+  const humid = ((device.data[4] << 8) + device.data[5]) / 256;
+  const battery = ((device.data[6] << 8) + device.data[7]) / 256;
+
+  const values = [
+    [device.name, dt_s, temperature, humid, light, battery, device.rssi]
+  ];
+  appendData(authenticate, values);
+  console.log(`write: ${values}`);
 }
