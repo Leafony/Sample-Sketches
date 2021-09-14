@@ -46,7 +46,7 @@
 //=====================================================================
 // Sketch firmware version
 //=====================================================================
-const String FIRMWARE_VERSION = "2021.09.060";
+const String FIRMWARE_VERSION = "2021.09.140";
 
 //=====================================================================
 // BLE Local device name
@@ -138,8 +138,8 @@ String strDeviceName = strDeviceNamePrefix + strDeviceNameUnique;
 // Example: If the minimum advertisement interval is 40ms and the maximum advertisement interval is 100ms
 // then the real advertisement interval will be mostly the middle value (70ms) plus a randomly added 20ms delay,
 // which needs to be added according to the Bluetooth specification.
-#define MIN_ADV_INTVAL 64  // 64 * 0.625ms = 40ms
-#define MAX_ADV_INTVAL 160 // 160 * 0.625ms = 100ms
+#define MIN_ADV_INTVAL 200 // 200 * 0.625ms = 125ms
+#define MAX_ADV_INTVAL 400 // 400 * 0.625ms = 250ms
 
 // Baudrate
 #define SERIAL_BAUD 115200
