@@ -316,7 +316,8 @@ buttonSubmitWake.addEventListener('click', function () {
  * Sleep time submit button
  */
 buttonSubmitSleep.addEventListener('click', function () {
-  if (!inputSleepText.value) {
+  // sleep time should be over 60 secounds in order not to break EEPROM.
+  if (!inputSleepText.value || parseInt(inputSleepText.value, 10) < 60) {
     return;
   }
   sendCommand('setSleep ' + inputSleepText.value);

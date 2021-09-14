@@ -68,7 +68,7 @@ String strDeviceName = strDeviceNamePrefix + strDeviceNameUnique;
 //  DEFAULT_WAKE_INTERVAL　：Beacon送信時間 (秒)
 //  DEFAULT_CLICK_WAKE_INTERVAL : ダブルタップをしたときの起動時間 (秒)
 //=====================================================================
-#define DEFAULT_SLEEP_INTERVAL 10
+#define DEFAULT_SLEEP_INTERVAL 60
 #define DEFAULT_WAKE_INTERVAL 1
 #define DEFAULT_CLICK_WAKE_INTERVAL 20
 
