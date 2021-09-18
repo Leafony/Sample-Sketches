@@ -80,11 +80,8 @@
           <img src="doubletap.gif" alg="gif image" class="img-thumbnail">
         </div>
 
-        <p class="langCng" lang="en">3. Select <b> Leaf_A </b> and press the pairing button.</p>
-        <p class="langCng" lang="ja">3. <b>Leaf_A</b>を選択し、ペア設定ボタンを押すと接続完了です。</p>
-
-        <p class="langCng" lang="en">4. Now Leafony set its internal calendar and start logging.</p>
-        <p class="langCng" lang="ja">4. Leafonyがパソコンやスマートフォンと接続すると、時刻が設定されます。</p>
+        <p class="langCng" lang="en">3. Select <b> Leaf_A </b> and press the pairing button, then the timestamp is set automatically.</p>
+        <p class="langCng" lang="ja">3. <b>Leaf_A</b>を選択し、ペア設定ボタンを押すと接続完了し、自動的にLeafonyの時刻が設定されます。</p>
       </div>
 
       <div class="col-12 mb-3 p-3 bg-white rounded shadow-sm">
@@ -105,6 +102,107 @@
         <p class="langCng" lang="ja">2. 一定の間隔で、測定したセンサデータをビーコンの電波で発し、同時にデータをメモリ（最大169サンプル）に保存します。</p>
       </div>
 
+      <!-- Scanning -->
+      <div class="col-12 my-3 p-3 bg-white rounded shadow-sm" id="feature-beacon">
+        <h2 class="langCng border-bottom" lang="en">Scanning Beacon</h2>
+        <h2 class="langCng border-bottom" lang="ja">ビーコンスキャン</h2>
+
+        <p class="langCng" lang="en">You can scan advertising packet (beacon).</p>
+        <p class="langCng" lang="ja">Leafonyが発するビーコンの電波をスキャンすることができます。</p>
+
+        <p class="langCng" lang="en">1.  Press <b>Scan Beacon</b> button to start scanning beacon. (This function is Android only. Please see <a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">the documentation</a>.)</p>
+        <p class="langCng" lang="ja">1. <b>Scan Beacon</b>ボタンを押すと、ビーコンの電波をスキャンします。(Android限定機能です。詳しくは<a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">WebBluetoothドキュメント</a>をご覧ください。)</p>
+
+        <div class="my-3 text-center">
+          <button type="button" class="btn btn-primary" id="ble-lescan-button">Scan Beacon</button>
+          <button type="button" class="btn btn-danger" id="ble-lestop-button" style="display:none;">Stop Scan</button>
+          <p class="langCng text-muted" lang="en">Only the first time, this application requires user input. Please pless the "Allow" button.</p>
+          <p class="langCng text-muted" lang="ja">初回のみBluetooth使用許可を確認するポップアップが表示されます。</p>
+        </div>
+
+        <p class="langCng" lang="en">2. Display updated when beacon packet is received.</p>
+        <p class="langCng" lang="ja">2. ビーコンの電波をキャッチすると画面が更新されます。ビーコンの電波は初期設定で指定した測定間隔ごとに発される他、Leafonyを振って接続待ちモードに入るときにも発されます。</p>
+
+        <div class="m-3 p-3 border rounded shadow-sm text-center">
+          <p class="display-4" id="textDevNameLe">Device Name</p>
+          <div class="row mx-auto" style="max-width: 500px;">
+            <div class="col-4 text-right">
+              <ion-icon name="thermometer-outline" style="color: rgb(230, 54, 54); font-size: 56px;"></ion-icon>
+            </div>
+            <div class="col-8 text-left">
+              <p class="display-4"><span id="textTempLe">00.0℃</span></p>
+            </div>
+          </div>
+          <div class="row mx-auto" style="max-width: 500px;">
+            <div class="col-4 text-right">
+              <ion-icon name="water-outline" style="color: rgb(116, 203, 238); font-size: 56px;"></ion-icon>
+            </div>
+            <div class="col-8 text-left">
+              <p class="display-4"><span id="textHumidLe">00%</span></p>
+            </div>
+          </div>
+          <div class="row mx-auto" style="max-width: 500px;">
+            <div class="col-4 text-right">
+              <ion-icon name="battery-full-outline" style="color: rgb(112, 212, 30); font-size: 56px;"></ion-icon>
+            </div>
+            <div class="col-8 text-left">
+              <p class="display-4"><span id="textBattLe">0.00V</span></p>
+            </div>
+          </div>
+          <p class="font-weight-light" id="textTimeLe">Last Update: 0000/00/00 00:00:00</p>
+        </div>
+      </div>
+
+      <div class="col-12 my-3 p-3 bg-white rounded shadow-sm">
+        <h2 class="langCng border-bottom" lang="en">Get Sensors Data</h2>
+        <h2 class="langCng border-bottom" lang="ja">センサデータのグラフ化</h2>
+
+        <p class="langCng" lang="en">You can graph the data measured by Leafony.</p>
+        <p class="langCng" lang="ja">Leafonyが測定したデータをグラフ化することができます。</p>
+
+        <p class="langCng" lang="en">1. Press the Connect button to search for nearby Bluetooth.</p>
+        <p class="langCng" lang="ja">1. センサデータのグラフ化は、Bluetooth接続モードで行います。Connectボタンを押して、接続モードにしてください。</p>
+
+        <div class="my-3 text-center">
+          <button type="button" class="btn btn-lg btn-primary" id="ble-connect-button">Connect</button>
+          <button type="button" class="btn btn-lg btn-danger" id="ble-disconnect-button" style="display:none;">Disconnect</button>
+          <div class="small text-muted"><b>Device Name: </b><span id="textUniqueName"></span></div>
+          <div class="small text-muted"><b>FW Version: </b><span id="textFWVersion"></span></div>
+        </div>
+
+        <p class="langCng" lang="en">2. Once the connection is established, press the Get Data button below and wait for a while to graph the sensor data.</p>
+        <p class="langCng" lang="ja">2. 接続が完了したら、Get Dataボタンを押すと、保存されたセンサデータがグラフ化されます。</p>
+
+
+        <div class="my-3 text-center">
+          <button type="button" class="btn btn-lg btn-primary" id="ble-get-button">Get Data</button>
+          <p class="text-muted" id="text-get-data-status"></p>
+        </div>
+
+        <div class="row m-3 p-3 border rounded shadow-sm">
+          <div class="col-xl-4">
+            <h2 class="text-center">Temperature & Humidity</h2>
+            <div id="chart-temp"></div>
+          </div>
+          <div class="col-xl-4">
+            <h2 class="text-center">Illuminance</h2>
+            <div id="chart-ilum"></div>
+          </div>
+          <div class="col-xl-4">
+            <h2 class="text-center">Battery Voltage</h2>
+            <div id="chart-batt"></div>
+          </div>
+        </div>
+
+        <p class="langCng" lang="en">3. Graph plots can also be downloaded as CSV files.</p>
+        <p class="langCng" lang="ja">3. グラフプロットはCSVファイルとしてダウンロードこともできます。</p>
+
+        <div class="my-3 text-center">
+          <button type="button" class="btn btn-primary" id="button-download" download="data.csv" href="#">Download All Plots as CSV</button>
+        </div>
+      </div>
+
+      <!-- Initial Settings-->
       <div class="col-12 mb-3 p-3 bg-white rounded shadow-sm">
         <div class="accordion" id="accordionExample">
           <div class="card">
@@ -112,7 +210,7 @@
               <h5 class="mb-0">
                 <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
                   <h4 class="langCng" lang="en">Initial Settings</h4>
-                  <h4 class="langCng" lang="ja">初期設定</h4>
+                  <h4 class="langCng" lang="ja">詳細設定</h4>
                 </button>
               </h5>
               <span class="langCng small" lang="en">(Optional) Set sleep time and device name. Remove saved data.</span>
@@ -219,107 +317,7 @@
           </div>
         </div>
       </div>
-
-      <div class="col-12 my-3 p-3 bg-white rounded shadow-sm" id="feature-beacon">
-        <h2 class="langCng border-bottom" lang="en">Scanning Beacon</h2>
-        <h2 class="langCng border-bottom" lang="ja">ビーコンスキャン</h2>
-
-        <p class="langCng" lang="en">You can scan advertising packet (beacon).</p>
-        <p class="langCng" lang="ja">Leafonyが発するビーコンの電波をスキャンすることができます。</p>
-
-        <p class="langCng" lang="en">1.  Press <b>Scan Beacon</b> button to start scanning beacon. (This function is Android only. Please see <a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">the documentation</a>.)</p>
-        <p class="langCng" lang="ja">1. <b>Scan Beacon</b>ボタンを押すと、ビーコンの電波をスキャンします。(Android限定機能です。詳しくは<a href="https://github.com/WebBluetoothCG/web-bluetooth/blob/main/implementation-status.md#scanning-api">WebBluetoothドキュメント</a>をご覧ください。)</p>
-
-        <div class="my-3 text-center">
-          <button type="button" class="btn btn-primary" id="ble-lescan-button">Scan Beacon</button>
-          <button type="button" class="btn btn-danger" id="ble-lestop-button" style="display:none;">Stop Scan</button>
-          <p class="langCng text-muted" lang="en">Only the first time, this application requires user input. Please pless the "Allow" button.</p>
-          <p class="langCng text-muted" lang="ja">初回のみBluetooth使用許可を確認するポップアップが表示されます。</p>
-        </div>
-
-        <p class="langCng" lang="en">2. Display updated when beacon packet is received.</p>
-        <p class="langCng" lang="ja">2. ビーコンの電波をキャッチすると画面が更新されます。ビーコンの電波は初期設定で指定した測定間隔ごとに発される他、Leafonyを振って接続待ちモードに入るときにも発されます。</p>
-
-        <div class="m-3 p-3 border rounded shadow-sm text-center">
-          <p class="display-4" id="textDevNameLe">Device Name</p>
-          <div class="row mx-auto" style="max-width: 500px;">
-            <div class="col-4 text-right">
-              <ion-icon name="thermometer-outline" style="color: rgb(230, 54, 54); font-size: 56px;"></ion-icon>
-            </div>
-            <div class="col-8 text-left">
-              <p class="display-4"><span id="textTempLe">00.0℃</span></p>
-            </div>
-          </div>
-          <div class="row mx-auto" style="max-width: 500px;">
-            <div class="col-4 text-right">
-              <ion-icon name="water-outline" style="color: rgb(116, 203, 238); font-size: 56px;"></ion-icon>
-            </div>
-            <div class="col-8 text-left">
-              <p class="display-4"><span id="textHumidLe">00%</span></p>
-            </div>
-          </div>
-          <div class="row mx-auto" style="max-width: 500px;">
-            <div class="col-4 text-right">
-              <ion-icon name="battery-full-outline" style="color: rgb(112, 212, 30); font-size: 56px;"></ion-icon>
-            </div>
-            <div class="col-8 text-left">
-              <p class="display-4"><span id="textBattLe">0.00V</span></p>
-            </div>
-          </div>
-          <p class="font-weight-light" id="textTimeLe">Last Update: 0000/00/00 00:00:00</p>
-        </div>
-      </div>
-
-      <div class="col-12 my-3 p-3 bg-white rounded shadow-sm">
-        <h2 class="langCng border-bottom" lang="en">Get Sensors Data</h2>
-        <h2 class="langCng border-bottom" lang="ja">センサデータのグラフ化</h2>
-
-        <p class="langCng" lang="en">You can graph the data measured by Leafony.</p>
-        <p class="langCng" lang="ja">Leafonyが測定したデータをグラフ化することができます。</p>
-
-        <p class="langCng" lang="en">1. Press the Connect button to search for nearby Bluetooth.</p>
-        <p class="langCng" lang="ja">1. センサデータのグラフ化は、Bluetooth接続モードで行います。Connectボタンを押して、接続モードにしてください。</p>
-
-        <div class="my-3 text-center">
-          <button type="button" class="btn btn-lg btn-primary" id="ble-connect-button">Connect</button>
-          <button type="button" class="btn btn-lg btn-danger" id="ble-disconnect-button" style="display:none;">Disconnect</button>
-          <div class="small text-muted"><b>Device Name: </b><span id="textUniqueName"></span></div>
-          <div class="small text-muted"><b>FW Version: </b><span id="textFWVersion"></span></div>
-        </div>
-
-        <p class="langCng" lang="en">2. Once the connection is established, press the Get Data button below and wait for a while to graph the sensor data.</p>
-        <p class="langCng" lang="ja">2. 接続が完了したら、Get Dataボタンを押すと、保存されたセンサデータがグラフ化されます。</p>
-
-
-        <div class="my-3 text-center">
-          <button type="button" class="btn btn-lg btn-primary" id="ble-get-button">Get Data</button>
-          <p class="text-muted" id="text-get-data-status"></p>
-        </div>
-
-        <div class="row m-3 p-3 border rounded shadow-sm">
-          <div class="col-xl-4">
-            <h2 class="text-center">Temperature & Humidity</h2>
-            <div id="chart-temp"></div>
-          </div>
-          <div class="col-xl-4">
-            <h2 class="text-center">Illuminance</h2>
-            <div id="chart-ilum"></div>
-          </div>
-          <div class="col-xl-4">
-            <h2 class="text-center">Battery Voltage</h2>
-            <div id="chart-batt"></div>
-          </div>
-        </div>
-
-        <p class="langCng" lang="en">3. Graph plots can also be saved as CSV files.</p>
-        <p class="langCng" lang="ja">3. グラフプロットはCSVファイルとして保存することもできます。</p>
-
-        <div class="my-3 text-center">
-          <button type="button" class="btn btn-primary" id="button-download" download="data.csv" href="#">Download All Plots as CSV</button>
-        </div>
-      </div>
     </div>
-    <hr>
   </div>
 
   <div class="py-5 bg-dark">
