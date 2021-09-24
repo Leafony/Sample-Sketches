@@ -88,8 +88,8 @@
         <h2 class="langCng border-bottom" lang="en">Start Logging</h2>
         <h2 class="langCng border-bottom" lang="ja">センサデータの測定開始</h2>
 
-        <p class="langCng" lang="en">1. When you press the disconnect button and exit the paring mode, Leafony start logging.</p>
-        <p class="langCng" lang="ja">1. センサデータの測定は、Disconnectボタンを押して、接続モードを解除すると開始します。</p>
+        <p class="langCng" lang="en">1. When you press the disconnect button and exit the paring mode, Leafony start logging. During the logging mode, Leafony get the sensors' data at a certain interval, and save them in the internal non-volatile memory. (Up to 169 samples.)</p>
+        <p class="langCng" lang="ja">1. センサデータの測定は、Disconnectボタンを押して、接続モードを解除すると開始します。一定の間隔で、測定したセンサデータをビーコンの電波で発し、同時にデータをメモリ（最大169サンプル）に保存します。</p>
 
         <div class="my-3 text-center">
           <button type="button" class="btn btn-lg btn-primary" id="ble-connect-button">Connect</button>
@@ -97,9 +97,6 @@
           <div class="small text-muted"><b>Device Name: </b><span id="textUniqueName"></span></div>
           <div class="small text-muted"><b>FW Version: </b><span id="textFWVersion"></span></div>
         </div>
-
-        <p class="langCng" lang="en">2. During the logging mode, Leafony get the sensors' data at a certain interval, and save them in the internal non-volatile memory. (Up to 169 samples.)</p>
-        <p class="langCng" lang="ja">2. 一定の間隔で、測定したセンサデータをビーコンの電波で発し、同時にデータをメモリ（最大169サンプル）に保存します。</p>
       </div>
 
       <!-- Scanning -->
@@ -222,10 +219,8 @@
 
 
                 <p class="langCng" lang="en">1. During the bluetooth paring mode, The variables like sleep time or device name can be changed.</p>
-                <p class="langCng" lang="ja">1. 初期設定は、Bluetoothの接続中に行います。測定間隔や名称の設定ができます。</p>
+                <p class="langCng" lang="ja">1. 初期設定は、Bluetoothの接続中に行います。</p>
 
-                <p class="langCng" lang="en">2. You can clear the saved data on the non-volatile memory.</p>
-                <p class="langCng" lang="ja">2. メモリに保存された測定データを消去することもできます。</p>
 
                 <div class="my-3 text-center">
                   <button type="button" class="btn btn-lg btn-primary" id="ble-connect-button">Connect</button>
