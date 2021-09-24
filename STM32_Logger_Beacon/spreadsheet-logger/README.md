@@ -58,6 +58,19 @@ cd Sample-Sketches/STM32_Logger_Beacon/spreadsheet-logger
 npm install
 ```
 
+### Windows
+[node-gyp requirements for Windows](https://github.com/TooTallNate/node-gyp#installation)
+
+Install the required tools and configurations using Microsoft's [windows-build-tools](https://github.com/felixrieseberg/windows-build-tools) from an elevated PowerShell or cmd.exe (run as Administrator).
+
+```bash
+npm install --global --production windows-build-tools
+```
+[node-bluetooth-hci-socket prerequisites](https://www.npmjs.com/package/@abandonware/noble#windows)
+
+Compatible Bluetooth 4.0 USB adapter
+[WinUSB](https://msdn.microsoft.com/en-ca/library/windows/hardware/ff540196(v=vs.85).aspx) driver setup for Bluetooth 4.0 USB adapter, using [Zadig](http://zadig.akeo.ie/) tool
+
 ## Usage
 
 Change `spreadsheetID` and `sheetName` according to your sheet.
