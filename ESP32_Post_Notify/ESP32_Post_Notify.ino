@@ -7,6 +7,7 @@
 //     Leaf configuration
 //       (1) AP02 ESP MCU
 //       (2) AI01 4-Sensors
+//       (3) AX08 29pin header
 //
 //    (c) 2020 Trillion-Node Study Group
 //    Released under the MIT license
