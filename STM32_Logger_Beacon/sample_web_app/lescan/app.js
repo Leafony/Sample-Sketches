@@ -49,6 +49,11 @@ const inputDeviceNameText = document.getElementById('device-name-input');
 const buttonSetTime = document.getElementById('set-time-button');
 const buttonDownload = document.getElementById('button-download');
 
+const inputSheetsUrl = document.getElementById('sheets-url-input');
+const buttonSaveurl = document.getElementById('save-url-button');
+
+const buttonTest = document.getElementById('btn-test')
+
 let leafony;
 let chartTemp, chartIlum, chartBatt;
 let arrayTemp, arrayHumd, arrayIlum, arrayBatt;
@@ -71,7 +76,7 @@ const noSleep = new NoSleep();
 /**
  * 
  */
-window.onload = function () {
+window.onload = async function () {
   if (!isScanningSupported) {
     document.getElementById('feature-beacon').style.display = 'none';
   }
@@ -145,6 +150,8 @@ window.onload = function () {
   buttonClearEEPROM.disabled = true;
   inputDeviceNameText.disabled = true;
   inputSleepText.disabled = true;
+
+  inputSheetsUrl.value = await localStorage.getItem('sheetsurl');
 };
 
 /**
@@ -662,7 +669,7 @@ function onStateChange(state) {
  * This function is called when Bluetooth receives advertising packet.
  * @param {*} state 
  */
-function onAdvertisementReceived(devname, state) {
+async function onAdvertisementReceived(devname, state) {
   textDevNameLe.innerText = devname;
 
   const data = new Uint8Array(state);
@@ -676,7 +683,25 @@ function onAdvertisementReceived(devname, state) {
   textBattLe.innerText = `${parseFloat(batt).toFixed(2)} V`;
 
   textTimeLe.innerText = 'Last Update: ' + new Date().toTimeString();
-  console.log("onAdvertisementReceived: " + asciiString);
+  console.log(`onAdvertisementReceived: ${devname}, ${state}`);
+
+  // Google Sheets Url is set in the localStorage:
+  const sheetsurl = inputSheetsUrl.value; 
+  if (sheetsurl) {
+    try {
+      await axios.get(sheetsurl, {
+        params: {
+          UniqueID: devname,
+          temperature: parseInt(temp),
+          humidity: parseInt(humd),
+          battery: parseFloat(batt).toFixed(2)
+        }
+      });
+    }
+    catch (err) {
+      console.error(err);
+    }
+  }
 }
 
 /**
@@ -747,3 +772,10 @@ const checkVersion = async () => {
   stateRecv = 'checkVersion';
   await sendCommand('version');
 }
+
+/**
+ * 
+ */
+buttonSaveurl.addEventListener('click', async () => {
+  localStorage.setItem('sheetsurl', inputSheetsUrl.value);
+});

@@ -35,6 +35,7 @@
   <div class="py-5 bg-dark">
     <div class="text-center text-light">
       <h1>Leafony Logger Beacon</h1>
+      <button type="button" class="btn btn-lg btn-primary" id="btn-test">Test</button>
     </div>
   </div>
 
@@ -147,6 +148,18 @@
             </div>
           </div>
           <p class="font-weight-light" id="textTimeLe">Last Update: 0000/00/00 00:00:00</p>
+        </div>
+
+        <p class="langCng" lang="en">3. By entering the URL of the Google Sheets API, you can save the received data in Google Sheets.</p>
+        <p class="langCng" lang="ja">3. Google Sheets APIのURLを入力することで、受信したデータをGoogle Sheetsに保存することができます。詳しくは<a href="#">こちら</a>をご覧ください。</p>
+
+        <div>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Your Google Sheets URL" aria-label="Your Google Sheets URL" aria-describedby="save-url" id="sheets-url-input">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" type="button" id="save-url-button">Save</button>
+            </div>
+          </div> 
         </div>
       </div>
 
@@ -348,6 +361,9 @@
   <!-- ionicons -->
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+  <!-- axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
   <script type="text/javascript" src="leafony.js"></script>
   <script type="text/javascript" src="app.js"></script>
