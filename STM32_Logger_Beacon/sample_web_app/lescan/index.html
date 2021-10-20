@@ -35,7 +35,6 @@
   <div class="py-5 bg-dark">
     <div class="text-center text-light">
       <h1>Leafony Logger Beacon</h1>
-      <button type="button" class="btn btn-lg btn-primary" id="btn-test">Test</button>
     </div>
   </div>
 
@@ -114,8 +113,8 @@
         <div class="my-3 text-center">
           <button type="button" class="btn btn-primary" id="ble-lescan-button">Scan Beacon</button>
           <button type="button" class="btn btn-danger" id="ble-lestop-button" style="display:none;">Stop Scan</button>
-          <p class="langCng text-muted" lang="en">Only the first time, this application requires user input. Please pless the "Allow" button.</p>
-          <p class="langCng text-muted" lang="ja">初回のみBluetooth使用許可を確認するポップアップが表示されます。</p>
+          <p class="langCng text-muted small" lang="en">Only the first time, this application requires user input. Please pless the "Allow" button.</p>
+          <p class="langCng text-muted small" lang="ja">初回のみBluetooth使用許可を確認するポップアップが表示されます。<br>スキャン中はデバイスがスリープしなくなります。</p>
         </div>
 
         <p class="langCng" lang="en">2. Display updated when beacon packet is received.</p>
@@ -261,13 +260,16 @@
                   </div>
 
                   <div class="form-group">
-                    <label for="sleep-text-input" class="langCng" lang="en">Sleep Time [s] (60～65535)</label>
+                    <label for="sleep-text-input" class="langCng" lang="en">Sleep Time [s] (60 - 65535)</label>
                     <label for="sleep-text-input" class="langCng" lang="ja">測定間隔 [秒] (60～65535)</label>
                     <div class="input-group">
                       <input type="text" class="form-control" placeholder="Sleep Time" id="sleep-text-input">
                       <div class="input-group-append" id="sleep-text-input">
                         <button class="btn btn-outline-secondary" type="button" id="check-sleep-button">Check</button>
                         <button class="btn btn-outline-secondary" type="button" id="submit-sleep-button">Submit</button>
+                      </div>
+                      <div class="invalid-feedback">
+                        Sleep time is out of range. Please select the value between 60 and 65535 seconds.
                       </div>
                     </div>
                   </div>
@@ -368,6 +370,7 @@
   <script type="text/javascript" src="leafony.js"></script>
   <script type="text/javascript" src="app.js"></script>
 
+  <!-- Language select -->
   <script>
     let langSelect = document.getElementById('languageSelect');
 

@@ -330,6 +330,17 @@ buttonSubmitSleep.addEventListener('click', function () {
   sendCommand('setSleep ' + inputSleepText.value);
 });
 
+inputSleepText.addEventListener('input', function () {
+  if (!inputSleepText.value ||
+      parseInt(inputSleepText.value, 10) < 60 ||
+      parseInt(inputSleepText.value, 10) > 65535) {
+    inputSleepText.classList.add('is-invalid');
+    buttonSubmitSleep.disabled = true;
+  } else {
+    inputSleepText.classList.remove('is-invalid');
+    buttonSubmitSleep.disabled = false;
+  }
+});
 
 /**
  * Sens frequency submit button
