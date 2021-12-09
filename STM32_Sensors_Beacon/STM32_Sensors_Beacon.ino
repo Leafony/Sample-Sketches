@@ -60,15 +60,11 @@ String strDeviceName = "Leaf_A";
 //=====================================================================
 // IOピンの名前定義
 //=====================================================================
-// Bus-Aに接続する場合
-// #define BLE_WAKEUP PA8
-// #define BLE_TX PA1
-// #define BLE_RX PA0
-
-// Bus-Bに接続する場合
-#define BLE_WAKEUP PB11
-#define BLE_TX PC5
-#define BLE_RX PC4
+#define BLE_WAKEUP PB12 // D7   PB12
+#define BLE_RX PA0      // [A2] PA1
+#define BLE_TX PA1      // [A1] PA0
+#define INT_0 PC7       // INT0
+#define INT_1 PB3       // INT1
 
 //=====================================================================
 // プログラム内で使用する定数定義
