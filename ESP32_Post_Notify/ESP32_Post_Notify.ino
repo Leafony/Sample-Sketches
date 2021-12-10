@@ -221,7 +221,7 @@ void myWifiStart() {
     // start deepsleep to prevent Joule heat from affecting next measurements.
     while (WiFi.status() != WL_CONNECTED) {
         if(statusCheckCounter > CHECK_NUM_MAX) {
-            WiFi.disconnect();
+            WiFi.disconnect(true);
             Serial.println("failed");
             Serial.println("Deepsleep Start");
             espDeepSleep();
@@ -235,7 +235,7 @@ void myWifiStart() {
 
 void myWifiStop() {
     // WiFi Connection killed
-    WiFi.disconnect();
+    WiFi.disconnect(true);
     Serial.println("\nWiFi is disconnected");
 }
 #endif

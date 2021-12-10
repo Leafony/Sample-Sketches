@@ -167,7 +167,7 @@ void setup() {
     // start deepsleep to prevent Joule heat from affecting next measurements.
     while (WiFi.status() != WL_CONNECTED) {
         if(statusCheckCounter > CHECK_NUM_MAX) {
-            WiFi.disconnect();
+            WiFi.disconnect(true);
             Serial.println("failed");
             Serial.println("Deepsleep Start");
             espDeepSleep();
@@ -199,7 +199,7 @@ void loop() {
 
     // WiFi Connection killed
     Serial.println("\nWiFi is disconnected");
-    WiFi.disconnect();
+    WiFi.disconnect(true);
 
     // ESP32 start deep sleep
     // After calling "esp_deep_sleep_start" function, any following codes will not be executed
