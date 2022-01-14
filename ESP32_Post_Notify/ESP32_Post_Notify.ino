@@ -373,7 +373,7 @@ void loop() {
             }
             break;
 
-        defalut:
+        default:
             delay(1000);
             break;
     }
