@@ -1,7 +1,7 @@
 //=====================================================================
 //  Sound level meter
 //
-//    (c) 2021 LEAFONY SYSTEMS Co., Ltd
+//    (c) 2022 LEAFONY SYSTEMS Co., Ltd
 //    Released under the MIT license
 //    https://opensource.org/licenses/MIT
 //
@@ -19,6 +19,7 @@
 
 unsigned int dataVR;
 unsigned int dataMic;
+unsigned int MicLevelNom = 550;
 
 //-----------------------------------------------
 // Get VR and MIC data
@@ -28,11 +29,9 @@ void getSensorData()
     dataVR = analogRead(VR);
     dataMic = analogRead(MIC);
 
-    Serial.println("---------------------");
-    Serial.print("MIC  = ");
+    Serial.print(dataVR,DEC);
+    Serial.print(",");
     Serial.println(dataMic,DEC);
-    Serial.print("VR   = ");
-    Serial.println(dataVR,DEC);
 }
 
 //-----------------------------------------------
@@ -65,19 +64,19 @@ void dispSensorData()
        digitalWrite(LED6,HIGH);
     }
 
-    if (dataMic < 700)
+    if (dataMic < MicLevelNom)
     {
       digitalWrite(LED1,LOW);
       digitalWrite(LED2,LOW);
       digitalWrite(LED3,LOW);
     }
-    else if (dataMic >= 700 && dataMic < 800)
+    else if (dataMic >= MicLevelNom && dataMic < MicLevelNom+50)
     {
       digitalWrite(LED1,LOW);
       digitalWrite(LED2,LOW);
       digitalWrite(LED3,HIGH);
     }
-    else if (dataMic >= 800 && dataMic < 850)
+    else if (dataMic >= MicLevelNom+50 && dataMic < MicLevelNom+150)
     {
       digitalWrite(LED1,LOW);
       digitalWrite(LED2,HIGH);
@@ -132,6 +131,11 @@ void setup() {
   digitalWrite(LED5,LOW);
   digitalWrite(LED6,LOW);
   delay(200);
+
+  Serial.print("VR");
+  Serial.print(",");
+  Serial.println("MIC");
+
 }
 
 
