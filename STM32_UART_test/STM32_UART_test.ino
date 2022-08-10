@@ -17,7 +17,7 @@
 //      Rev.00 2022/08/10 First release
 //=====================================================================
 
-HardwareSerial Serial_ESP(USART1);            // UART1 RX:D9(PA10) TX:D8(PA9)???
+HardwareSerial Serial_ESP(USART1);            // UART1 RX:D9(PA10) TX:D8(PA9)
 
 //=====================================================================
 // setup
@@ -35,7 +35,7 @@ void setup() {
       tm++;
       delay(10);
     }
-    Serial2.println(F("setup start"));
+    Serial.println(F("setup start"));
 
 //    Serial_ESP.println(F("setup start1"));
 }
