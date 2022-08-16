@@ -1,12 +1,12 @@
 ## ESP-AT for Leafony
 ESP32 MCUをATコマンドで使用するためのファームウエア
 
-espressifが提供している[ESP-AT](https://github.com/espressif/esp-at) V2.4.0.0(2022/05/20)のUARTピンアサインをに合わせたもの 
+espressifが提供している[ESP-AT](https://github.com/espressif/esp-at) V2.4.0.0(2022/05/20)のUARTピンアサインをLeafonyに合わせたもの 
 
-• TX (GPIO16)	  D9<br>
-• RX (GPIO17)	  D8<br>
-• CTS (GPIO15)	D7 (optional)<br>
-• RTS (GPIO14)	D6 (optional)<br>
+• TX (IO16)	:  D9<br>
+• RX (IO17)	:  D8<br>
+• CTS (IO15):	 D7 (optional)<br>
+• RTS (IO14):	 D6 (optional)<br>
 
 
 • Baudrate  : 115200<br>
