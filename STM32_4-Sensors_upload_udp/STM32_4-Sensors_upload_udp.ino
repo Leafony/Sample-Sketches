@@ -6,10 +6,9 @@
 //
 //     Leaf configuration
 //       (1) AI01 4-Sensors
-//       (2) AZ01 USB
-//       (3) AP03 STM32 MCU
-//       (4) AC04 LTE-M King M
-//       (5) AV05 LTE-M King S
+//       (2) AP03 STM32 MCU
+//       (3) AC04 LTE-M King M
+//       (4) AV05 LTE-M King S
 //
 //    (c) 2020 Trillion-Node Study Group
 //    Released under the MIT license
