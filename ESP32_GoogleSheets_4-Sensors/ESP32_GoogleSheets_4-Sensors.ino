@@ -20,8 +20,20 @@
 #include <HTS221.h>
 #include <ClosedCube_OPT3001.h>
 
+//#define ENTERPRISE
+
+#ifdef ENTERPRISE   // Enterprise
+#include <esp_wpa2.h>
+#endif
+
 // Unique ID
 String UniqueID = "Leafony_A";
+
+#ifdef ENTERPRISE   // Enterprise
+#define EAP_IDENTITY "login" //if connecting from another corporation, use identity@organisation.domain in Eduroam 
+#define EAP_PASSWORD "password" //your Eduroam password
+const char* SSID_ENT = "eduroam"; // Eduroam SSID
+#endif
 
 // Connecting WiFi Settings
 const char* SSID = "wifi_ssid";           // WiFi SSID
@@ -160,7 +172,18 @@ void setup() {
         illumErrorConfig = illum.writeConfig(illumConfig);  //retry
     }
 
+#ifdef ENTERPRISE   // Enterprise
+    WiFi.mode(WIFI_STA);
+    esp_wifi_sta_wpa2_ent_set_identity((uint8_t *)EAP_IDENTITY, strlen(EAP_IDENTITY)); //provide identity
+    esp_wifi_sta_wpa2_ent_set_username((uint8_t *)EAP_IDENTITY, strlen(EAP_IDENTITY)); //provide username --> identity and username is same
+    esp_wifi_sta_wpa2_ent_set_password((uint8_t *)EAP_PASSWORD, strlen(EAP_PASSWORD)); //provide password
+    esp_wpa2_config_t config = WPA2_CONFIG_INIT_DEFAULT();
+    esp_wifi_sta_wpa2_ent_enable(&config);
+    WiFi.begin(SSID_ENT); //connect to wifi
+#else
     WiFi.begin(SSID, PASSWORD);
+#endif
+
     Serial.print("WiFi connecting");
     // Wait until succeed connecting.
     // If the number of checks is more than CHECK_NUM_MAX, give up connecting and
