@@ -42,14 +42,14 @@ DHT dht(DHT_PIN,DHT22);
 String UniqueID = "Leafony_A";
 
 #ifdef ENTERPRISE   // Enterprise
-#define EAP_IDENTITY "login" //if connecting from another corporation, use identity@organisation.domain in Eduroam 
-#define EAP_PASSWORD "password" //your Eduroam password
-const char* SSID_ENT = "eduroam"; // Eduroam SSID
+#define EAP_IDENTITY "identity" //identity
+#define EAP_PASSWORD "password" //Password
+const char* SSID_ENT = "ssid"; // Wi-Fi SSID
 #endif
 
 // Connecting WiFi Settings
-const char* SSID = "wifi_ssid";           // WiFi SSID
-const char* PASSWORD = "wifi_password";   // WiFi Password
+const char* SSID = "ssid";           // Wi-Fi SSID
+const char* PASSWORD = "password";   // Password
 // Accessed Google Script Settings
 const char* APP_SERVER = "script.google.com";
 const char* KEY = "google_scripts_key";
