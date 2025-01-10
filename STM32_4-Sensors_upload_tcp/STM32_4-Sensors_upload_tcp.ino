@@ -158,7 +158,7 @@ void loop() {
     return;
   }
 
-  if (gprs.attachGPRS(GPRS_APN, GPRS_LOGIN, GPRS_PASSWORD) != GPRS_READY) {
+  if (gprs.attachGPRS(GPRS_APN, GPRS_LOGIN, GPRS_PASSWORD, gprs.LPWA_V4_GPRS_BAND_DOCOMO) != GPRS_READY) {
     Serial.println("modem will restart after 5 sec");
     restartSequenceWhenModemError(5000);
     return;
