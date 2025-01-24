@@ -29,7 +29,7 @@ void resetLoRa(bool path_through);
 
 const byte localAddress = 0xFF;
 
-TCA9536 io(TCA9536_Address_t::TCA9536A_ADDRESS);
+TCA9536 io(TCA9536_Address_t::TCA9536_ADDRESS);
 
 /**
  * @brief 受信時に呼ばれるハンドラ
