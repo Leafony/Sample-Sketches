@@ -37,7 +37,7 @@ void resetLoRa(bool path_through);
 
 int counter = 0;
 
-TCA9536 io(TCA9536_Address_t::TCA9536A_ADDRESS);
+TCA9536 io(TCA9536_Address_t::TCA9536_ADDRESS);
 
 ATECCX08A atecc = ATECCX08A();
 
