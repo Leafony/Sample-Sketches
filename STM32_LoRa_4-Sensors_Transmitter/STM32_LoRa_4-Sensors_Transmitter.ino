@@ -22,7 +22,7 @@ void wakeupSensors();
 void sendPacket();
 
 // IO Expander on LoRa Mary leaf
-TCA9536 io(TCA9536_Address_t::TCA9536A_ADDRESS);
+TCA9536 io(TCA9536_Address_t::TCA9536_ADDRESS);
 
 // Sensors
 Adafruit_LIS3DH accel = Adafruit_LIS3DH();
