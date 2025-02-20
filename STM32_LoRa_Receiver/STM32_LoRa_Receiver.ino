@@ -14,17 +14,15 @@
 // LoRaのピン番号
 #define LORA_BOOT0 IOEX_PIN_0
 #define LORA_RESET IOEX_PIN_2
-#define LORA_IRQ_DUMB D10
-#define LORA_RF_IRQ D5
+#define LORA_IRQ_DUMB 10
+#define LORA_RF_IRQ 5
 
 // LoRa周波数
-// 日本国内で使用する場合は必ず923MHzを使用してください。
-#define LORA_FREQUENCY 923E6        // AS923 https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md#frequency
-#define LORA_SPREADING_FACTOR 7     // 6-12の間で設定可能 https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md#spreading-factor
-#define LORA_SIGNAL_BANDWIDTH 125E3 // https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md#signal-bandwidth
-#define LORA_GAIN 0                 // 0-6の間で設定可能 https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md#lna-gain
+#define LORA_FREQUENCY 923E6        // 日本向け AS923
+#define LORA_SPREADING_FACTOR 7     // 拡散率（6-12の範囲）
+#define LORA_SIGNAL_BANDWIDTH 125E3 // 信号帯域幅
+#define LORA_GAIN 0                 // ゲイン（0-6の範囲）
 
-void SystemClock_Config(void);
 void resetLoRa(bool path_through);
 
 const byte localAddress = 0xFF;
@@ -40,22 +38,27 @@ void onReceive(int packetSize)
 {
   if (packetSize == 0)
   {
-    Serial.println("no packet\r");
-    return; // if there's no packet, return
+    Serial.println("No packet received");
+    return;
   }
+
   int recipient = LoRa.read();
   String incoming = "";
+
   while (LoRa.available())
   {
     incoming += (char)LoRa.read();
   }
+
   if (recipient != localAddress && recipient != 0xFF)
   {
     Serial.println("This message is not for me.");
     return;
   }
+
+  Serial.print("Received: ");
   Serial.print(incoming);
-  Serial.print(",");
+  Serial.print(", RSSI: ");
   Serial.println(LoRa.packetRssi());
 }
 
@@ -64,24 +67,15 @@ void onReceive(int packetSize)
  *
  * @param path_through パススルーモード有効化
  */
-void resetLoRa(bool paththrough = false)
+void resetLoRa(bool path_through)
 {
   // SPIパススルーモード
   pinMode(LORA_IRQ_DUMB, OUTPUT);
-  if (paththrough)
-  {
-    digitalWrite(LORA_IRQ_DUMB, LOW);
-  }
-  else
-  {
-    digitalWrite(LORA_IRQ_DUMB, HIGH);
-  }
+  digitalWrite(LORA_IRQ_DUMB, path_through ? LOW : HIGH);
   delay(100);
 
-  // Hardware reset
+  // ハードウェアリセット
   io.write(LORA_BOOT0, LOW);
-
-  delay(1000);
   io.write(LORA_RESET, HIGH);
   delay(200);
   io.write(LORA_RESET, LOW);
@@ -92,26 +86,21 @@ void resetLoRa(bool paththrough = false)
 
 void setup()
 {
-  // CPUスピードを80MHz→16MHzに変更
-  // 低速にすることでLoRaのSPI通信速度を下げることができ、
-  // 安定して通信することができる
-  SystemClock_Config();
-
   Serial.begin(115200);
-  while (!Serial)
-    ;
+  delay(500);  // シリアル通信安定化のための待機
+  while (!Serial);
 
   Serial.println("LoRa Receiver Basic");
 
   Wire.begin();
 
   // IOエキスパンダーを初期化
-  if (io.begin() == false)
+  if (!io.begin())
   {
     Serial.println("TCA9536 not detected. Please check wiring. Freezing...");
-    while (1)
-      ;
+    while (1);
   }
+
   io.disablePullUp(true);
   io.pinMode(LORA_RESET, OUTPUT);
   io.pinMode(LORA_BOOT0, OUTPUT);
@@ -121,29 +110,35 @@ void setup()
   resetLoRa(false);
   resetLoRa(true);
 
-  while (LoRa.begin((long)LORA_FREQUENCY) == false)
+  // SPI通信開始
+  SPI.begin();
+
+  // LoRaを初期化
+  if (!LoRa.begin(LORA_FREQUENCY))
   {
-    Serial.println("Starting LoRa failed!\r");
-    delay(1000);
+    Serial.println("Starting LoRa failed! Halting system.");
+    while (1);
   }
 
-  // LoRa通信設定
+  // LoRa通信設定（`LoRa.begin()` の後に適用）
   LoRa.setSpreadingFactor(LORA_SPREADING_FACTOR);
   LoRa.setSignalBandwidth(LORA_SIGNAL_BANDWIDTH);
   LoRa.setGain(LORA_GAIN);
   LoRa.enableCrc();
 
-  // register the receive callback
+  // 受信コールバックを登録
   LoRa.onReceive(onReceive);
 
-  // put the radio into receive mode
+  // 受信モードに切り替え
   LoRa.receive();
 
-  Serial.println("Receiver start\r");
+  Serial.println("Receiver started");
 }
 
 void loop()
 {
-  // do noting
+  // 何もしない
   delay(1000);
 }
+
+
