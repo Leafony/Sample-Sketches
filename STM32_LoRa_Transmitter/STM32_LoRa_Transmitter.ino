@@ -14,17 +14,15 @@
 // LoRaのピン番号
 #define LORA_BOOT0 IOEX_PIN_0
 #define LORA_RESET IOEX_PIN_2
-#define LORA_IRQ_DUMB D10
+#define LORA_IRQ_DUMB 10  // D10 に変更（Arduinoのピン定義に合わせる）
 
 // LoRa周波数
-// 日本国内で使用する場合は必ず923MHzを使用してください。
-#define LORA_FREQUENCY 923E6        // AS923 https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md#frequency
-#define LORA_SPREADING_FACTOR 7     // 6-12の間で設定可能 https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md#spreading-factor
-#define LORA_SIGNAL_BANDWIDTH 125E3 // https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md#signal-bandwidth
-#define LORA_GAIN 0                 // 0-6の間で設定可能 https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md#lna-gain
+#define LORA_FREQUENCY 923E6        // 日本向け AS923
+#define LORA_SPREADING_FACTOR 7     // 拡散率（6-12の範囲）
+#define LORA_SIGNAL_BANDWIDTH 125E3 // 信号帯域幅
+#define LORA_GAIN 0                 // ゲイン（0-6の範囲）
 
-void SystemClock_Config(void);
-void resetLoRa(bool path_through);
+void resetLoRa(bool path_through = false);
 
 int counter = 0;
 
@@ -35,18 +33,11 @@ TCA9536 io(TCA9536_Address_t::TCA9536_ADDRESS);
  *
  * @param path_through パススルーモード有効化
  */
-void resetLoRa(bool path_through = false)
+void resetLoRa(bool path_through)
 {
   // SPIパススルーモード
   pinMode(LORA_IRQ_DUMB, OUTPUT);
-  if (path_through)
-  {
-    digitalWrite(LORA_IRQ_DUMB, LOW);
-  }
-  else
-  {
-    digitalWrite(LORA_IRQ_DUMB, HIGH);
-  }
+  digitalWrite(LORA_IRQ_DUMB, path_through ? LOW : HIGH);
   delay(100);
 
   // ハードウェアリセット
@@ -62,26 +53,20 @@ void resetLoRa(bool path_through = false)
 
 void setup()
 {
-  // CPUスピードを80MHz→16MHzに変更
-  // 低速にすることでLoRaのSPI通信速度を下げることができ、
-  // 安定して通信することができる
-  SystemClock_Config();
-
   Serial.begin(115200);
-  while (!Serial)
-    ;
+  while (!Serial);
 
   Serial.println("LoRa Transmitter Example");
 
   Wire.begin();
 
   // IOエキスパンダーを初期化
-  if (io.begin() == false)
+  if (!io.begin())
   {
     Serial.println("TCA9536 not detected. Please check wiring. Freezing...");
-    while (1)
-      ;
+    while (1);
   }
+
   io.disablePullUp(true);
   io.pinMode(LORA_RESET, OUTPUT);
   io.pinMode(LORA_BOOT0, OUTPUT);
@@ -91,19 +76,21 @@ void setup()
   resetLoRa(false);
   resetLoRa(true);
 
-  // LoRa通信設定
+  // SPI通信開始
+  SPI.begin();
+
+  // LoRaを初期化
+  if (!LoRa.begin(LORA_FREQUENCY))
+  {
+    Serial.println("Starting LoRa failed!");
+    while (1);
+  }
+
+  // LoRa通信設定（`LoRa.begin()` の後に適用）
   LoRa.setSpreadingFactor(LORA_SPREADING_FACTOR);
   LoRa.setSignalBandwidth(LORA_SIGNAL_BANDWIDTH);
   LoRa.setGain(LORA_GAIN);
   LoRa.enableCrc();
-
-  // LoRaを初期化
-  if (LoRa.begin(LORA_FREQUENCY) == false)
-  {
-    Serial.println("Starting LoRa failed!");
-    while (1)
-      ;
-  }
 }
 
 void loop()
