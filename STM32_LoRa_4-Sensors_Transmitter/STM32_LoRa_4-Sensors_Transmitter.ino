@@ -345,5 +345,6 @@ void loop()
   // システムを一定期間停止
   DEBUG_SERIAL.println("Restart after " + String(WAKEUP_INTERVAL_MS + randomInterval) + " ms...");
   DEBUG_SERIAL.flush();
-  LowPower.shutdown(WAKEUP_INTERVAL_MS + randomInterval);
+  LowPower.sleep(WAKEUP_INTERVAL_MS + randomInterval);
+  //LowPower.shutdown(WAKEUP_INTERVAL_MS + randomInterval);
 }

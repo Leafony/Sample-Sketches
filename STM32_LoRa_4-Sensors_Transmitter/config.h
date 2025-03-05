@@ -8,7 +8,7 @@
   Serial
 
 // システム起動間隔 (ms)
-#define WAKEUP_INTERVAL_MS 1 * 60 * 1000 // 1分
+#define WAKEUP_INTERVAL_MS 1 * 10 * 1000 // 10秒
 
 // ランダム送信間隔 (ms)
 // LoRaの輻輳を避けるために付与するランダムな送信オフセット時間の最大値
