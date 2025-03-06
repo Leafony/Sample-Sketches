@@ -23,16 +23,14 @@ ST7032 lcd;  // LCDオブジェクト
 #define LORA_RF_IRQ D5
 
 // LoRa周波数
-// 日本国内で使用する場合は必ず923MHzを使用してください。
-#define LORA_FREQUENCY 923E6        // AS923 https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md#frequency
-#define LORA_SPREADING_FACTOR 7     // 6-12の間で設定可能 https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md#spreading-factor
-#define LORA_SIGNAL_BANDWIDTH 125E3 // https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md#signal-bandwidth
-#define LORA_GAIN 0                 // 0-6の間で設定可能 https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md#lna-gain                
+#define LORA_FREQUENCY 923E6        // AS923
+#define LORA_SPREADING_FACTOR 7     // 6-12の間で設定可能
+#define LORA_SIGNAL_BANDWIDTH 125E3 // 信号帯域幅
+#define LORA_GAIN 0                 // 0-6の間で設定可能
 
 void resetLoRa(bool path_through);
 
 const byte localAddress = 0xFF;
-
 TCA9536 io(TCA9536_Address_t::TCA9536_ADDRESS);
 
 /**
@@ -40,7 +38,7 @@ TCA9536 io(TCA9536_Address_t::TCA9536_ADDRESS);
  */
 void onReceive(int packetSize) {
   if (packetSize == 0) {
-    Serial.println("no packet");
+    Serial.println("No packet received");
     return; 
   }
 
@@ -57,10 +55,14 @@ void onReceive(int packetSize) {
 
   int rssi = LoRa.packetRssi();
 
-  // シリアルモニターにデータ表示
-  Serial.print(incoming);
-  Serial.print(",");
-  Serial.println(rssi);
+  // シリアルモニターにデータ表示（フォーマットを見やすく）
+  Serial.println("=== Received Packet ===");
+  Serial.print("Message: ");
+  Serial.println(incoming);
+  Serial.print("RSSI: ");
+  Serial.print(rssi);
+  Serial.println(" dBm");
+  Serial.println("=======================");
 
 #ifdef USE_LCD
   // LCDにRSSIを表示
@@ -104,9 +106,6 @@ void resetLoRa(bool paththrough = false) {
 }
 
 void setup() {
-// CPUスピードを80MHz→16MHzに変更
-// 低速にすることでLoRaのSPI通信速度を下げることができ、
-// 安定して通信することができる
   Serial.begin(115200);
   while (!Serial);
 
@@ -148,10 +147,10 @@ void setup() {
   LoRa.setGain(LORA_GAIN);
   LoRa.enableCrc();
 
-  // register the receive callback
+  // 受信コールバック登録
   LoRa.onReceive(onReceive);
 
-  // put the radio into receive mode
+  // 受信モードにする
   LoRa.receive();
 
   Serial.println("Receiver start");
@@ -160,4 +159,5 @@ void setup() {
 void loop() {
   delay(1000);
 }
+
 
