@@ -41,9 +41,10 @@
  ```
 3.コマンド`1`と`2`を入力し、スイッチのLEDの点滅と消灯を確認する。
 
-4.[29 pinリーフ](https://docs.leafony.com/docs/leaf/extension/ax02/#%E3%83%94%E3%83%B3%E9%85%8D%E7%BD%AE)にテスターを当てて、3.3V±0.3Vを確認する。(3V3-GND)
-　
+4.[29 pinリーフ](https://docs.leafony.com/docs/leaf/extension/ax02/#%E3%83%94%E3%83%B3%E9%85%8D%E7%BD%AE)にテスターを当て、3.3V±0.3Vを確認する。
+ 
 5.次に、コマンド`5`を入力し、5V電源がON（負荷が無いため実測5.2～5.3V）であることを確認する。(VBUS-GND)
+
 
 6.充電のON/OFFをIOExpanderリードし、確認する
 | 充電 | ACアダプター | バッテリー | 表示|
