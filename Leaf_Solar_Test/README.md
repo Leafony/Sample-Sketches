@@ -9,10 +9,10 @@
 * AZ63 Nut Plate
 * M2X10mm ネジ
 ### Solar-charger-debugger AS
-* [Solar-charger-debugger-Leaf](https://github.com/Leafony/HW-Design-Files/tree/master/Solar-charger-debugger-Leaf)
+* [Solar-charger-debugger-Leaf](https://github.com/Leafony/HW-Design-Files/tree/master/Solar-charger-debugger-Leaf) 
 * AZ01 USB
 * AZ63 Nut Plate
-* M2X8mm
+* M2X8mm  
 ### その他
 * リン酸鉄リチウムイオンバッテリ
 * ACアダプタ DC12V
@@ -26,6 +26,9 @@
 ## 組立て
 <img src="./docs/Solar_3.2V_Test.jpg" width="400" />
 
+注記:Solar-charger-debugger-Leafは、高さが2mmより高いので必ず上段にすること。
+
+Solar-charger-debugger-Leaf
 ## 検査方法
 1.バッテリーをSolar 3.2Vに繋げると、スイッチのLEDが点滅し、Solar-charger-debuggerのLEDが点灯することを確認する
 
