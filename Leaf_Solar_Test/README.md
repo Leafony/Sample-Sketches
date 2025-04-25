@@ -2,7 +2,7 @@
 ## はじめに
 本内容は、AV05 Solar 3.2V の検査検査手順を記す。
 ## 用意するもの
-###Solar 3.2V AS
+### Solar 3.2V AS
 * AX02 29 pin
 * AP03 STM32 MCU  
 * AV05 Solar 3.2V
@@ -20,7 +20,8 @@
 * USB/UART変換ケーブル
 * 6p-SHコネクタ・ケーブル
 ## ソースコード
-*
+*Leaf_Solar_Test.ino
+https://github.com/Leafony/Sample-Sketches/blob/master/Leaf_Solar_Test/Leaf_Solar_Test.ino
 ## 組立て
 
 ## 検査方法
