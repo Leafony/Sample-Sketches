@@ -2,21 +2,25 @@
 ## はじめに
 本内容は、AV05 Solar 3.2V の検査検査手順を記す。
 ## 用意するもの
+###Solar 3.2V AS
 * AX02 29 pin
 * AP03 STM32 MCU  
 * AV05 Solar 3.2V
 * AZ63 Nut Plate
-* M2X10mm
+* M2X10mm ネジ
+### Solar-charger-debugger AS
 * AZ01 USB
-* solar-charger-debugger
+* Solar-charger-debugger-Leaf
 * AZ63 Nut Plate
 * M2X8mm
-* USB/UART変換ケーブル
-* 6p-SHコネクタ・ケーブル
+### その他
 * リン酸鉄リチウムイオンバッテリ
 * ACアダプタ DC12V
 * スイッチ
-
+* USB/UART変換ケーブル
+* 6p-SHコネクタ・ケーブル
 ## ソースコード
+*
 ## 組立て
+
 ## 検査方法
