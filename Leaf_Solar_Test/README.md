@@ -19,8 +19,23 @@
 * スイッチ
 * USB/UART変換ケーブル
 * 6p-SHコネクタ・ケーブル
+* PC
 ## ソースコード
 * [Leaf_Solar_Test.ino](https://github.com/Leafony/Sample-Sketches/blob/master/Leaf_Solar_Test/Leaf_Solar_Test.ino)
 ## 組立て
 
 ## 検査方法
+1.Arduino IDEでシリアルモニタを立ち上げ、テキストボックスに`m`を入力するとシリアルモニタに以下の内容が表示される。
+ --------------------------------------------------
+ m = This Menu
+ 1 = KTD: LED start
+ 2 = KTD: LED stop
+ 3 = TCA: Initialize
+ 4 = TCA: Read register
+ 5 = TCA: ONVCC_High
+ 6 = TCA: ONVCC_Low
+ 7 = ADC: Initialize
+ 8 = ADC: AD convert
+ -------------------------------------------------
+2.
+
