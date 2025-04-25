@@ -20,8 +20,7 @@
 * USB/UART変換ケーブル
 * 6p-SHコネクタ・ケーブル
 ## ソースコード
-*Leaf_Solar_Test.ino
-https://github.com/Leafony/Sample-Sketches/blob/master/Leaf_Solar_Test/Leaf_Solar_Test.ino
+*[Leaf_Solar_Test.ino](https://github.com/Leafony/Sample-Sketches/blob/master/Leaf_Solar_Test/Leaf_Solar_Test.ino)
 ## 組立て
 
 ## 検査方法
