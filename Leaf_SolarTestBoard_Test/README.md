@@ -7,7 +7,7 @@
 * AP03 STM32 MCU  
 * AV06 1.8V～5.5V
 * AZ63 Nut Plate
-* M2X8mm ネジ  
+* M2X10mm ネジ  
 ### Solar-charger-debugger AS
 * [Solar-charger-debugger-Leaf](https://github.com/Leafony/HW-Design-Files/tree/master/Solar-charger-debugger-Leaf) [^1]
 * AZ01 USB
