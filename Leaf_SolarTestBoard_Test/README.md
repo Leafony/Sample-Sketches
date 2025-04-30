@@ -15,6 +15,7 @@
 * M2X8mm  
 ### その他
 * XXXX
+* バッテリー
 * USBケーブル
 * 6p-SHコネクタ・ケーブル
 * PC
@@ -31,7 +32,7 @@
 
 <img src="./docs/Solar-charger-debugger-Leaf_3d.png" width="400" />
 
-2.スイッチを押すとLEDが点滅し、Solar-charger-debuggerのLEDが点灯することを確認する
+2.スイッチをONにすると、Solar-charger-debuggerのLEDが点灯することを確認する
 
 3.次に、Arduino IDEでシリアルモニタを立ち上げ、テキストボックスに、コマンド`m`を入力すると以下のメニュー画面が表示される
  ```
