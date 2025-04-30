@@ -3,7 +3,7 @@
 本内容は、AV06 1.8V～5.5V の検査検査手順を記す。
 ## 用意するもの
 ### AV06 1.8V～5.5V AS
-* 2.54x6P_through_hole](https://github.com/Leafony/HW-Design-Files/tree/master/2.54x6P_through_hole))
+* [2.54x6P_through_hole](https://github.com/Leafony/HW-Design-Files/tree/master/2.54x6P_through_hole))
 * AP03 STM32 MCU  
 * AV06 1.8V～5.5V
 * AZ63 Nut Plate
