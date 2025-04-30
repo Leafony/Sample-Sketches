@@ -29,6 +29,10 @@
 
 Solar-charger-debugger-Leaf
 ## 検査方法
+
+<img src="./docs/Solar-charger-debugger-Leaf_3d.png" width="400" />
+
+
 1.バッテリーをSolar 3.2Vに繋げると、スイッチのLEDが点滅し、Solar-charger-debuggerのLEDが点灯することを確認する
 
 2.次に、Arduino IDEでシリアルモニタを立ち上げ、テキストボックスに、コマンド`m`を入力すると以下のメニュー画面が表示される
