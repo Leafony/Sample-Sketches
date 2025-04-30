@@ -27,9 +27,9 @@
 
 注記:Solar-charger-debugger-Leafは、高さが2mmより高いので必ず上段にすること。
 
-Solar-charger-debugger-Leaf
 ## 検査方法
 1.Solar-charger-debuggerをRunモードにする
+
 <img src="./docs/Solar-charger-debugger-Leaf_3d.png" width="400" />
 
 2.スイッチを押すとLEDが点滅し、Solar-charger-debuggerのLEDが点灯することを確認する
