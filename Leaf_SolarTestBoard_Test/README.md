@@ -28,7 +28,7 @@
 
 
 ## 検査方法
-1.Solar-charger-debuggerをRunモードにする
+1.Solar-charger-debugger-LeafをRunモードにする
 
 <img src="./docs/Solar-charger-debugger-Leaf_3d.png" width="400" />
 
