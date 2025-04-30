@@ -25,7 +25,7 @@
 ## 組立て
 <img src="./docs/Solar_3.2V_Test.jpg" width="400" />
 
-注記:Solar-charger-debugger-Leafは、高さが2mmより高いので必ず上段にすること。
+注記:Solar-charger-debugger-Leafは、高さ約3mmなので必ず上段にすること。
 
 ## 検査方法
 1.Solar-charger-debuggerをRunモードにする
@@ -48,9 +48,9 @@
  ```
 4.コマンド`1`と`2`を入力し、スイッチのLEDの点滅と消灯を確認する
 
-5.Solar-charger-debugger-Leafにテスターを当て、3.3V±0.3Vを確認する。
+5.Solar-charger-debugger-Leafにテスターを当て、3.3V±0.3Vを確認する
  
-6.次に、コマンド`5`を入力し、5V電源がON（負荷が無いため実測5.2～5.3V）であることを確認する。
+6.次に、コマンド`5`を入力し、5V電源がON（負荷が無いため実測5.2～5.3V）であることを確認する
 
 7.コマンド`4`を入力し、IOExpanderリードさせて、充電のON/OFFを以下の表示を確認する
 
