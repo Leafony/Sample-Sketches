@@ -13,6 +13,7 @@
 * AZ01 USB
 * AZ63 Nut Plate
 * M2X8mm  
+注記:Solar-charger-debugger-Leafは、高さ約3mmなので必ず上段にすること
 ### その他
 * XXXX
 * バッテリー
@@ -21,11 +22,10 @@
 * PC
 * テスター
 ## ソースコード
-* [Leaf_Solar_Test.ino](https://github.com/Leafony/Sample-Sketches/blob/master/Leaf_Solar_Test/Leaf_Solar_Test.ino)
+* [Leaf_SolarTestBoard_Test.ino](https://github.com/Leafony/Sample-Sketches/blob/master/Leaf_SolarTestBoard_Test/Leaf_SolarTestBoard_Test.ino)
 ## 組立て
 <img src="./docs/Solar_3.2V_Test.jpg" width="400" />
 
-注記:Solar-charger-debugger-Leafは、高さ約3mmなので必ず上段にすること。
 
 ## 検査方法
 1.Solar-charger-debuggerをRunモードにする
