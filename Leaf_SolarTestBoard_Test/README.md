@@ -32,7 +32,7 @@
 
 <img src="./docs/Solar-charger-debugger-Leaf_3d.png" width="400" />
 
-2.AV06 1.8V～5.5VのスイッチをONにすると、Solar-charger-debuggerのLEDが点灯することを確認する
+2.AV06 1.8V～5.5VのスイッチをONにすると、Solar-charger-debugger-LeafのLEDが点灯することを確認する
 
 3.次に、Arduino IDEでシリアルモニタを立ち上げ、テキストボックスに、コマンド`m`を入力すると以下のメニュー画面が表示される
  ```
