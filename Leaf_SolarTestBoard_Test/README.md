@@ -15,7 +15,7 @@
 * M2X8mm  
 [^1]:Solar-charger-debugger-Leafは、高さ約3mmなので必ず上段にすること
 ### その他
-* XXXX
+* [ポゴピンプローブクリップ 6ピン 2.54mmピッチ](https://www.switch-science.com/products/8174)
 * バッテリー
 * USBケーブル
 * 6p-SHコネクタ・ケーブル
