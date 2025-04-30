@@ -9,7 +9,7 @@
 * M2X8mm ネジ
 ### Solar-charger-debugger AS
 * [Solar-charger-debugger-Leaf](https://github.com/Leafony/HW-Design-Files/tree/master/Solar-charger-debugger-Leaf) 
-<img src="./docs/Solar-charger-debugger-Leaf_3d.png" width="400" />
+<img src="./docs/Solar-charger-debugger-Leaf_3dv1.png" width="400" />
 * AZ01 USB
 * AZ63 Nut Plate
 * M2X8mm  
