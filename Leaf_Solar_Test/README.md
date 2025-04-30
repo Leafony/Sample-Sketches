@@ -29,13 +29,12 @@
 
 Solar-charger-debugger-Leaf
 ## 検査方法
-
+1.Solar-charger-debuggerをRunモードにする
 <img src="./docs/Solar-charger-debugger-Leaf_3d.png" width="400" />
 
+2.スイッチを押すとLEDが点滅し、Solar-charger-debuggerのLEDが点灯することを確認する
 
-1.バッテリーをSolar 3.2Vに繋げると、スイッチのLEDが点滅し、Solar-charger-debuggerのLEDが点灯することを確認する
-
-2.次に、Arduino IDEでシリアルモニタを立ち上げ、テキストボックスに、コマンド`m`を入力すると以下のメニュー画面が表示される
+3.次に、Arduino IDEでシリアルモニタを立ち上げ、テキストボックスに、コマンド`m`を入力すると以下のメニュー画面が表示される
  ```
  m = This Menu
  1 = KTD: LED start
@@ -47,18 +46,18 @@ Solar-charger-debugger-Leaf
  7 = ADC: Initialize
  8 = ADC: AD convert
  ```
-3.コマンド`1`と`2`を入力し、スイッチのLEDの点滅と消灯を確認する
+4.コマンド`1`と`2`を入力し、スイッチのLEDの点滅と消灯を確認する
 
-4.Solar-charger-debugger-Leafにテスターを当て、3.3V±0.3Vを確認する。
+5.Solar-charger-debugger-Leafにテスターを当て、3.3V±0.3Vを確認する。
  
-5.次に、コマンド`5`を入力し、5V電源がON（負荷が無いため実測5.2～5.3V）であることを確認する。
+6.次に、コマンド`5`を入力し、5V電源がON（負荷が無いため実測5.2～5.3V）であることを確認する。
 
-6.コマンド`4`を入力し、IOExpanderリードさせて、充電のON/OFFを以下の表示を確認する
+7.コマンド`4`を入力し、IOExpanderリードさせて、充電のON/OFFを以下の表示を確認する
 
 | 充電 | ACアダプター | バッテリー | 表示|
 | :---  | :--- | :--- | :--- |
 |OFF |  無し | 有り |"Addr_0x00 = f0" |
 |ON|  有り | 有り | "Addr_0x00 = f1"  |
 
-7.コマンド`8`を入力し、A/D変換値リードさせて、ACアダプター無し、バッテリーのみで、バッテリーの電圧を確認する
+8.コマンド`8`を入力し、A/D変換値リードさせて、ACアダプター無し、バッテリーのみで、バッテリーの電圧を確認する
 
