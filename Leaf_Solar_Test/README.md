@@ -1,6 +1,6 @@
 # AV05 Solar 3.2V 検査手順
 ## はじめに
-本内容は、AV05 Solar 3.2V の検査検査手順を記す。
+本内容は、AV05 Solar 3.2V の検査検査手順を記します。
 ## 用意するもの
 ### Solar 3.2V AS
 * AP03 STM32 MCU  
@@ -31,9 +31,9 @@
 
 <img src="./docs/Solar-charger-debugger-Leaf_3d.png" width="400" />
 
-2.スイッチを押すとLEDが点滅し、Solar-charger-debuggerのLEDが点灯することを確認する
+2.スイッチを押すとLEDが点滅し、Solar-charger-debuggerのLEDが点灯します。
 
-3.次に、Arduino IDEでシリアルモニタを立ち上げ、テキストボックスに、コマンド`m`を入力すると以下のメニュー画面が表示される
+3.次に、Arduino IDEでシリアルモニタを立ち上げ、テキストボックスに、コマンド`m`を入力すると以下のメニュー画面が表示されます。
  ```
  m = This Menu
  1 = KTD: LED start
@@ -45,11 +45,11 @@
  7 = ADC: Initialize
  8 = ADC: AD convert
  ```
-4.コマンド`1`と`2`を入力し、スイッチのLEDの点滅と消灯を確認する
+4.コマンド`1`と`2`を入力し、スイッチのLEDの点滅と消灯を確認します。
 
-5.Solar-charger-debugger-Leafにテスターを当て、3.3V±0.3Vを確認する
+5.Solar-charger-debugger-Leafにテスターを当て、3.3V±0.3Vを確認します。
  
-6.コマンド`5`を入力し、5V電源がON（負荷が無いため実測5.2～5.3V）であることを確認する
+6.コマンド`5`を入力し、5V電源がON（負荷が無いため実測5.2～5.3V）であることを確認します。
 
 7.コマンド`4`を入力し、IOExpanderリードさせて、充電のON/OFFを以下の表示を確認する
 
