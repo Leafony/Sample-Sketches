@@ -5,23 +5,24 @@
 ### Solar 3.2V AS
 * AP03 STM32 MCU  
 * AV05 Solar 3.2V
-* AZ63 Nut Plate
-* M2X8mm ネジ
+* AX02 29 pin
+
 ### Solar-charger-debugger AS
 * [Solar-charger-debugger-Leaf](https://github.com/Leafony/HW-Design-Files/tree/master/Solar-charger-debugger-Leaf) [^1]
 * AZ01 USB
 * AZ63 Nut Plate
-* M2X8mm  
+* M2X8mm ネジ
+* USBケーブル 
 [^1]:Solar-charger-debugger-Leafは、高さ約3mmなので必ず上段にすること
 ### その他
+* PC
+* テスター
 * リーフ組立て治具(Leafx3)
 * リン酸鉄リチウムイオンバッテリ
 * ACアダプタ DC12V
 * スイッチ
-* USBケーブル
 * 6p-SHコネクタ・ケーブル
-* PC
-* テスター
+
 ## ソースコード
 * [Leaf_Solar_Test.ino](https://github.com/Leafony/Sample-Sketches/blob/master/Leaf_Solar_Test/Leaf_Solar_Test.ino)
 ## 組立て
