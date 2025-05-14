@@ -26,6 +26,14 @@
 ## 組立て
 <img src="./docs/Solar_3.2V_Test.jpg" width="400" />
 
+|Stack No| Leaf | 
+| :---  | :--- | 
+|1 | AX02 29 pin |
+|2|  AP03 STM32 MCU| 
+|3|  AV05 Solar 3.2V| 
+* **29 pinのコネクタは、外して使用します。**
+
+
 ## 検査方法
 1.Solar-charger-debuggerをRunモードにする
 
