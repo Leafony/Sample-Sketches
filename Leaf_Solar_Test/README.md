@@ -14,6 +14,7 @@
 * M2X8mm  
 [^1]:Solar-charger-debugger-Leafは、高さ約3mmなので必ず上段にすること
 ### その他
+* リーフ組立て治具(Leafx3)
 * リン酸鉄リチウムイオンバッテリ
 * ACアダプタ DC12V
 * スイッチ
