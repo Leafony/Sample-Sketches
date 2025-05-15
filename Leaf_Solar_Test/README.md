@@ -26,7 +26,7 @@
 ## ソースコード
 * [Leaf_Solar_Test.ino](https://github.com/Leafony/Sample-Sketches/blob/master/Leaf_Solar_Test/Leaf_Solar_Test.ino)
 ## 組立て
-<img src="./docs/Solar_3.2V_Test.jpg" width="400" />
+//<img src="./docs/Solar_3.2V_Test.jpg" width="400" />
 
 |Stack No| Leaf | 
 | :---  | :--- | 
