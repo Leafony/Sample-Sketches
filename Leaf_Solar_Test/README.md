@@ -38,7 +38,6 @@
 
 ## 検査方法
 1.Solar-charger-debuggerをRunモードにする
-
 <img src="./docs/Solar-charger-debugger-Leaf_3d.png" width="400" />
 
 2.スイッチを押すとLEDが点滅し、Solar-charger-debuggerのLEDが点灯します。
