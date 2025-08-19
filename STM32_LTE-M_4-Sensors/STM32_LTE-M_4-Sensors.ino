@@ -47,8 +47,8 @@
 //-----------------------------------
 // Select LTE carrier
 //-----------------------------------
-#define LTE_CARRIER LPWA_V4_GPRS_BAND_KDDI
-//#define LTE_CARRIER LPWA_V4_GPRS_BAND_DOCOMO 
+//#define LTE_CARRIER LPWA_V4_GPRS_BAND_KDDI
+#define LTE_CARRIER LPWA_V4_GPRS_BAND_DOCOMO 
 
 //-----------------------------------
 // I2C address (4-sensors)
@@ -474,3 +474,4 @@ void loop() {
     cnt++;
   }
 }
+
